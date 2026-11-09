@@ -1,0 +1,46 @@
+
+# Environnements Python
+.venv/
+venv/
+env/
+
+# Fichiers temporaires Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets et configuration privée
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Dossiers et fichiers locaux
+.vscode/
+*.log
+tmp/
+temp/
+
+# Données privées et médias générés
+uploads/
+private_media/
+generated_images/
+data/private/
+*.sqlite
+*.sqlite3
+
+# Modèles IA locaux
+models/
+*.safetensors
+*.ckpt
+*.pth
+*.pt
