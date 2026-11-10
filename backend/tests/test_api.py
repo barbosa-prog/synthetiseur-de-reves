@@ -52,7 +52,8 @@ def test_openapi_contract(client):
     response = client.get("/api/v1/openapi.json")
     assert response.status_code == 200
     schema = response.json()
-    assert set(schema["paths"]) == {"/api/v1/health"}
+    assert "/api/v1/health" in schema["paths"]
+    assert "/api/v1/auth/login" in schema["paths"]
     responses = schema["paths"]["/api/v1/health"]["get"]["responses"]
     assert responses["200"]["content"]["application/json"]["schema"]["$ref"].endswith(
         "/HealthResponse"

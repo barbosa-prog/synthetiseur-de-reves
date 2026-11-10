@@ -31,8 +31,45 @@ class User(Base):
         server_default=text("gen_random_uuid()"),
     )
     email: Mapped[str | None] = mapped_column(Text, unique=True)
+    # Nullable pour préserver les comptes P02 ; ils ne peuvent pas se connecter.
+    password_hash: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     dreams: Mapped[list["Dream"]] = relationship(back_populates="user", passive_deletes="all")
+
+
+Index("uq_users_email_normalized", func.lower(User.email), unique=True)
+
+
+class AuthSession(Base):
+    """Session révocable ; seul le condensat du jeton aléatoire est stocké."""
+
+    __tablename__ = "auth_sessions"
+    __table_args__ = (
+        CheckConstraint("expires_at > created_at", name="ck_session_expiration"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4,
+        server_default=text("gen_random_uuid()"),
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="RESTRICT"), nullable=False, index=True,
+    )
+    token_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class AuthThrottle(Base):
+    """Compteurs persistants à fenêtre fixe, clés pseudonymisées."""
+
+    __tablename__ = "auth_throttles"
+    __table_args__ = (CheckConstraint("attempts >= 0", name="ck_throttle_attempts"),)
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    window_start: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False)
 
 
 class Dream(Base):

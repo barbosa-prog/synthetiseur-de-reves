@@ -13,10 +13,12 @@ HTTP_ERRORS = {
     403: ("forbidden", "Accès refusé."),
     404: ("not_found", "Ressource introuvable."),
     405: ("method_not_allowed", "Méthode HTTP non autorisée."),
+    409: ("registration_conflict", "Inscription impossible avec cet e-mail."),
     413: ("payload_too_large", "Requête trop volumineuse."),
     415: ("unsupported_media_type", "Format non accepté."),
     422: ("validation_error", "Données de requête invalides."),
     429: ("rate_limited", "Trop de requêtes."),
+    503: ("service_unavailable", "Service temporairement indisponible."),
 }
 
 
