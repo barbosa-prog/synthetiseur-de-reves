@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@source "../../backend/app/web/templates";
+@source "../../backend/app/web/static/js";
+
+@theme {
+  --color-night: #0B1120;
+  --color-panel: #121C30;
+  --color-card: #172238;
+  --color-lavender: #B39AFF;
+  --color-ink: #EAF0FF;
+  --color-muted: #B9C5DC;
+  --font-sans: "Segoe UI", system-ui, sans-serif;
+}
+
+@layer base {
+  body { @apply bg-night text-ink font-sans antialiased; }
+  button, a, input { @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lavender; }
+  button, a { -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
+}
+
+@layer components {
+  .btn { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-colors; }
+  .btn-primary { @apply bg-lavender text-night hover:bg-violet-200; }
+  .btn-secondary { @apply border border-slate-600 bg-card text-ink hover:bg-slate-700; }
+  .field { @apply w-full rounded-xl border border-slate-500 bg-night px-4 py-3 text-ink; }
+  .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.2em] text-lavender; }
+  .surface { @apply rounded-2xl border border-slate-700 bg-panel; }
+  .nav-link { @apply rounded-lg px-3 py-2 text-sm text-muted hover:bg-card hover:text-ink; }
+}
+
+.dream-sky { background: radial-gradient(ellipse at 75% 30%, #362c59 0%, #172238 45%, #121c30 90%); }
+.moon-disc { width: 105px; height: 105px; border-radius: 50%; background: #cbbaff; box-shadow: 0 0 65px #b39aff30; transform: translate(30px, -8px); }
+.orbit { position: absolute; width: 320px; height: 160px; border: 1px solid #b39aff30; border-radius: 50%; transform: rotate(-20deg); }
+.orbit-two { width: 420px; height: 220px; transform: rotate(20deg); }
+.sky-star { position: absolute; color: #ddd1ff; }
+.star-one { top: 35px; left: 20%; font-size: 28px; }
+.star-two { right: 16%; top: 70px; font-size: 18px; }
+.star-three { bottom: 55px; left: 30%; font-size: 18px; }
+@media (max-width: 767px) {
+  #navigation.mobile-open { display: flex; position: absolute; top: 88px; left: 0; right: 0; z-index: 20; padding: 20px; background: #121c30; border-bottom: 1px solid #334155; flex-direction: column; align-items: stretch; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; } }

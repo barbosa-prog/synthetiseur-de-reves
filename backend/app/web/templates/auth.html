@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Créer un compte' if mode == 'register' else 'Connexion' }} · Synthétiseur de rêves{% endblock %}
+{% block content %}
+<div class="mx-auto grid max-w-7xl items-center gap-12 px-5 py-12 sm:px-8 sm:py-18 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
+  <section aria-labelledby="vision-title">
+    <p class="eyebrow mb-5">Un journal pour vos nuits</p>
+    <h1 id="vision-title" class="max-w-xl text-4xl leading-tight font-semibold tracking-tight sm:text-5xl">Vos rêves s’effacent.<br><span class="text-lavender">Gardez une trace.</span></h1>
+    <p class="mt-6 max-w-md text-base leading-8 text-muted">Un espace calme et personnel pour retrouver les souvenirs du réveil. Votre histoire commence par un compte privé.</p>
+    <div class="dream-sky relative my-9 flex h-52 items-center justify-center overflow-hidden rounded-3xl border border-slate-700/70" aria-hidden="true">
+      <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+      <div class="moon-disc"></div><span class="sky-star star-one">✧</span><span class="sky-star star-two">✦</span><span class="sky-star star-three">✧</span>
+      <span class="absolute bottom-5 left-6 text-xs tracking-widest text-muted">UN PEU DE NUIT. UN PEU D’IMAGINATION.</span>
+    </div>
+    <div class="flex items-start gap-3 text-sm leading-6 text-muted">{{ icon('shield', 'mt-1 h-5 w-5 shrink-0 text-lavender') }}<p>Votre compte reste personnel. Ce projet pédagogique est destiné aux essais avec des récits fictifs.</p></div>
+  </section>
+  <section class="surface p-6 sm:p-10" aria-labelledby="form-title">
+    <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-400/10 text-lavender">{{ icon('lock', 'h-6 w-6') }}</div>
+    <p class="eyebrow mb-3">{{ 'Bienvenue' if mode == 'register' else 'Votre espace privé' }}</p>
+    <h2 id="form-title" class="text-3xl font-semibold tracking-tight">{{ 'Créer votre compte' if mode == 'register' else 'Heureux de vous retrouver' }}</h2>
+    <p class="mt-3 text-sm leading-6 text-muted">{{ 'Quelques instants pour ouvrir votre espace personnel.' if mode == 'register' else 'Connectez-vous pour accéder à votre espace.' }}</p>
+    {% if error %}<div role="alert" class="mt-6 rounded-xl border border-rose-400/40 bg-rose-400/10 p-4 text-sm text-rose-100">{{ error }}</div>{% endif %}
+    {% if expired %}<p role="status" class="mt-6 rounded-xl border border-amber-300/30 p-4 text-sm text-amber-100">Votre session est absente ou a expiré. Connectez-vous pour continuer.</p>{% endif %}
+    {% if registered %}<p role="status" class="mt-6 rounded-xl border border-emerald-300/30 p-4 text-sm text-emerald-100">Votre compte est créé. Vous pouvez vous connecter.</p>{% endif %}
+    <form method="post" action="{{ '/inscription' if mode == 'register' else '/connexion' }}" class="mt-8 space-y-6" data-auth-form>
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <div><label class="mb-2 block text-sm font-medium" for="email">Adresse e-mail</label><input class="field" id="email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="vous@exemple.fr" required></div>
+      <div><label class="mb-2 block text-sm font-medium" for="password">Mot de passe</label><input class="field" id="password" name="password" type="password" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}" minlength="15" maxlength="128" aria-describedby="password-help" required><p id="password-help" class="mt-2 text-xs leading-5 text-muted">15 à 128 caractères. Une phrase longue est bienvenue.</p></div>
+      <button type="submit" class="btn btn-primary w-full">{{ 'Créer mon compte' if mode == 'register' else 'Me connecter' }} {{ icon('arrow', 'h-4 w-4') }}</button>
+    </form>
+    <p class="mt-6 text-center text-sm text-muted">{{ 'Déjà un compte ?' if mode == 'register' else 'Première visite ?' }} <a class="font-medium text-lavender underline-offset-4 hover:underline" href="{{ '/connexion' if mode == 'register' else '/inscription' }}">{{ 'Se connecter' if mode == 'register' else 'Créer un compte' }}</a></p>
+    <p class="mt-8 border-t border-slate-700 pt-5 text-xs leading-5 text-muted">Aucun e-mail n’est envoyé. Utilisez une adresse et un mot de passe fictifs pour la démonstration.</p>
+  </section>
+</div>
+{% endblock %}

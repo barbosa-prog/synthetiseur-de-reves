@@ -1,8 +1,9 @@
 # Synthétiseur de rêves
 
 Production pédagogique locale en Python 3.12. Ce dépôt contient actuellement
-**P01 : le socle FastAPI**, **P02 : PostgreSQL** et **P03 : authentification et
-isolation des rêves**. Stockage physique des médias, worker et modèles IA ne sont
+**P01 : le socle FastAPI**, **P02 : PostgreSQL**, **P03 : authentification et
+isolation des rêves** et **P20 : interface web Jinja2/Tailwind**.
+Stockage physique des médias, worker et modèles IA ne sont
 pas encore implémentés. Aucun service payant n'est nécessaire.
 
 ## Installation Windows (PowerShell)
@@ -118,7 +119,7 @@ requirements-dev.txt
 pyproject.toml
 ```
 
-Architecture validée pour la suite : Streamlit, FastAPI, PostgreSQL, stockage privé
+Architecture finale : HTML/Jinja2, Tailwind CSS et JavaScript, FastAPI, PostgreSQL, stockage privé
 et worker séparé ; modèles IA locaux à sélectionner après essais matériels.
 P09 devra inclure filtre date/humeur, fréquences et émotions dominantes.
 P15 devra inclure installation reproductible, build et déploiement local automatisé.
@@ -303,7 +304,7 @@ en-têtes Authorization ou jetons. Ne pas activer les traces HTTP détaillées n
 locale ; HTTPS sera obligatoire avant toute exposition réseau. Les réponses privées
 portent `Cache-Control: no-store`. Aucun cookie d'authentification n'est créé.
 
-### API et intégration Streamlit
+### API Bearer et ancienne piste Streamlit
 
 | Méthode | Route | Contrat |
 | --- | --- | --- |
@@ -323,7 +324,8 @@ comptes P02 sans mot de passe reçoivent la même réponse 401. L'inscription en
 doublon retourne 409 : ce compromis pédagogique permet d'inférer qu'une adresse
 est déjà enregistrée, même si le message reste générique.
 
-Streamlit devra appeler l'API depuis son serveur via httpx, jamais PostgreSQL.
+La piste d'intégration Streamlit ci-dessous est historique et remplacée par P20.
+Un client serveur Streamlit pourrait appeler l'API via httpx, jamais PostgreSQL.
 Après login, conserver `access_token` uniquement dans `st.session_state` de la
 session courante ; le transmettre dans `Authorization: Bearer <jeton>`.
 Ne pas le placer dans une URL, une zone affichée, un cache global `st.cache_data`
@@ -435,3 +437,168 @@ La recette réseau réelle Uvicorn/PostgreSQL a obtenu successivement 201 (regis
 200 (login), 200 (session), 204 (logout), 401 (réutilisation du jeton révoqué).
 Les serveurs temporaires ont été arrêtés et leur répertoire supprimé.
 Docker Compose et l'interface Streamlit n'ont pas été testés dans cette campagne.
+
+## P20 — Interface web Jinja2 et Tailwind local
+
+L'interface finale est servie par la même application FastAPI que l'API.
+Streamlit est exclusivement la référence de maquette de pré-production.
+La charte utilise bleu nuit `#0B1120`, surfaces `#121C30`/`#172238`, lavande
+`#B39AFF`, texte `#EAF0FF` et secondaire `#B9C5DC`, avec une police système locale.
+Aucune police, image, feuille de style ou bibliothèque JavaScript n'est chargée
+depuis un CDN. Le CSS compilé est livré dans le dépôt.
+
+### Pages et périmètre
+
+| Route | Fonction |
+| --- | --- |
+| `/` | Redirige vers l'espace protégé |
+| `/inscription` GET/POST | Formulaire et création de compte fictif |
+| `/connexion` GET/POST | Formulaire et connexion par cookie |
+| `/accueil` GET | Espace privé et présentation des étapes à venir |
+| `/deconnexion` POST | Révocation et suppression des cookies |
+| `/web/session` GET | Contrôle privé d'expiration, sans jeton dans le JSON |
+| `/static/...` | CSS compilé, JavaScript et favicon publics uniquement |
+
+Navigation responsive, formulaire utilisable sans JavaScript, lien d'évitement,
+labels et messages accessibles. Aucun bouton ne prétend capturer un audio ou
+générer une image. Les étapes futures sont identifiées « À venir ». Aucun média
+privé n'est créé ni servi dans `static/`. P04, P19 et les fonctionnalités IA ne
+sont pas implémentés par P20.
+
+### Installation et compilation sous Windows
+
+Prérequis : Python 3.12, PostgreSQL local, Node.js et npm. L'installation télécharge
+seulement les dépendances de développement, sans service payant ni modèle IA.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+Push-Location frontend
+npm.cmd ci --ignore-scripts --no-audit --no-fund
+npm.cmd run build
+Pop-Location
+```
+
+`frontend/package-lock.json` fige les dépendances JavaScript. Tailwind CLI 4.3.0
+compile `frontend/styles/app.css` en `backend/app/web/static/css/app.css`.
+`npm.cmd run watch`, depuis `frontend`, recompile pendant le développement.
+Le serveur n'a pas besoin de Node pour servir le CSS déjà compilé.
+`frontend/.gitignore` exclut uniquement son `node_modules/` ; le `.gitignore`
+principal est conservé. En cas d'erreur de chaîne de certificats npm, utiliser
+l'autorité approuvée de l'environnement via `NODE_EXTRA_CA_CERTS`, sans désactiver
+la vérification TLS ni modifier la configuration globale pour la contourner.
+
+### HTTPS local
+
+Les cookies sont toujours `Secure` : aucun mode HTTP avec cookies affaiblis.
+Configurer `WEB_ORIGIN=https://localhost:8443` dans le `.env` privé si nécessaire.
+Le schéma et l'hôte des pages doivent correspondre à cette origine exacte.
+Les API Bearer P03 restent utilisables sur leur origine locale HTTP historique.
+
+```powershell
+# PostgreSQL déjà démarré et DATABASE_URL configurée
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe scripts\dev_https.py
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8443 --no-access-log --no-proxy-headers --ssl-keyfile tmp/https/key.pem --ssl-certfile tmp/https/cert.pem
+```
+
+Ouvrir **https://localhost:8443/connexion**. Arrêt : `Ctrl+C`.
+Le script crée un certificat de développement dans `tmp/https`, déjà ignoré par
+Git, sans écraser les fichiers existants et sans installer d'autorité dans Windows.
+Ce certificat n'est pas publiquement approuvé : un avertissement navigateur est
+attendu. Pour une utilisation normale sans exception de certificat, configurer
+un certificat local approuvé par le poste. N'accepter une éventuelle exception
+manuelle que pour cette instance locale identifiée, jamais pour un site distant.
+Aucune clé privée ni certificat de développement n'est ajouté au dépôt.
+
+### Sessions, CSRF et compatibilité P03
+
+Le formulaire de connexion réutilise le service P03, extrait sans changement de
+ses règles métier. Les routes JSON `/api/v1/auth/*` gardent leur contrat Bearer
+et ne prennent pas les cookies comme justificatif d'authentification. Les routes
+web résolvent le cookie vers les mêmes sessions PostgreSQL : empreinte SHA-256,
+expiration absolue huit heures, révocation immédiate pour les requêtes suivantes.
+Pas de migration supplémentaire. Aucune dépendance à un service externe.
+
+Cookie d'authentification `__Host-dream_session` : `HttpOnly`, `Secure`,
+`SameSite=Lax`, `Path=/`, aucun `Domain`, `Expires` ou `Max-Age`. Le navigateur
+peut restaurer un cookie de session lors de la restauration d'une session ;
+l'expiration serveur reste l'autorité. Aucun jeton d'authentification dans l'URL,
+le HTML, les réponses JSON web, JavaScript ou un stockage navigateur applicatif.
+Il reste naturellement présent dans la gestion interne des cookies du navigateur.
+
+Un second cookie HttpOnly `__Host-dream_csrf` contient un secret aléatoire distinct.
+Le formulaire contient seulement une preuve HMAC de ce secret liée à la session
+actuelle (ou au pré-login), jamais le jeton d'authentification. Cette preuve CSRF
+est visible dans le DOM ; elle n'est pas un secret permettant de se connecter.
+Chaque POST web exige cette preuve et une origine exacte ; les contextes
+Fetch Metadata interorigines sont refusés. Les cookies/prouves sont renouvelés
+à la connexion, l'ancienne session du navigateur est révoquée, puis les cookies
+sont effacés à la déconnexion. Les formulaires d'autres onglets peuvent devoir
+être rechargés après une rotation. Une requête CSRF refusée retourne 403 JSON.
+
+L'échappement Jinja2 reste actif. Une CSP autorise uniquement les ressources de
+même origine, interdit les scripts inline et l'intégration dans une iframe.
+Les réponses privées ne sont pas mises en cache. Les logs d'accès sont désactivés
+dans la commande documentée. Les limites de tentatives P03 s'appliquent aussi aux
+formulaires web. Le formulaire ne réaffiche jamais un mot de passe soumis.
+
+À l'expiration, l'accès serveur est refusé et le navigateur revient à la connexion.
+Un minuteur et un contrôle périodique/au retour dans l'onglet accompagnent cette
+expiration dans l'interface ; aucun jeton n'est transmis au JavaScript.
+
+### Tests reproductibles
+
+Les tests pytest habituels utilisent `TEST_DATABASE_URL` vers une base dédiée ;
+sans cette configuration les tests PostgreSQL sont explicitement ignorés.
+`WEB_TEST_URL` permet de tester un serveur HTTPS de test avec Chrome/Edge installé.
+Ne pas pointer ces variables vers un environnement contenant de vraies données.
+
+Une recette autonome Windows est fournie pour PostgreSQL 17 natif déjà installé :
+
+```powershell
+.\.venv\Scripts\python.exe scripts\verify_p20.py
+# Si nécessaire, avant la commande :
+# $env:P20_POSTGRES_BIN = 'C:\chemin\PostgreSQL\17\bin'
+.\.venv\Scripts\python.exe -m ruff check backend scripts
+.\.venv\Scripts\python.exe -m pip check
+```
+
+Cette recette crée une instance PostgreSQL temporaire, applique Alembic, démarre
+Uvicorn HTTPS sur un port libre, exécute les tests P01/P02/P03/P20 puis arrête les
+services et supprime les données temporaires. Elle ne modifie aucune instance
+existante et masque les identifiants PostgreSQL. Chrome/Edge est lancé avec un
+profil temporaire ; aucun navigateur n'est téléchargé. Les captures de contrôle
+sont écrites dans `tmp/p20-screenshots`, ignoré par Git. Les tests navigateur
+acceptent uniquement dans leur contexte de test le certificat HTTPS temporaire
+non approuvé ; cela ne vérifie pas la confiance du certificat sur le poste.
+
+### Validation P20 du 10 novembre 2026
+
+Compilation Tailwind locale réussie (CLI 4.3.0), CSS minifié livré sans CDN.
+La recette finale a exécuté **85 tests : 85 réussites, aucun ignoré**, en 36,53 s :
+69 tests précédents, 15 tests web, un parcours navigateur multiétape dans Chrome
+réel en mode headless. PostgreSQL 17 natif et Uvicorn HTTPS ont été démarrés pour
+les essais puis arrêtés ; aucune base existante n'a été modifiée.
+Couverture du code Python `backend.app` instrumenté par pytest : **98,68 %**
+(524/531 instructions). Ce taux ne mesure ni le CSS ni le JavaScript, ni les
+instructions exécutées dans le processus Uvicorn séparé ; leur comportement est
+contrôlé par le test navigateur.
+
+Contrôles effectués : inscription/connexion PostgreSQL, page privée inaccessible
+sans session, rotation/révocation/expiration, compatibilité Bearer, attributs des
+cookies, CSRF absent/invalide/interorigine, navigation mobile, absence de
+débordement horizontal à 1440 et 390 px, absence de ressources externes et d'erreurs
+JavaScript dans la recette. Les captures desktop/mobile ont été inspectées.
+Ruff, `pip check` et `git diff --check` réussissent. L'avertissement de dépréciation
+Starlette/httpx connu reste présent.
+
+Un premier essai navigateur a révélé que `Referrer-Policy: no-referrer` faisait
+envoyer `Origin: null` pour les formulaires. La politique a été corrigée en
+`same-origin`, sans relâcher la vérification CSRF. La recette finale passe après
+correction. L'installation npm a également nécessité l'autorité publique déjà
+approuvée par Windows ; la vérification TLS est restée active.
+
+Non vérifiés : Firefox/Safari, matériel mobile réel, confiance du certificat
+local dans Windows et livraison Docker complète (P15). Les critères appliqués
+à P20 sont ceux fournis dans la demande ; aucun accès Jira ni changement Jira
+n'a été effectué.

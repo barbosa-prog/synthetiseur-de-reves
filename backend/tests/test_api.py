@@ -24,7 +24,7 @@ def test_health(client):
     }
 
 
-@pytest.mark.parametrize("path", ["/", "/health", "/api/v1/unknown", "/api/v1/dreams"])
+@pytest.mark.parametrize("path", ["/unknown", "/health", "/api/v1/unknown", "/api/v1/dreams"])
 def test_missing_route(client, path):
     response = client.get(path)
     assert response.status_code == 404

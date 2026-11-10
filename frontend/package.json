@@ -1,0 +1,12 @@
+{
+  "name": "dreams-web",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i ./styles/app.css -o ../backend/app/web/static/css/app.css --minify",
+    "watch": "tailwindcss -i ./styles/app.css -o ../backend/app/web/static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.0",
+    "tailwindcss": "4.3.0"
+  }
+}

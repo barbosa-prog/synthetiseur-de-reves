@@ -59,14 +59,21 @@ def current_session(
     token: Annotated[str, Depends(require_token)], db: Database,
 ) -> AuthSession:
     """Authentifie uniquement un en-tête Bearer, jamais une URL ni un cookie."""
-    session = db.scalar(select(AuthSession).where(
+    session = find_session(db, token)
+    if session is None:
+        raise unauthorized()
+    return session
+
+
+def find_session(db: Session, token: str) -> AuthSession | None:
+    """Résolution partagée, sans changer le transport Bearer des routes API."""
+    if len(token) != 43:
+        return None
+    return db.scalar(select(AuthSession).where(
         AuthSession.token_hash == token_digest(token),
         AuthSession.revoked_at.is_(None),
         AuthSession.expires_at > func.now(),
     ))
-    if session is None:
-        raise unauthorized()
-    return session
 
 
 ActiveSession = Annotated[AuthSession, Depends(current_session)]
