@@ -1,6 +1,7 @@
 [tool.pytest.ini_options]
 testpaths = ["backend/tests"]
 addopts = "-ra"
+markers = ["integration: exige TEST_DATABASE_URL vers PostgreSQL local jetable"]
 
 [tool.ruff]
 target-version = "py312"
