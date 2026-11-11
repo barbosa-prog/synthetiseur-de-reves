@@ -138,6 +138,21 @@ class Media(Base):
         ),
         CheckConstraint("(storage_state = 'purged') = (purged_at IS NOT NULL)",
                         name="ck_media_purged"),
+        CheckConstraint("duration_ms IS NULL OR duration_ms BETWEEN 1 AND 480000",
+                        name="ck_media_duration"),
+        CheckConstraint("sample_rate_hz IS NULL OR sample_rate_hz = 16000",
+                        name="ck_media_sample_rate"),
+        CheckConstraint("channels IS NULL OR channels = 1", name="ck_media_channels"),
+        CheckConstraint("sample_count IS NULL OR sample_count BETWEEN 1 AND 7680000",
+                        name="ck_media_sample_count"),
+        CheckConstraint("source_size_bytes IS NULL OR source_size_bytes BETWEEN 1 AND 15728640",
+                        name="ck_media_source_size"),
+        CheckConstraint(
+            "source_format IS NULL OR source_format IN ('wav','mp3','webm','ogg','mp4')",
+            name="ck_media_source_format",
+        ),
+        CheckConstraint("audio_source IS NULL OR audio_source IN ('import','microphone')",
+                        name="ck_media_audio_source"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -157,6 +172,13 @@ class Media(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     purge_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     purged_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    duration_ms: Mapped[int | None] = mapped_column(Integer)
+    sample_rate_hz: Mapped[int | None] = mapped_column(Integer)
+    channels: Mapped[int | None] = mapped_column(Integer)
+    sample_count: Mapped[int | None] = mapped_column(BigInteger)
+    source_format: Mapped[str | None] = mapped_column(String(12))
+    source_size_bytes: Mapped[int | None] = mapped_column(BigInteger)
+    audio_source: Mapped[str | None] = mapped_column(String(12))
     dream: Mapped[Dream] = relationship(back_populates="media")
 
 

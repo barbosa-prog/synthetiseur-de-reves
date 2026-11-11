@@ -12,13 +12,14 @@
   <div class="mt-8 grid gap-6 lg:grid-cols-[1fr_300px]">
     <section class="surface p-6 sm:p-8" aria-labelledby="journey-title">
       <p class="eyebrow mb-3">Le parcours à venir</p><h2 id="journey-title" class="text-2xl font-semibold">Du réveil au souvenir</h2>
-      <p class="mt-3 text-sm leading-6 text-muted">Le socle de votre espace est prêt. La capture audio et les traitements ne sont pas encore disponibles.</p>
+      <p class="mt-3 text-sm leading-6 text-muted">Enregistrez ou importez votre audio privé. La transcription et les autres traitements seront ajoutés plus tard.</p>
+      <a href="/nouveau-reve" class="btn btn-primary mt-5">Capturer un rêve {{ icon('arrow', 'h-4 w-4') }}</a>
       <ol class="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         {% for name in ['Audio', 'Transcription', 'Illustration', 'Émotion', 'Historique'] %}
-        <li class="rounded-xl border border-slate-700 bg-night p-4"><span class="block text-xs text-lavender">0{{ loop.index }}</span><span class="mt-3 block text-sm font-medium">{{ name }}</span><span class="mt-2 block text-xs text-muted">À venir</span></li>
+        <li class="rounded-xl border border-slate-700 bg-night p-4"><span class="block text-xs text-lavender">0{{ loop.index }}</span><span class="mt-3 block text-sm font-medium">{{ name }}</span><span class="mt-2 block text-xs text-muted">{{ 'Disponible' if loop.first else 'À venir' }}</span></li>
         {% endfor %}
       </ol>
-      <p class="mt-7 flex items-center gap-2 text-sm text-muted">{{ icon('spark', 'h-5 w-5 text-lavender') }} Aucun récit n’est demandé à cette étape.</p>
+      <p class="mt-7 flex items-center gap-2 text-sm text-muted">{{ icon('spark', 'h-5 w-5 text-lavender') }} Utilisez un récit fictif pour la démonstration.</p>
     </section>
     <aside class="surface p-6" aria-labelledby="privacy-title"><div class="mb-5 text-lavender">{{ icon('shield', 'h-7 w-7') }}</div><h2 id="privacy-title" class="text-lg font-semibold">Votre espace vous appartient</h2><p class="mt-4 text-sm leading-7 text-muted">La session expire après huit heures. Vous pouvez vous déconnecter à tout moment depuis la navigation.</p><p class="mt-5 border-t border-slate-700 pt-5 text-xs leading-6 text-muted">Outil créatif et pédagogique, sans interprétation médicale.</p></aside>
   </div>

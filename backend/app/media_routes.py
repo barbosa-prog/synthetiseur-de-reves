@@ -35,7 +35,8 @@ def media_service(request: Request, db: Database) -> MediaService:
 Service = Annotated[MediaService, Depends(media_service)]
 
 
-def private_response(service: MediaService, user_id: uuid.UUID, media_id: uuid.UUID):
+def private_response(service: MediaService, user_id: uuid.UUID, media_id: uuid.UUID,
+                     inline_audio: bool = False):
     """Flux déjà ouvert : aucun chemin absolu ou storage_key dans les en-têtes."""
     try:
         download = service.download(user_id, media_id)
@@ -57,12 +58,15 @@ def private_response(service: MediaService, user_id: uuid.UUID, media_id: uuid.U
         finally:
             download.stream.close()
 
+    disposition = (
+        "inline" if inline_audio and download.media_type.startswith("audio/") else "attachment"
+    )
     return StreamingResponse(
         chunks(), media_type=download.media_type,
         headers={"Content-Length": str(download.size), "Cache-Control": "no-store",
                  "Pragma": "no-cache", "X-Content-Type-Options": "nosniff",
                  "Content-Security-Policy": "default-src 'none'; sandbox",
-                 "Content-Disposition": f'attachment; filename="media-{media_id}.{extension}"'},
+                 "Content-Disposition": f'{disposition}; filename="media-{media_id}.{extension}"'},
         background=BackgroundTask(download.stream.close),
     )
 
@@ -77,4 +81,4 @@ def api_media(media_id: uuid.UUID, user: CurrentUser, service: Service):
             include_in_schema=False)
 def browser_media(media_id: uuid.UUID, session: BrowserSession, service: Service):
     """Cookie P20 HTTPS ; lecture GET uniquement, aucune mutation nécessitant CSRF."""
-    return private_response(service, session.user_id, media_id)
+    return private_response(service, session.user_id, media_id, inline_audio=True)

@@ -12,6 +12,7 @@ from fastapi.responses import PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.api import router
+from backend.app.audio_routes import router as audio_router
 from backend.app.auth_routes import router as auth_router
 from backend.app.dream_routes import router as dream_router
 from backend.app.errors import register_error_handlers
@@ -48,7 +49,7 @@ def create_app() -> FastAPI:
         version="0.1.0",
         description=(
             "Backend local pédagogique : API, sessions, interface web et médias privés. "
-            "Aucune intégration IA ni import utilisateur audio."
+            "Capture audio locale et privée, sans intégration IA."
         ),
         docs_url="/api/v1/docs",
         redoc_url="/api/v1/redoc",
@@ -70,14 +71,16 @@ def create_app() -> FastAPI:
     application.include_router(dream_router)
     application.include_router(web_router)
     application.include_router(media_router)
+    application.include_router(audio_router)
     application.add_exception_handler(WebLoginRequired, web_login_required)
     application.mount("/static", StaticFiles(directory=Path(__file__).parent / "web/static"),
                       name="static")
 
     @application.middleware("http")
     async def private_responses(request, call_next):
-        is_web = request.url.path.startswith("/web/media/") or request.url.path in {
+        is_web = request.url.path.startswith(("/web/media/", "/reves/")) or request.url.path in {
             "/", "/connexion", "/inscription", "/accueil", "/deconnexion", "/web/session",
+            "/nouveau-reve", "/web/audio",
         }
         if is_web and (
             request.url.scheme != "https" or request.headers.get("host") != parts.netloc
@@ -95,13 +98,14 @@ def create_app() -> FastAPI:
         ):
             response.headers["Content-Security-Policy"] = (
                 "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; "
-                "connect-src 'self'; object-src 'none'; base-uri 'none'; "
+                "connect-src 'self'; media-src 'self' blob:; object-src 'none'; base-uri 'none'; "
                 "frame-ancestors 'none'; form-action 'self'"
             )
             response.headers["X-Content-Type-Options"] = "nosniff"
             # no-referrer peut rendre Origin « null » sur un formulaire POST.
             # same-origin préserve le contrôle CSRF sans transmettre de référence externe.
             response.headers["Referrer-Policy"] = "same-origin"
+            response.headers["Permissions-Policy"] = "microphone=(self), camera=()"
         return response
 
     return application

@@ -3,7 +3,7 @@
 Production pédagogique locale en Python 3.12. Ce dépôt contient actuellement
 **P01 : le socle FastAPI**, **P02 : PostgreSQL**, **P03 : authentification et
 isolation des rêves**, **P20 : interface web Jinja2/Tailwind** et **P19 : stockage
-privé local**. Import utilisateur audio, worker et modèles IA ne sont
+privé local**, **P04 : capture et import audio**. Worker et modèles IA ne sont
 pas encore implémentés. Aucun service payant n'est nécessaire.
 
 ## Installation Windows (PowerShell)
@@ -784,3 +784,174 @@ Les essais n'ont pas validé un arrêt électrique brutal, une analyse antivirus
 un décodage MP3 intégral, les ACL du futur dossier utilisateur, un chiffrement
 applicatif ou un déploiement Docker complet. Utiliser une racine privée distincte
 pour chaque environnement/base ; ne pas mutualiser ce dossier entre plusieurs bases.
+
+## P04 — Enregistrement et import audio privés
+
+### Parcours disponible
+
+Après connexion, ouvrir **https://localhost:8443/nouveau-reve**, également accessible
+depuis l'accueil et la navigation. Deux modes :
+
+- **Microphone** : démarrer, autoriser le micro, arrêter, écouter puis confirmer.
+  MediaRecorder sélectionne un format pris en charge par le navigateur. Les pistes
+  sont arrêtées après enregistrement et les URL Blob sont libérées. Rien n'est
+  envoyé avant la confirmation explicite.
+- **Import** : choisir un WAV ou MP3, écouter puis confirmer. Le navigateur contrôle
+  extension, fichier vide et taille pour guider l'utilisateur ; le serveur effectue
+  ses propres vérifications, indépendamment du type MIME déclaré.
+
+Le succès ouvre `/reves/{uuid}/audio`, avec lecteur privé et durée mesurée. Cette
+page concerne seulement l'audio de ce brouillon, sans historique complet. Aucun
+texte, émotion, transcription réelle/factice, image ou job IA n'est créé. La
+capture d'un autre rêve crée un nouveau brouillon ; aucun audio existant n'est
+écrasé. Un utilisateur étranger reçoit 404 pour la confirmation et pour le média.
+
+### Routes
+
+| Route | Contrat |
+| --- | --- |
+| GET `/nouveau-reve` | Page connectée, cookie HttpOnly et HTTPS |
+| POST `/web/audio` | Cookie P20, origine stricte et `X-CSRF-Token` |
+| POST `/api/v1/dreams/audio` | Bearer P03, corps binaire ; schéma disponible dans OpenAPI |
+| GET `/reves/{uuid}/audio` | Confirmation privée et lecteur du compte propriétaire |
+
+Les deux POST reçoivent le **corps binaire brut**, pas un formulaire multipart.
+En-têtes : `X-Audio-Format` obligatoire (`wav`, `mp3`, `webm`, `ogg`, `mp4`),
+`X-Audio-Source` (`import` par défaut ou `microphone`), et facultativement
+`X-Audio-Filename`, encodé en pourcentage avec `encodeURIComponent`.
+Le nom est contrôlé puis oublié ; jamais utilisé comme chemin ni conservé en base.
+`import` est limité à WAV/MP3. Le tag `microphone` indique une origine déclarée,
+pas une preuve matérielle ; ses autres formats restent soumis au décodage réel.
+
+Succès 201 : `dream_id`, `media_id`, durée, nombre d'échantillons, fréquence,
+canaux, format/taille de la source et origine déclarée. Aucun chemin, nom original
+ou clé de stockage. Les erreurs utilisent l'enveloppe JSON existante et des messages
+publics : 400 transfert/nom invalide, 401 authentification, 403 CSRF, 408 interruption,
+413 taille, 415 format/contenu, 422 vide/durée, 429 saturation et 503 indisponibilité.
+Les cookies ne remplacent pas un Bearer sur les routes API. La preuve CSRF du DOM
+est distincte du jeton d'authentification, qui reste inaccessible à JavaScript.
+
+### Formats et conversion réellement implémentés
+
+PyAV 19.0.2 fournit localement les bibliothèques FFmpeg, sans exécutable FFmpeg
+à installer séparément et sans API externe. La source est décodée entièrement :
+signature, conteneur imposé, piste audio unique, codec, fréquence, canaux et trames.
+Les conteneurs avec vidéo/pistes supplémentaires sont refusés. Les playlists et
+entrées URL ne sont pas acceptées. Les références externes des conteneurs sont
+désactivées. Les erreurs du décodeur ne renvoient ni logs FFmpeg ni chemins.
+
+| Entrée | Usage | Validation réalisée |
+| --- | --- | --- |
+| WAV PCM | Import | Contenu PCM, trames complètes, décodage |
+| MP3 MPEG Layer III | Import | Décodage effectif, au-delà de la seule structure P19 |
+| WebM Opus/Vorbis | MediaRecorder | Décodage ; Chrome Opus testé de bout en bout |
+| Ogg Opus/Vorbis | MediaRecorder | Ogg Opus testé avec signal synthétique encodé localement |
+| MP4 AAC/Opus | MediaRecorder | MP4 AAC testé avec signal synthétique encodé localement |
+
+Tout audio accepté est **normalisé en WAV PCM 16 bits, mono, 16 kHz** avant stockage
+P19. Seul ce WAV est conservé ; la source reçue et le résultat intermédiaire sont
+effacés du dossier temporaire après traitement. Le lecteur web utilise la route
+privée P19, désormais en `inline` pour l'audio web ; les téléchargements Bearer et
+les images gardent leur disposition `attachment`. Les contrôles de propriétaire
+et d'intégrité P19 restent actifs. Pas de gestion HTTP Range dans ce ticket.
+
+### Limites et ressources
+
+La limite du cadrage reste **15 Mio exactement, soit 15 728 640 octets** pour la
+source reçue, contrôlée par Content-Length et par comptage effectif du flux même
+si cet en-tête est absent. La limite vaut aussi pour le WAV final P19.
+P04 ajoute un garde-fou explicite de **8 minutes**, mesuré sur les échantillons
+décodés, pour borner le travail et produire un WAV 16 kHz dans cette enveloppe.
+Le client arrête également le microphone à huit minutes. Le projet vise des récits
+courts ; cette borne technique n'est pas présentée comme une durée issue du cadrage.
+
+La réception écrit progressivement sur disque temporaire privé hors dépôt/OneDrive,
+sans `request.body()` ni chargement multipart intégral. Le transfert est limité à
+30 secondes, le décodage à 20 secondes dans un sous-processus sans shell. Au plus
+deux réceptions/conversions sont actives par processus serveur ; le surplus reçoit
+429. Le décodeur utilise un thread et la sortie est écrite par blocs. Le stockage
+P19 utilise ensuite sa lecture bornée du WAV normalisé (maximum 15 Mio) ; la mémoire
+native totale de FFmpeg n'est pas plafonnée par une limite RSS du système.
+
+Authentification et CSRF sont vérifiés avant lecture des octets. Un upload invalide
+ou interrompu pendant la réception ne crée aucun rêve/média. Après conversion,
+le brouillon et ses métadonnées sont validés dans une **seule transaction**, avec
+la publication/compensation P19. Une erreur après commit mais avant réception de
+la réponse peut laisser un audio correctement enregistré : l'interface parle de
+résultat non confirmé, sans promettre qu'aucun enregistrement n'a eu lieu. L'idempotence
+des reprises et les quotas journaliers ne sont pas ajoutés dans P04.
+
+Les messages couvrent refus de permission, micro absent/occupé, format invalide,
+taille et interruption. La CSP autorise uniquement `media-src 'self' blob:` pour
+la préécoute et la lecture privée ; scripts inline et `unsafe-eval` restent interdits.
+La permission microphone est limitée à la même origine et la caméra est désactivée.
+Le contenu audio n'est pas journalisé. JavaScript est nécessaire au parcours audio.
+
+### Migration 0004
+
+`0004_audio_capture.py` ajoute à `media` des champs nullables : durée mesurée,
+fréquence, canaux, nombre d'échantillons, format/taille de la source et origine.
+Les médias antérieurs sont conservés sans métadonnées supposées. Des contraintes
+bornent les nouvelles mesures ; aucun changement des migrations 0001–0003, aucun
+backfill audio ni migration destructive exécutée sur les données existantes.
+Ces informations préparent P05 sans implémenter de transcription.
+
+### Installation et démarrage Windows
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m alembic check
+Push-Location frontend
+npm.cmd run build
+Pop-Location
+# Générer les certificats seulement s'ils n'existent pas déjà :
+# .\.venv\Scripts\python.exe scripts\dev_https.py
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8443 --no-access-log --no-proxy-headers --ssl-keyfile tmp/https/key.pem --ssl-certfile tmp/https/cert.pem
+```
+
+Conserver la configuration PostgreSQL/stockage P19 et `WEB_ORIGIN` du `.env` privé.
+Ouvrir l'origine HTTPS exacte, se connecter puis accéder à `/nouveau-reve`. Un
+certificat local approuvé est préférable ; les certificats de développement P20
+ne sont pas installés dans Windows et peuvent afficher un avertissement. La commande
+ne démarre pas PostgreSQL : utiliser son instance locale ou Compose comme dans P02.
+
+```powershell
+# Recette complète PostgreSQL/HTTPS/Chrome temporaires
+.\.venv\Scripts\python.exe scripts\verify_p20.py
+# Diagnostic des seuls parcours navigateur (ce n'est pas la suite complète)
+.\.venv\Scripts\python.exe scripts\verify_p20.py --browser-only
+.\.venv\Scripts\python.exe -m ruff check backend scripts
+.\.venv\Scripts\python.exe -m pip check
+```
+
+### Validation P04 du 11 novembre 2026
+
+**180 tests réussis, aucun ignoré**, en 87,15 s avec Python 3.12.14 et PostgreSQL 17.
+Les 143 tests précédents restent verts. P04 ajoute 18 tests de conversion/réception,
+18 tests d'intégration et un parcours Chrome. Couverture du Python instrumenté
+`backend.app` : **92,34 %** (1085/1175 instructions) ; les sous-processus de décodage,
+le processus HTTP et le JavaScript ne sont pas inclus dans ce pourcentage.
+
+Réellement exécutés : imports WAV/MP3 et décodage des cinq formats ci-dessus,
+WAV exactement à 15 Mio, refus d'un WAV synthétique de 481 secondes, rejet des
+contenus falsifiés/vides/trop grands, CSRF, absence d'authentification, noms malveillants,
+isolation entre comptes, transaction brouillon/média et nettoyage après erreurs.
+Après la suite, un audio importé par P04 a été relu en HTTP 200 après arrêt et
+redémarrage effectifs de PostgreSQL et Uvicorn. Les services/données temporaires
+ont ensuite été arrêtés/supprimés, sans toucher à une instance existante.
+
+Chrome réel en mode headless : MediaRecorder, préécoute avant confirmation, sauvegarde,
+lecture du WAV privé, import WAV/MP3, messages d'erreur, affichage desktop/mobile.
+La source microphone est le **périphérique fictif fourni par Chrome**, pas un micro
+matériel. Le refus de permission est réglé dans Chrome via DevTools, sans remplacer
+getUserMedia. L'interruption d'upload ASGI et l'expiration du décodeur sont simulées
+dans les tests ; un câble réseau débranché et un processus réellement bloqué n'ont
+pas été testés. Captures inspectées dans `tmp/p04-screenshots`.
+
+Les adaptations du test navigateur ont conservé la CSP stricte : assertions sans
+`eval`, synchronisation sur la progression du lecteur et absence de relecture d'une
+réponse après navigation. Ruff et `pip check` réussissent. L'avertissement connu
+Starlette/httpx subsiste. Non vérifiés : microphone physique, sortie haut-parleur,
+Firefox/Safari réels, antivirus et livraison Docker complète. Aucun service payant,
+modèle IA, transcription, éditeur de texte, image ou classification ajouté.

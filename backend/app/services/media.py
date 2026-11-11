@@ -36,7 +36,7 @@ def lock_key(db: Session, key: str) -> None:
 
 
 class MediaService:
-    """Transactions explicites ; aucune route d'import utilisateur dans P19."""
+    """Transactions privées P19 réutilisées par la capture audio P04."""
 
     def __init__(self, storage: PrivateStorage, sessions: sessionmaker[Session]):
         self.storage, self.sessions = storage, sessions
@@ -44,12 +44,33 @@ class MediaService:
     def store(self, user_id: uuid.UUID, dream_id: uuid.UUID, source: BinaryIO, *,
               kind: str, media_format: str, filename: str | None = None) -> uuid.UUID:
         """Vérifie le propriétaire, publie le fichier puis valide sa référence en base."""
+        return self._store(user_id, dream_id, source, kind=kind,
+                           media_format=media_format, filename=filename)[0]
+
+    def store_audio_draft(self, user_id: uuid.UUID, source: BinaryIO, metadata: dict) -> dict:
+        """Crée brouillon et référence média dans une seule transaction P19 compensable."""
+        allowed = {"duration_ms", "sample_rate_hz", "channels", "sample_count",
+                   "source_format", "source_size_bytes", "audio_source"}
+        if set(metadata) != allowed:
+            raise StorageError("Métadonnées audio invalides.")
+        media_id, dream_id = self._store(user_id, None, source, kind="audio",
+                                       media_format="wav", metadata=metadata)
+        return {"dream_id": dream_id, "media_id": media_id, **metadata}
+
+    def _store(self, user_id, dream_id, source, *, kind, media_format, filename=None,
+               metadata=None):
+        """Publication P19 commune aux médias internes et aux nouveaux brouillons audio."""
         key, written = new_key(), False
         try:
             with self.sessions() as db:
-                dream = db.scalar(select(Dream).where(
-                    Dream.id == dream_id, Dream.user_id == user_id, Dream.status != "deleted",
-                ).with_for_update())
+                if dream_id is None:
+                    dream = Dream(user_id=user_id)
+                    db.add(dream)
+                    db.flush()
+                else:
+                    dream = db.scalar(select(Dream).where(
+                        Dream.id == dream_id, Dream.user_id == user_id, Dream.status != "deleted",
+                    ).with_for_update())
                 if dream is None:
                     raise MediaNotFound
                 lock_key(db, key)
@@ -58,10 +79,10 @@ class MediaService:
                 written = True
                 media = Media(dream_id=dream.id, kind=kind, storage_key=stored.key,
                               size_bytes=stored.size, media_type=stored.media_type,
-                              sha256=stored.sha256, storage_state="ready")
+                              sha256=stored.sha256, storage_state="ready", **(metadata or {}))
                 db.add(media)
                 db.commit()
-                return media.id
+                return media.id, dream.id
         except Exception as exc:
             if written:
                 try:

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Capturer un rêve · Synthétiseur de rêves{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl px-5 py-10 sm:px-8 sm:py-14" data-protected-page data-expires-at="{{ expires_at }}">
+  <a href="/accueil" class="text-sm text-muted hover:text-ink">← Mon espace</a>
+  <p class="eyebrow mt-8 mb-3">01 · Capturer</p>
+  <h1 class="text-4xl font-semibold tracking-tight">Racontez votre rêve.</h1>
+  <p class="mt-4 max-w-2xl leading-7 text-muted">Enregistrez votre voix ou choisissez un fichier audio. Écoutez-le avant de confirmer son enregistrement dans votre espace privé.</p>
+  <div class="mt-7 flex flex-wrap gap-3 text-xs text-muted"><span class="rounded-full border border-slate-700 px-3 py-2">15 Mio maximum</span><span class="rounded-full border border-slate-700 px-3 py-2">8 minutes maximum</span><span class="rounded-full border border-slate-700 px-3 py-2">Aucune transcription à cette étape</span></div>
+  <section id="audio-capture" class="surface mt-8 p-6 sm:p-9" data-csrf="{{ csrf }}">
+    <div role="group" aria-label="Méthode de capture" class="flex flex-wrap gap-3">
+      <button class="btn btn-primary" id="mode-micro" type="button" aria-pressed="true">Enregistrer au micro</button>
+      <button class="btn btn-secondary" id="mode-file" type="button" aria-pressed="false">Importer un fichier</button>
+    </div>
+    <div id="micro-panel" class="mt-8">
+      <div class="flex items-start gap-4"><span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-violet-400/10 text-lavender">{{ icon('moon', 'h-6 w-6') }}</span><div><h2 class="text-xl font-semibold">Un instant pour votre souvenir</h2><p class="mt-2 text-sm leading-6 text-muted">L’accès au microphone n’est demandé qu’au démarrage. Rien n’est envoyé avant votre confirmation.</p></div></div>
+      <p id="recording-time" class="mt-7 text-4xl font-light tracking-wider tabular-nums" aria-label="Durée de l’enregistrement">00:00</p>
+      <div class="mt-5 flex flex-wrap gap-3"><button id="record-start" class="btn btn-primary" type="button">Démarrer l’enregistrement</button><button id="record-stop" class="btn btn-secondary" type="button" disabled>Arrêter</button></div>
+    </div>
+    <div id="file-panel" class="mt-8" hidden>
+      <h2 class="text-xl font-semibold">Choisir un audio existant</h2><label class="mt-5 block rounded-2xl border border-dashed border-slate-500 bg-night p-6" for="audio-file"><span class="mb-4 block text-sm text-muted">Fichier WAV ou MP3 · 15 Mio maximum</span><input id="audio-file" type="file" accept=".wav,.mp3,audio/wav,audio/mpeg" class="block max-w-full text-sm text-ink"></label>
+    </div>
+    <p id="audio-status" role="status" class="mt-6 text-sm leading-6 text-muted">Prêt à enregistrer.</p>
+    <p id="audio-error" role="alert" class="mt-5 rounded-xl border border-rose-400/40 bg-rose-400/10 p-4 text-sm text-rose-100" hidden></p>
+    <div id="audio-review" class="mt-7 border-t border-slate-700 pt-7" hidden>
+      <h2 class="text-xl font-semibold">Écouter et confirmer</h2><audio id="audio-preview" class="mt-5 w-full" controls preload="metadata"></audio>
+      <p class="mt-4 text-xs leading-6 text-muted">La vérification et la conversion sont effectuées localement sur le serveur. L’audio sera conservé au format WAV pour la future transcription.</p>
+      <div class="mt-6 flex flex-wrap gap-3"><button id="audio-confirm" class="btn btn-primary" type="button">Confirmer et enregistrer l’audio {{ icon('arrow', 'h-4 w-4') }}</button><button id="audio-reset" class="btn btn-secondary" type="button">Recommencer</button></div>
+    </div>
+    <noscript><p class="mt-6 text-amber-100">JavaScript est nécessaire pour l’enregistrement et l’envoi audio. Les pages de connexion restent utilisables sans JavaScript.</p></noscript>
+  </section>
+  <p class="mt-6 flex items-start gap-3 text-sm leading-6 text-muted">{{ icon('shield', 'h-5 w-5 shrink-0 text-lavender') }} Utilisez un récit fictif pour cette démonstration. Aucun service externe ni outil d’intelligence artificielle n’est appelé.</p>
+</div>
+<script src="{{ url_for('static', path='js/audio.js') }}" defer></script>
+{% endblock %}

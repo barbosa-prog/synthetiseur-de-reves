@@ -1,5 +1,6 @@
 """Recette isolée Windows : PostgreSQL natif temporaire, HTTPS, pytest et Chrome/Edge."""
 
+import argparse
 import io
 import os
 import secrets
@@ -14,14 +15,14 @@ from pathlib import Path
 
 import httpx
 import trustme
-from sqlalchemy import URL
+from sqlalchemy import URL, select
 from sqlalchemy.orm import Session
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from backend.app.database import make_engine, session_factory  # noqa: E402
-from backend.app.models import AuthSession, Dream, User  # noqa: E402
+from backend.app.models import AuthSession, Dream, Media, User  # noqa: E402
 from backend.app.security import new_token, token_digest  # noqa: E402
 from backend.app.services.media import MediaService  # noqa: E402
 from backend.app.storage.local import LocalPrivateStorage  # noqa: E402
@@ -36,6 +37,9 @@ def free_port() -> int:
 
 def main() -> int:
     """Ne touche à aucune base ou service existant et n'affiche aucun secret."""
+    parser = argparse.ArgumentParser(description="Recette locale isolée des tickets développés.")
+    parser.add_argument("--browser-only", action="store_true", help="Tests navigateur seulement")
+    args = parser.parse_args()
     pg = Path(os.getenv("P20_POSTGRES_BIN", r"C:\Program Files\PostgreSQL\17\bin"))
     if not (pg / "initdb.exe").is_file():
         raise SystemExit("PostgreSQL natif absent : configurer P20_POSTGRES_BIN.")
@@ -101,10 +105,13 @@ def main() -> int:
                     time.sleep(0.1)
                 else:
                     raise RuntimeError("Serveur HTTPS temporaire indisponible.")
+            checks = (["-m", "browser"] if args.browser_only else [
+                "--cov=backend.app", "--cov-report=term-missing", "--cov-fail-under=80",
+            ])
             result = subprocess.run([
                 sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
                 "--basetemp", str(directory / "pytest"), "--tb=short",
-                "--cov=backend.app", "--cov-report=term-missing", "--cov-fail-under=80",
+                *checks,
             ], cwd=ROOT, env=env, capture_output=True, text=True, timeout=300)
             output = result.stdout + result.stderr
             for secret in (raw_url, password, role):
@@ -137,6 +144,25 @@ def main() -> int:
                     payload = audio.getvalue()
                     identifier = service.store(user_id, dream_id, io.BytesIO(payload),
                                                kind="audio", media_format="wav")
+                    uploaded = None
+                    with Session(engine) as db:
+                        candidate = db.scalar(select(Media).where(
+                            Media.audio_source.is_not(None), Media.storage_state == "ready",
+                        ).limit(1))
+                        if candidate is not None:
+                            recorded_token = new_token()
+                            recorded_owner = candidate.dream.user_id
+                            uploaded = (candidate.id, recorded_owner, recorded_token)
+                            db.add(AuthSession(
+                                user_id=recorded_owner, token_hash=token_digest(recorded_token),
+                                expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
+                            ))
+                            db.commit()
+                    recorded_payload = None
+                    if uploaded is not None:
+                        recorded = service.download(uploaded[1], uploaded[0])
+                        with recorded.stream:
+                            recorded_payload = recorded.stream.read()
                     endpoint = origin + f"/api/v1/media/{identifier}/content"
                     headers = {"Authorization": "Bearer " + token}
                     with httpx.Client(verify=False, trust_env=False) as client:
@@ -164,6 +190,16 @@ def main() -> int:
                         response = client.get(endpoint, headers=headers)
                         if response.status_code != 200 or response.content != payload:
                             raise RuntimeError("Persistance après redémarrage non validée.")
+                        if uploaded is not None:
+                            recorded_response = client.get(
+                                origin + f"/api/v1/media/{uploaded[0]}/content",
+                                headers={"Authorization": "Bearer " + uploaded[2]},
+                            )
+                            if (recorded_response.status_code != 200
+                                    or recorded_response.content != recorded_payload):
+                                raise RuntimeError("Audio P04 perdu après redémarrage.")
+                            print("P04 : audio importé relu après redémarrage réel, HTTP 200.",
+                                  flush=True)
                         service.request_purge(user_id, identifier)
                         if client.get(endpoint, headers=headers).status_code != 404:
                             raise RuntimeError("Purge du média de test non validée.")
