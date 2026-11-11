@@ -14,6 +14,8 @@ from pydantic import (
     field_validator,
 )
 
+from backend.app.text_rules import normalize_text
+
 
 class Credentials(BaseModel):
     """Identifiants JSON ; aucune utilisation en paramètres d'URL."""
@@ -65,6 +67,8 @@ class DreamResponse(BaseModel):
     transcript: str | None
     emotion: str | None
     status: str
+    text_version: int
+    text_updated_at: datetime | None
 
 
 class DreamUpdate(BaseModel):
@@ -73,11 +77,10 @@ class DreamUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
     transcript: str | None = Field(default=None, max_length=20000)
     emotion: Literal["heureux", "stressant", "neutre", "triste", "autre"] | None = None
+    expected_text_version: int | None = Field(default=None, ge=0, le=2147483646, strict=True)
 
-    @field_validator("transcript")
+    @field_validator("transcript", mode="before")
     @classmethod
     def nonblank_text(cls, value: str | None) -> str:
         """Refuse l'effacement d'un récit par une correction vide."""
-        if value is None or not value.strip():
-            raise ValueError("Texte vide refusé")
-        return value.strip()
+        return normalize_text(value)

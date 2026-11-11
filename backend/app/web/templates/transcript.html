@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Votre récit · Synthétiseur de rêves{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
+  <a href="/accueil" class="text-sm text-muted hover:text-ink">← Mon espace</a>
+  <p class="eyebrow mt-8 mb-3">02 · Le récit</p>
+  <h1 class="text-4xl font-semibold tracking-tight">Les mots de votre rêve.</h1>
+  <p class="mt-4 max-w-2xl leading-7 text-muted">Écrivez votre récit à votre rythme. Vous pourrez ensuite le retrouver et le corriger avant les futures étapes de création.</p>
+  <div class="mt-8 grid items-start gap-6 lg:grid-cols-[1fr_300px]">
+    <section class="surface p-6 sm:p-8" aria-labelledby="editor-title">
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-3"><h2 id="editor-title" class="text-xl font-semibold">Votre texte</h2><span class="rounded-full border border-slate-600 px-3 py-1 text-xs text-muted">Version {{ dream.text_version }}</span></div>
+      {% if saved %}<p role="status" class="mb-6 rounded-xl border border-emerald-300/30 bg-emerald-300/5 p-4 text-sm text-emerald-100">Votre récit a été enregistré. Version {{ dream.text_version }}.</p>{% endif %}
+      {% if error %}<div role="alert" class="mb-6 rounded-xl border border-rose-400/40 bg-rose-400/10 p-4 text-sm leading-6 text-rose-100">{{ error }}</div>{% endif %}
+      <form method="post" action="/reves/{{ dream.id }}/recit" id="transcript-form" data-unsaved="{{ 'true' if unsaved else 'false' }}">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="expected_version" value="{{ expected }}">
+        <label class="mb-3 block text-sm font-medium" for="transcript">Récit du rêve</label>
+        <textarea id="transcript" name="transcript" class="field min-h-80 resize-y text-base leading-8 sm:min-h-96" rows="14" maxlength="40000" required aria-describedby="text-help text-count client-text-error" placeholder="Cette nuit, je me souviens…">{{ text }}</textarea>
+        <div class="mt-3 flex flex-wrap justify-between gap-2 text-xs text-muted"><p id="text-help">20 000 caractères maximum. Texte brut uniquement.</p><p id="text-count" aria-live="polite">{{ text|length }} / 20 000</p></div>
+        <p id="client-text-error" role="alert" class="mt-4 text-sm text-rose-100" hidden></p>
+        <div class="mt-7 flex flex-wrap items-center gap-4"><button class="btn btn-primary" type="submit">Enregistrer le récit {{ icon('check', 'h-4 w-4') }}</button><a class="text-sm text-muted underline underline-offset-4" href="/reves/{{ dream.id }}/recit">Recharger la version enregistrée</a></div>
+        <p id="save-hint" class="mt-4 text-xs leading-6 text-muted">Sauvegarde explicite : votre saisie n’est pas envoyée pendant la frappe.</p>
+      </form>
+      {% if dream.text_updated_at %}<p class="mt-5 border-t border-slate-700 pt-5 text-xs text-muted">Dernière correction : <time datetime="{{ dream.text_updated_at.isoformat() }}">{{ dream.text_updated_at.strftime('%d/%m/%Y à %H:%M %z') }}</time></p>{% endif %}
+    </section>
+    <aside class="space-y-6">
+      {% if audio %}<section class="surface p-6"><p class="eyebrow mb-3">Votre audio privé</p><h2 class="text-lg font-semibold">Réécouter le souvenir</h2><audio controls preload="metadata" class="mt-5 w-full" src="/web/media/{{ audio.id }}/content"></audio><a href="/reves/{{ dream.id }}/audio" class="mt-4 inline-block text-sm text-lavender underline-offset-4 hover:underline">Voir la confirmation audio</a></section>{% endif %}
+      <section class="surface p-6"><div class="mb-4 text-lavender">{{ icon('lock', 'h-6 w-6') }}</div><h2 class="text-lg font-semibold">Vous gardez la main</h2><p class="mt-4 text-sm leading-7 text-muted">Pour le moment, le récit est saisi manuellement. Si un texte est déjà présent, il est chargé dans l’éditeur.</p><p class="mt-4 text-sm leading-7 text-muted">La transcription et la génération seront ajoutées plus tard. Aucune IA n’est appelée lors de la sauvegarde.</p><p class="mt-5 border-t border-slate-700 pt-5 text-xs leading-6 text-muted">Utilisez un récit fictif pour cette démonstration. L’audio d’origine n’est pas modifié.</p></section>
+    </aside>
+  </div>
+</div>
+<script src="{{ url_for('static', path='js/transcript.js') }}" defer></script>
+{% endblock %}

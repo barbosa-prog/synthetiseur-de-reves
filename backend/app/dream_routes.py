@@ -2,13 +2,16 @@
 
 import uuid
 
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, Response
 from sqlalchemy import func, select
 
 from backend.app.auth import CurrentUser, Database
 from backend.app.auth_schemas import DreamResponse, DreamUpdate
+from backend.app.errors import error_response
 from backend.app.models import Dream
 from backend.app.schemas import ErrorResponse
+from backend.app.services.transcripts import TextVersionConflict, apply_correction
+from backend.app.services.transcripts import owned_dream as find_owned_dream
 
 router = APIRouter(prefix="/api/v1/dreams", tags=["Rêves privés"], responses={
     401: {"model": ErrorResponse, "description": "Authentification requise."},
@@ -18,12 +21,7 @@ router = APIRouter(prefix="/api/v1/dreams", tags=["Rêves privés"], responses={
 
 def owned_dream(db, user, dream_id: uuid.UUID) -> Dream:
     """Même 404 pour un UUID absent, supprimé ou appartenant à un autre compte."""
-    dream = db.scalar(select(Dream).where(
-        Dream.id == dream_id, Dream.user_id == user.id, Dream.status != "deleted",
-    ).with_for_update())
-    if dream is None:
-        raise HTTPException(404, "Ressource introuvable")
-    return dream
+    return find_owned_dream(db, user.id, dream_id, lock=True)
 
 
 @router.get("/{dream_id}", response_model=DreamResponse)
@@ -37,8 +35,14 @@ def update_dream(dream_id: uuid.UUID, payload: DreamUpdate,
                  user: CurrentUser, db: Database) -> Dream:
     """Mutation minimale ; user_id, statut et clés de stockage ne sont pas acceptés."""
     dream = owned_dream(db, user, dream_id)
-    for field, value in payload.model_dump(exclude_unset=True).items():
-        setattr(dream, field, value)
+    changes = payload.model_dump(exclude_unset=True)
+    if "transcript" in changes:
+        try:
+            apply_correction(db, dream, changes["transcript"], payload.expected_text_version)
+        except TextVersionConflict:
+            return error_response(409, "text_version_conflict", "Version plus récente disponible.")
+    if "emotion" in changes:
+        dream.emotion = changes["emotion"]
     db.commit()
     return dream
 

@@ -87,6 +87,7 @@ class Dream(Base):
             name="ck_dream_emotion",
         ),
         CheckConstraint("transcript IS NULL OR btrim(transcript) <> ''", name="ck_dream_text"),
+        CheckConstraint("text_version >= 0", name="ck_dream_text_version"),
         CheckConstraint("status <> 'ready' OR transcript IS NOT NULL", name="ck_dream_ready"),
         CheckConstraint(
             "(status = 'deleted') = (deleted_at IS NOT NULL)", name="ck_dream_deleted",
@@ -102,6 +103,8 @@ class Dream(Base):
         ForeignKey("users.id", ondelete="RESTRICT"), nullable=False,
     )
     transcript: Mapped[str | None] = mapped_column(Text)
+    text_version: Mapped[int] = mapped_column(Integer, server_default="0")
+    text_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     emotion: Mapped[str | None] = mapped_column(String(20))
     status: Mapped[str] = mapped_column(String(20), server_default="draft")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

@@ -3,7 +3,7 @@
 Production pédagogique locale en Python 3.12. Ce dépôt contient actuellement
 **P01 : le socle FastAPI**, **P02 : PostgreSQL**, **P03 : authentification et
 isolation des rêves**, **P20 : interface web Jinja2/Tailwind** et **P19 : stockage
-privé local**, **P04 : capture et import audio**. Worker et modèles IA ne sont
+privé local**, **P04 : capture et import audio**, **P06 : correction du récit**. Worker et modèles IA ne sont
 pas encore implémentés. Aucun service payant n'est nécessaire.
 
 ## Installation Windows (PowerShell)
@@ -955,3 +955,108 @@ réponse après navigation. Ruff et `pip check` réussissent. L'avertissement co
 Starlette/httpx subsiste. Non vérifiés : microphone physique, sortie haut-parleur,
 Firefox/Safari réels, antivirus et livraison Docker complète. Aucun service payant,
 modèle IA, transcription, éditeur de texte, image ou classification ajouté.
+
+## P06 — Correction du récit avant génération
+
+Depuis la confirmation audio P04, **Écrire ou corriger le récit** ouvre un éditeur
+privé responsive. Il charge le texte réellement présent en base, ou une zone vide
+pour la saisie manuelle. Aucune transcription réelle ou simulée n'est produite.
+L'audio original reste disponible en lecture et n'est jamais modifié par la sauvegarde.
+
+| Méthode | Route | Protection |
+| --- | --- | --- |
+| GET | `/reves/{dream_id}/recit` | Session navigateur HTTPS, propriétaire |
+| POST | `/reves/{dream_id}/recit` | Session, propriétaire, origine et CSRF |
+| GET | `/api/v1/dreams/{dream_id}/transcript` | Bearer, propriétaire |
+| PATCH | `/api/v1/dreams/{dream_id}/transcript` | Bearer, propriétaire, version attendue |
+
+Le PATCH attend `transcript` et `expected_version` (entier obligatoire). La réponse
+contient `id`, `transcript`, `text_version` et `text_updated_at`. Un rêve inconnu,
+supprimé ou appartenant à un autre compte produit la même réponse 404.
+
+### Validation, sauvegarde et versions
+
+La limite serveur est de **20 000 points de code Unicode**, après normalisation des
+retours de ligne en LF, avant suppression des espaces aux extrémités. Les textes
+vides ou uniquement composés d'espaces, NUL et surrogates isolés sont refusés.
+Le compteur JavaScript respecte cette limite ; la validation serveur reste obligatoire.
+Le HTML est conservé comme texte brut et échappé par Jinja, sans interprétation.
+Les formulaires sont limités à 256 Kio avant parsing, avec un délai de lecture de
+10 secondes. Aucun récit n'est ajouté aux journaux ou au stockage du navigateur.
+
+La sauvegarde est explicite : confirmation, version et date s'affichent après
+enregistrement. Une actualisation recharge PostgreSQL. Un avertissement prévient
+du départ avec des modifications non enregistrées ; il ne constitue pas une
+sauvegarde et ne garantit pas la récupération après fermeture, panne ou expiration.
+
+Chaque modification effective incrémente `text_version` et actualise `text_updated_at`.
+Réenregistrer le même texte ne change pas sa version. Un verrou PostgreSQL et la
+version attendue empêchent deux onglets de s'écraser : une correction dépassée
+reçoit **409**, conserve la saisie à l'écran et demande un rechargement explicite.
+Copier la saisie avant ce rechargement si elle doit être conservée.
+
+La migration **0005**, après 0004, ajoute ces deux colonnes et la contrainte de
+version positive ou nulle. Les rêves sans texte restent en version 0 ; les textes
+existants reçoivent la référence 1, sans date de correction inventée. Les récits,
+médias et migrations précédentes sont préservés. Il s'agit d'un compteur de version,
+pas d'un historique de révisions.
+
+Pour compatibilité P03, l'ancien `PATCH /api/v1/dreams/{id}` accepte encore un texte
+sans `expected_text_version` : il incrémente le compteur mais conserve alors le
+comportement du dernier enregistrement gagnant. Fournir ce champ active le contrôle
+de conflit. Les nouvelles routes et le formulaire exigent toujours une version.
+Tout futur code P05 doit utiliser le service partagé de correction ; P07 devra
+capturer puis revérifier cette version avant publication. Cette intégration future
+n'est pas implémentée ici ; aucune IA, génération ou liste d'historique n'est ajoutée.
+
+### Commandes Windows P06
+
+Conserver le `.env` privé et la configuration PostgreSQL/stockage/HTTPS existants.
+Aucune dépendance supplémentaire n'est nécessaire pour P06. Démarrer PostgreSQL
+avec la procédure P02, puis depuis la racine :
+
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m alembic check
+Push-Location frontend
+npm.cmd run build
+Pop-Location
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8443 --no-access-log --no-proxy-headers --ssl-keyfile tmp/https/key.pem --ssl-certfile tmp/https/cert.pem
+```
+
+Se connecter sur l'origine HTTPS configurée, sauvegarder un audio depuis
+`/nouveau-reve`, puis suivre le lien vers l'éditeur. Les certificats locaux P20
+doivent déjà exister ; leur commande de préparation figure ci-dessus.
+
+```powershell
+# Suite complète : PostgreSQL temporaire réel, migrations, HTTPS et Chrome
+.\.venv\Scripts\python.exe scripts\verify_p20.py
+.\.venv\Scripts\python.exe -m ruff check backend scripts
+.\.venv\Scripts\python.exe -m pip check
+```
+
+### Validation P06 du 11 novembre 2026
+
+**206 tests réussis, aucun ignoré, en 116,50 secondes** sur Python 3.12.14 et
+PostgreSQL 17 réel : les 180 tests précédents et 26 nouveaux cas P06. Couverture
+du Python instrumenté : **92,38 %**, soit 1224/1325 instructions. Ce pourcentage
+ne mesure pas le JavaScript ni les sous-processus audio.
+
+Exécutés : migrations et comparaison modèle/schéma, conservation d'un récit
+antérieur à 0005, saisie/modification/relecture après nouvelle connexion,
+limites de longueur et Unicode, vide, contrôle de propriétaire/UUID, absence
+d'authentification, CSRF et HTML malveillant rendu littéralement. Deux requêtes
+concurrentes sur la même version donnent une réussite et un conflit 409.
+
+Un parcours Chrome réel headless vérifie le lien depuis P04, la sauvegarde et
+l'actualisation, le conflit entre onglets avec conservation de la saisie,
+les erreurs de formulaire, l'absence de stockage navigateur et la préservation
+octet pour octet de l'audio. Captures ordinateur et mobile inspectées dans
+`tmp/p06-screenshots`. Tailwind compilé localement, Ruff et `pip check` réussis.
+La recette existante vérifie aussi la relecture audio après redémarrage effectif
+de PostgreSQL/Uvicorn ; aucun redémarrage de Windows n'a été testé.
+
+L'avertissement connu de dépréciation Starlette/httpx demeure sans échec.
+Les tests utilisent une base et des comptes fictifs temporaires, sans migration
+de l'instance personnelle existante. Firefox/Safari, accessibilité par lecteur
+d'écran et récupération d'une saisie après panne ne sont pas vérifiés.

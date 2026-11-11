@@ -9,8 +9,8 @@
     <p class="mt-5 leading-7 text-muted">Un rêve brouillon a été créé dans votre compte. Vous pouvez écouter son audio ci-dessous. Aucune transcription n’a été lancée.</p>
     <audio id="saved-audio" controls preload="metadata" class="mt-7 w-full" src="/web/media/{{ media.id }}/content"></audio>
     <dl class="mt-7 grid grid-cols-2 gap-5 rounded-xl bg-night p-5 text-sm"><div><dt class="text-muted">Durée mesurée</dt><dd class="mt-2">{{ '%.1f'|format(media.duration_ms / 1000) }} s</dd></div><div><dt class="text-muted">Format conservé</dt><dd class="mt-2">WAV · mono · 16 kHz</dd></div></dl>
-    <p class="mt-6 rounded-xl border border-slate-700 p-4 text-sm leading-6 text-muted">La transcription sera ajoutée dans un prochain ticket. Votre récit reste un brouillon, sans texte ou émotion imposés.</p>
-    <a href="/nouveau-reve" class="btn btn-secondary mt-7">Capturer un autre rêve</a>
+    <p class="mt-6 rounded-xl border border-slate-700 p-4 text-sm leading-6 text-muted">La transcription sera ajoutée dans un prochain ticket. Vous pouvez déjà saisir votre récit manuellement, sans émotion imposée.</p>
+    <div class="mt-7 flex flex-wrap gap-3"><a href="/reves/{{ media.dream_id }}/recit" class="btn btn-primary">Écrire ou corriger le récit {{ icon('arrow', 'h-4 w-4') }}</a><a href="/nouveau-reve" class="btn btn-secondary">Capturer un autre rêve</a></div>
   </section>
 </div>
 {% endblock %}

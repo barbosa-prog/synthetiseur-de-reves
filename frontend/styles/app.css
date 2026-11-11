@@ -14,7 +14,7 @@
 
 @layer base {
   body { @apply bg-night text-ink font-sans antialiased; }
-  button, a, input { @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lavender; }
+  button, a, input, textarea { @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lavender; }
   button, a { -webkit-tap-highlight-color: transparent; }
   [hidden] { display: none !important; }
 }
