@@ -34,7 +34,7 @@ def test_migration_roundtrip_and_model_consistency(database):
         command.downgrade(config, "base")
         assert inspect(connection).get_table_names() == ["alembic_version"]
         command.upgrade(config, "head")
-        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "0002"
+        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "0003"
 
 
 def test_persistence_and_relationships_after_reconnect(database):

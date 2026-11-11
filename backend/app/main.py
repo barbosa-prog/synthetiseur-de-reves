@@ -15,6 +15,7 @@ from backend.app.api import router
 from backend.app.auth_routes import router as auth_router
 from backend.app.dream_routes import router as dream_router
 from backend.app.errors import register_error_handlers
+from backend.app.media_routes import router as media_router
 from backend.app.schemas import ErrorResponse
 from backend.app.web.routes import WebLoginRequired, web_login_required
 from backend.app.web.routes import router as web_router
@@ -46,8 +47,8 @@ def create_app() -> FastAPI:
         title="Synthétiseur de rêves — API",
         version="0.1.0",
         description=(
-            "Backend local pédagogique P01–P03 et P20 : API, sessions et interface web. "
-            "Aucune intégration IA ni stockage physique de médias."
+            "Backend local pédagogique : API, sessions, interface web et médias privés. "
+            "Aucune intégration IA ni import utilisateur audio."
         ),
         docs_url="/api/v1/docs",
         redoc_url="/api/v1/redoc",
@@ -68,13 +69,14 @@ def create_app() -> FastAPI:
     application.include_router(auth_router)
     application.include_router(dream_router)
     application.include_router(web_router)
+    application.include_router(media_router)
     application.add_exception_handler(WebLoginRequired, web_login_required)
     application.mount("/static", StaticFiles(directory=Path(__file__).parent / "web/static"),
                       name="static")
 
     @application.middleware("http")
     async def private_responses(request, call_next):
-        is_web = request.url.path in {
+        is_web = request.url.path.startswith("/web/media/") or request.url.path in {
             "/", "/connexion", "/inscription", "/accueil", "/deconnexion", "/web/session",
         }
         if is_web and (
@@ -83,10 +85,14 @@ def create_app() -> FastAPI:
             return PlainTextResponse("Utilisez l’origine HTTPS configurée pour l’interface.",
                                      status_code=400, headers={"Cache-Control": "no-store"})
         response = await call_next(request)
-        if is_web or request.url.path.startswith(("/api/v1/auth/", "/api/v1/dreams/")):
+        if is_web or request.url.path.startswith((
+            "/api/v1/auth/", "/api/v1/dreams/", "/api/v1/media/",
+        )):
             response.headers["Cache-Control"] = "no-store"
             response.headers["Pragma"] = "no-cache"
-        if is_web or request.url.path.startswith("/static/"):
+        if (is_web and not request.url.path.startswith("/web/media/")) or (
+            request.url.path.startswith("/static/")
+        ):
             response.headers["Content-Security-Policy"] = (
                 "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; "
                 "connect-src 'self'; object-src 'none'; base-uri 'none'; "

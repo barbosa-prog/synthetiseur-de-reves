@@ -1,5 +1,6 @@
 """Recette isolée Windows : PostgreSQL natif temporaire, HTTPS, pytest et Chrome/Edge."""
 
+import io
 import os
 import secrets
 import socket
@@ -7,13 +8,23 @@ import subprocess
 import sys
 import tempfile
 import time
+import wave
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import httpx
 import trustme
 from sqlalchemy import URL
+from sqlalchemy.orm import Session
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from backend.app.database import make_engine, session_factory  # noqa: E402
+from backend.app.models import AuthSession, Dream, User  # noqa: E402
+from backend.app.security import new_token, token_digest  # noqa: E402
+from backend.app.services.media import MediaService  # noqa: E402
+from backend.app.storage.local import LocalPrivateStorage  # noqa: E402
 
 
 def free_port() -> int:
@@ -62,7 +73,8 @@ def main() -> int:
             raw_url = url.render_as_string(hide_password=False)
             origin = f"https://127.0.0.1:{web_port}"
             env.update(DATABASE_URL=raw_url, TEST_DATABASE_URL=raw_url,
-                       WEB_ORIGIN=origin, WEB_TEST_URL=origin)
+                       WEB_ORIGIN=origin, WEB_TEST_URL=origin,
+                       PRIVATE_MEDIA_ROOT=str(directory / "private_media"))
             result = subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"],
                                     cwd=ROOT, env=env, capture_output=True, timeout=60)
             if result.returncode:
@@ -71,12 +83,14 @@ def main() -> int:
             certificate = authority.issue_cert("localhost", "127.0.0.1")
             certificate.private_key_pem.write_to_path(directory / "key.pem")
             certificate.cert_chain_pems[0].write_to_path(directory / "cert.pem")
-            server = subprocess.Popen([
+            server_command = [
                 sys.executable, "-m", "uvicorn", "backend.app.main:app", "--host", "127.0.0.1",
                 "--port", str(web_port), "--no-access-log", "--no-proxy-headers",
                 "--ssl-keyfile", str(directory / "key.pem"),
                 "--ssl-certfile", str(directory / "cert.pem"),
-            ], cwd=ROOT, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            ]
+            server = subprocess.Popen(server_command, cwd=ROOT, env=env,
+                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             with httpx.Client(verify=False, trust_env=False) as client:
                 for _ in range(100):
                     try:
@@ -89,12 +103,74 @@ def main() -> int:
                     raise RuntimeError("Serveur HTTPS temporaire indisponible.")
             result = subprocess.run([
                 sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
+                "--basetemp", str(directory / "pytest"), "--tb=short",
                 "--cov=backend.app", "--cov-report=term-missing", "--cov-fail-under=80",
             ], cwd=ROOT, env=env, capture_output=True, text=True, timeout=300)
             output = result.stdout + result.stderr
             for secret in (raw_url, password, role):
                 output = output.replace(secret, "[MASQUÉ]")
             print(output, flush=True)
+            if result.returncode == 0:
+                # P19 : vérifie aussi un vrai redémarrage des deux processus, pas seulement du pool.
+                engine = make_engine(url)
+                service = MediaService(LocalPrivateStorage(directory / "private_media"),
+                                       session_factory(engine))
+                token = new_token()
+                try:
+                    with Session(engine) as db:
+                        user = User(email="restart-fiction@example.com")
+                        dream = Dream(user=user)
+                        db.add(dream)
+                        db.flush()
+                        user_id, dream_id = user.id, dream.id
+                        db.add(AuthSession(
+                            user_id=user.id, token_hash=token_digest(token),
+                            expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
+                        ))
+                        db.commit()
+                    audio = io.BytesIO()
+                    with wave.open(audio, "wb") as sample:
+                        sample.setnchannels(1)
+                        sample.setsampwidth(2)
+                        sample.setframerate(16000)
+                        sample.writeframes(b"\x00\x00" * 160)
+                    payload = audio.getvalue()
+                    identifier = service.store(user_id, dream_id, io.BytesIO(payload),
+                                               kind="audio", media_format="wav")
+                    endpoint = origin + f"/api/v1/media/{identifier}/content"
+                    headers = {"Authorization": "Bearer " + token}
+                    with httpx.Client(verify=False, trust_env=False) as client:
+                        response = client.get(endpoint, headers=headers)
+                        if response.status_code != 200 or response.content != payload:
+                            raise RuntimeError("Lecture privée HTTP initiale échouée.")
+                    server.terminate()
+                    server.wait(timeout=15)
+                    server = None
+                    engine.dispose()
+                    run_pg([str(pg / "pg_ctl.exe"), "-D", str(data), "-m", "fast", "-w", "stop"])
+                    run_pg([str(pg / "pg_ctl.exe"), "-D", str(data),
+                            "-l", str(directory / "pg.log"),
+                            "-o", f"-h 127.0.0.1 -p {db_port}", "-w", "start"])
+                    server = subprocess.Popen(server_command, cwd=ROOT, env=env,
+                                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    with httpx.Client(verify=False, trust_env=False) as client:
+                        for _ in range(100):
+                            try:
+                                if client.get(origin + "/api/v1/health").status_code == 200:
+                                    break
+                            except httpx.HTTPError:
+                                pass
+                            time.sleep(0.1)
+                        response = client.get(endpoint, headers=headers)
+                        if response.status_code != 200 or response.content != payload:
+                            raise RuntimeError("Persistance après redémarrage non validée.")
+                        service.request_purge(user_id, identifier)
+                        if client.get(endpoint, headers=headers).status_code != 404:
+                            raise RuntimeError("Purge du média de test non validée.")
+                    print("P19 HTTP : lecture 200, redémarrage PostgreSQL/Uvicorn, "
+                          "relecture 200, purge puis 404.", flush=True)
+                finally:
+                    engine.dispose()
             return result.returncode
         finally:
             if server is not None:

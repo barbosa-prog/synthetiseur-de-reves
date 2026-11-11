@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
+    BigInteger,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -117,6 +118,26 @@ class Media(Base):
     __table_args__ = (
         CheckConstraint("kind IN ('audio','image','sound')", name="ck_media_kind"),
         CheckConstraint("btrim(storage_key) <> ''", name="ck_media_key"),
+        CheckConstraint("storage_state IN ('legacy','ready','deleting','purged')",
+                        name="ck_media_state"),
+        CheckConstraint("size_bytes IS NULL OR size_bytes BETWEEN 1 AND 15728640",
+                        name="ck_media_size"),
+        CheckConstraint(
+            "storage_state = 'legacy' OR (size_bytes IS NOT NULL AND media_type IS NOT NULL "
+            "AND sha256 IS NOT NULL AND storage_key ~ '^[a-f0-9]{64}$' "
+            "AND sha256 ~ '^[a-f0-9]{64}$')", name="ck_media_managed",
+        ),
+        CheckConstraint(
+            "media_type IS NULL OR (kind IN ('audio','sound') AND media_type IN "
+            "('audio/wav','audio/mpeg')) OR (kind = 'image' AND media_type IN "
+            "('image/png','image/jpeg','image/webp'))", name="ck_media_type",
+        ),
+        CheckConstraint(
+            "(storage_state IN ('deleting','purged')) = (purge_requested_at IS NOT NULL)",
+            name="ck_media_purge_request",
+        ),
+        CheckConstraint("(storage_state = 'purged') = (purged_at IS NOT NULL)",
+                        name="ck_media_purged"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -129,6 +150,13 @@ class Media(Base):
     kind: Mapped[str] = mapped_column(String(16))
     storage_key: Mapped[str] = mapped_column(Text, unique=True)
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    size_bytes: Mapped[int | None] = mapped_column(BigInteger)
+    media_type: Mapped[str | None] = mapped_column(String(32))
+    sha256: Mapped[str | None] = mapped_column(String(64))
+    storage_state: Mapped[str] = mapped_column(String(12), server_default="legacy")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    purge_requested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    purged_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     dream: Mapped[Dream] = relationship(back_populates="media")
 
 

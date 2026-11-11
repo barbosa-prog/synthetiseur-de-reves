@@ -2,8 +2,8 @@
 
 Production pédagogique locale en Python 3.12. Ce dépôt contient actuellement
 **P01 : le socle FastAPI**, **P02 : PostgreSQL**, **P03 : authentification et
-isolation des rêves** et **P20 : interface web Jinja2/Tailwind**.
-Stockage physique des médias, worker et modèles IA ne sont
+isolation des rêves**, **P20 : interface web Jinja2/Tailwind** et **P19 : stockage
+privé local**. Import utilisateur audio, worker et modèles IA ne sont
 pas encore implémentés. Aucun service payant n'est nécessaire.
 
 ## Installation Windows (PowerShell)
@@ -602,3 +602,185 @@ Non vérifiés : Firefox/Safari, matériel mobile réel, confiance du certificat
 local dans Windows et livraison Docker complète (P15). Les critères appliqués
 à P20 sont ceux fournis dans la demande ; aucun accès Jira ni changement Jira
 n'a été effectué.
+
+## P19 — Stockage privé local des médias
+
+### Configuration Windows
+
+Par défaut, le dossier utilisé est
+`%LOCALAPPDATA%\SynthetiseurDeReves\private_media`, hors OneDrive et hors dépôt.
+Il n'est créé que lors d'une première écriture autorisée, jamais au simple
+démarrage de l'API. Pour personnaliser le dossier, éditer la variable facultative
+`PRIVATE_MEDIA_ROOT` du `.env` privé avec un chemin absolu dédié.
+Le `.env` existant n'est pas modifié automatiquement. Ne pas recopier le modèle
+sur un `.env` déjà configuré.
+
+Le service refuse un chemin relatif, une racine de disque, un partage UNC, le
+dépôt (donc aussi `static/`), OneDrive et les liens symboliques/jonctions dans le
+chemin. Un dossier existant non vide n'est pas adopté automatiquement : le service
+initialise uniquement un dossier vide ou neuf avec le marqueur `.private-store-v1/`.
+Ne pas créer ce marqueur manuellement dans un dossier contenant d'autres données.
+Les fichiers sont plats : une clé hexadécimale aléatoire de 256 bits sans extension,
+sans nom utilisateur, e-mail ou nom de fichier original. Aucun répertoire privé
+n'est monté par FastAPI comme dossier statique.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m alembic current
+.\.venv\Scripts\python.exe -m alembic check
+```
+
+Lancer le backend avec la commande HTTPS P20. Pour tester un autre dossier dans
+le terminal courant, sans modifier `.env` :
+
+```powershell
+$env:PRIVATE_MEDIA_ROOT = Join-Path $env:LOCALAPPDATA 'SynthetiseurDeReves\private_media'
+```
+
+Le dossier doit être sur un système de fichiers local supportant les liens durs
+atomiques (NTFS sur Windows). Les permissions Windows sont héritées du profil
+utilisateur : vérifier et restreindre ses ACL avant toute donnée réelle. Sous
+POSIX, les nouveaux dossiers/fichiers sont demandés en modes 0700/0600.
+Le service protège les accès HTTP ; il ne protège pas contre un administrateur
+du poste, un compte de service compromis, une sauvegarde externe ou un déplacement
+concurrent de dossiers par un programme privilégié. Il ne chiffre pas lui-même
+les fichiers : chiffrement du disque et politique de sauvegarde restent à vérifier.
+
+### Interfaces internes et formats
+
+`PrivateStorage` définit `write/open/delete/inventory` ; `LocalPrivateStorage`
+implémente ce contrat sans dépendre de FastAPI ou SQLAlchemy. `MediaService`
+coordonne stockage et PostgreSQL via `store`, `download`, `request_purge` et
+`reconcile`. Ces fonctions sont destinées aux futurs tickets ; aucun formulaire
+d'import, endpoint d'écriture, moteur IA ou export complet n'est ajouté.
+
+`store(user_id, dream_id, source, kind=..., media_format=...)` vérifie l'appartenance
+du rêve avant toute écriture. Le nom de fichier original est facultatif, validé
+puis oublié ; il n'est jamais utilisé pour construire un chemin ni conservé en
+base. Les chemins, noms Windows réservés, flux alternatifs, extensions incohérentes
+et caractères dangereux sont refusés. La clé est toujours générée par le service.
+
+Formats acceptés : WAV PCM et MP3 pour audio (**15 Mio maximum**), PNG/JPEG/WebP
+non animés pour image (**8 Mio maximum**, 16 millions de pixels). SVG et formats
+actifs sont refusés. Pillow vérifie et décode les images, `wave` valide les données
+PCM, Mutagen vérifie la structure MPEG Layer III du MP3. Cette dernière vérification
+ne remplace pas un décodage audio intégral ni une analyse antivirus : P04 devra
+compléter la validation d'import. Les limites sont contrôlées pendant la lecture
+du flux, indépendamment d'une taille annoncée. Le contenu est validé avant écriture.
+
+Le fichier est écrit en staging privé, synchronisé avec `fsync`, puis publié par
+lien dur atomique sans écrasement. Aucun fichier final partiellement écrit n'est
+présenté à un lecteur. Le staging est retiré après publication. La lecture ouvre
+un descripteur, refuse les liens/reparse points et les liens durs externes, puis
+contrôle taille et SHA-256 avant de diffuser les octets. Les fichiers normaux
+doivent être modifiés uniquement via le service.
+
+### Routes de consultation
+
+| Route GET | Protection |
+| --- | --- |
+| `/api/v1/media/{uuid}/content` | Session Bearer P03 |
+| `/web/media/{uuid}/content` | Cookie HttpOnly, origine HTTPS P20 ; session absente/expirée redirigée vers connexion |
+
+Chaque lecture vérifie `media → dream → user`, le rêve non supprimé, l'état prêt
+et l'expiration du média. UUID inconnu, média étranger, legacy, expiré, purgé,
+fichier manquant ou altéré : même réponse 404. Le transport cookie n'est pas ajouté
+aux routes API Bearer. Les routes web sont en GET sans mutation : aucun changement
+des règles CSRF des formulaires P20. Pas de route publique de suppression.
+
+La réponse contient les octets et un nom généré à partir de l'UUID, jamais le nom
+original, la clé opaque ou un chemin absolu. En-têtes : `Cache-Control: no-store`,
+`Content-Disposition: attachment`, `nosniff` et CSP restrictive. Aucun jeton dans
+les URL. Aucun contenu média ou chemin privé journalisé. Les accès Uvicorn restent
+désactivés dans la commande documentée. La diffusion est séquentielle ; les requêtes
+Range et l'intégration de lecture audio dans l'interface ne sont pas implémentées.
+Un téléchargement déjà autorisé et ouvert peut finir après une demande de purge.
+
+### Migration 0003 et données existantes
+
+`0003_private_media.py` ajoute taille, MIME, SHA-256, état de stockage et dates de
+création/demande de purge/purge. Clés étrangères et anciennes références sont
+conservées ; aucune migration précédente n'est modifiée, aucun fichier n'est
+déplacé ou supprimé. Les anciennes lignes restent `legacy` avec taille/format/
+empreinte NULL : on ne prétend pas connaître un fichier non vérifié. Leur date
+`created_at` correspond à la migration, pas à une date originale inventée.
+Elles ne sont pas servies par les nouvelles routes. Une éventuelle reprise de
+ces références exige une opération distincte explicitement autorisée.
+
+Les nouveaux médias sont `ready`. Une demande interne explicite de purge marque
+`deleting` et valide cet état avant d'effacer le fichier ; il devient immédiatement
+inaccessible aux nouvelles consultations. Après effacement, la ligne reste comme
+trace `purged`. Une purge échouée reste `deleting` et peut être reprise ; elle
+n'est pas présentée comme réussie. Ce n'est pas encore la suppression utilisateur
+complète P10.
+
+PostgreSQL et le disque ne forment pas une transaction distribuée. Une erreur DB
+confirmée déclenche une compensation si le fichier n'est pas référencé. En cas
+d'accusé de commit perdu ou de DB indisponible, le service conserve le fichier
+potentiellement référencé pour éviter une perte de données. Un arrêt brutal peut
+laisser un staging ou un fichier orphelin ; la réconciliation le détecte. Les
+écritures et nettoyages partagent des verrous transactionnels PostgreSQL par clé.
+
+### Maintenance sans suppression par défaut
+
+```powershell
+# Inventaire : compteurs seulement, aucun chemin ni clé affiché
+.\.venv\Scripts\python.exe scripts\media_maintenance.py
+# À exécuter seulement après examen des compteurs :
+.\.venv\Scripts\python.exe scripts\media_maintenance.py --apply
+```
+
+Le mode simulation ne modifie ni fichiers ni métadonnées. `--apply` reprend les
+purges déjà demandées et retire les objets internes sans référence, âgés de plus
+de **24 heures**. Les objets récents, référencés, legacy, noms inconnus et liens
+ne sont pas effacés. Les fichiers référencés manquants sont comptés, jamais
+remplacés ou supprimés de la base automatiquement. Aucun nettoyage n'est lancé
+automatiquement au démarrage ni exécuté sur les données existantes pendant P19.
+Ne pas lancer des manipulations manuelles concurrentes dans ce dossier.
+
+### Tests Windows
+
+```powershell
+# Recette isolée : PostgreSQL natif temporaire, tous les tests et Chrome installé
+.\.venv\Scripts\python.exe scripts\verify_p20.py
+# Ou avec TEST_DATABASE_URL dédié déjà configuré :
+.\.venv\Scripts\python.exe -m pytest -p no:cacheprovider
+.\.venv\Scripts\python.exe -m ruff check backend scripts
+.\.venv\Scripts\python.exe -m pip check
+```
+
+Le nom historique du script `verify_p20.py` est conservé ; il lance désormais la
+suite complète, incluant P19. Ses fichiers et médias de test sont dans un dossier
+temporaire hors dépôt/OneDrive, supprimé après la recette. Un `--basetemp` isolé
+évite les conflits de permissions du dossier pytest global sur Windows. Sans
+PostgreSQL/serveur HTTPS configurés, les tests concernés restent explicitement
+ignorés dans une exécution pytest simple, jamais déclarés validés.
+
+### Validation P19
+
+Sous Windows, Python 3.12.14 et PostgreSQL 17 natif temporaire : **143 tests
+réussis, aucun ignoré**, en 63,70 s. Les 85 tests précédents restent verts ; P19
+ajoute 39 tests de stockage et 19 tests d'intégration. Couverture instrumentée de
+`backend.app` : **94,26 %** (887/941 instructions). Les migrations sont exécutées
+et comparées aux modèles, mais ne sont pas incluses dans ce taux de couverture.
+
+Vérifications réelles : fichiers PNG/JPEG/WebP/WAV fictifs, structure MP3 synthétique,
+taille/type, noms dangereux, jonctions Windows, liens durs externes, écritures
+atomiques et collisions, permissions par propriétaire Bearer/cookie, UUID inconnus,
+fichiers manquants/altérés/expirés, purge et reprise, compensation DB, commit
+réussi avec accusé perdu, inventaire sec et nettoyage des orphelins anciens.
+La migration de références legacy a conservé les lignes et les clés originales.
+
+Une recette HTTP supplémentaire a obtenu 200 pour un WAV fictif, puis 200 après
+arrêt et redémarrage effectifs de **PostgreSQL et Uvicorn**, enfin 404 après purge.
+Le parcours Chrome P20 reste validé. Les services et données temporaires ont été
+arrêtés/supprimés ; aucun stockage privé existant n'a été nettoyé.
+Ruff et `pip check` réussissent. L'avertissement Starlette/httpx connu subsiste.
+
+Le premier essai global a rencontré des permissions incompatibles sur le dossier
+pytest partagé ; la recette utilise désormais son propre répertoire temporaire.
+Les essais n'ont pas validé un arrêt électrique brutal, une analyse antivirus,
+un décodage MP3 intégral, les ACL du futur dossier utilisateur, un chiffrement
+applicatif ou un déploiement Docker complet. Utiliser une racine privée distincte
+pour chaque environnement/base ; ne pas mutualiser ce dossier entre plusieurs bases.
