@@ -45,7 +45,7 @@ def update_transcript(dream_id: uuid.UUID, payload: TranscriptUpdate,
     return dream
 
 
-async def editor_form(request: Request) -> dict[str, str]:
+async def editor_form(request: Request, names=None) -> dict[str, str]:
     """Formulaire borné avant parsing ; aucun fichier, champ supplémentaire ou log du récit."""
     if request.headers.get("origin") != request.app.state.web_origin:
         raise HTTPException(403, "Origine refusée")
@@ -66,7 +66,7 @@ async def editor_form(request: Request) -> dict[str, str]:
     try:
         values = parse_qs(body.decode("ascii"), keep_blank_values=True, strict_parsing=True,
                           encoding="utf-8", errors="strict", max_num_fields=3)
-        if set(values) != {"transcript", "expected_version", "csrf"}:
+        if set(values) != (names or {"transcript", "expected_version", "csrf"}):
             raise ValueError
         if any(len(value) != 1 for value in values.values()):
             raise ValueError

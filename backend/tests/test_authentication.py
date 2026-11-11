@@ -147,7 +147,9 @@ def test_owner_and_cross_account_crud(auth_client):
                                      if method == "PATCH" else {}))
         assert response.status_code == 404 and response.json() == absent.json()
     assert client.get(path, headers=owner).json()["transcript"] == "Récit fictif P03."
-    response = client.patch(path, headers=owner, json={"transcript": "Correction fictive"})
+    response = client.patch(path, headers=owner, json={
+        "transcript": "Correction fictive", "expected_text_version": 0,
+    })
     assert response.status_code == 200 and response.json()["transcript"] == "Correction fictive"
     assert client.patch(path, headers=owner, json={"user_id": alice}).status_code == 422
     assert client.delete(path, headers=owner).status_code == 204

@@ -6,10 +6,11 @@
   <section class="surface mt-8 p-7 sm:p-10">
     <span class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-300/10 text-emerald-100">{{ icon('check', 'h-7 w-7') }}</span>
     <p class="eyebrow mb-3">01 · Audio privé</p><h1 class="text-3xl font-semibold">Votre audio est enregistré.</h1>
-    <p class="mt-5 leading-7 text-muted">Un rêve brouillon a été créé dans votre compte. Vous pouvez écouter son audio ci-dessous. Aucune transcription n’a été lancée.</p>
+    <p class="mt-5 leading-7 text-muted">Un rêve brouillon a été créé dans votre compte. Vous pouvez écouter son audio ci-dessous. La transcription se lance uniquement à votre demande.</p>
     <audio id="saved-audio" controls preload="metadata" class="mt-7 w-full" src="/web/media/{{ media.id }}/content"></audio>
     <dl class="mt-7 grid grid-cols-2 gap-5 rounded-xl bg-night p-5 text-sm"><div><dt class="text-muted">Durée mesurée</dt><dd class="mt-2">{{ '%.1f'|format(media.duration_ms / 1000) }} s</dd></div><div><dt class="text-muted">Format conservé</dt><dd class="mt-2">WAV · mono · 16 kHz</dd></div></dl>
-    <p class="mt-6 rounded-xl border border-slate-700 p-4 text-sm leading-6 text-muted">La transcription sera ajoutée dans un prochain ticket. Vous pouvez déjà saisir votre récit manuellement, sans émotion imposée.</p>
+    <p class="mt-6 rounded-xl border border-slate-700 p-4 text-sm leading-6 text-muted">Vous pouvez demander une transcription locale ou saisir votre récit manuellement, sans émotion imposée.</p>
+    <a href="/reves/{{ media.dream_id }}/transcription" class="btn btn-secondary mt-6">Transcrire l’audio en français</a>
     <div class="mt-7 flex flex-wrap gap-3"><a href="/reves/{{ media.dream_id }}/recit" class="btn btn-primary">Écrire ou corriger le récit {{ icon('arrow', 'h-4 w-4') }}</a><a href="/nouveau-reve" class="btn btn-secondary">Capturer un autre rêve</a></div>
   </section>
 </div>

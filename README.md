@@ -3,8 +3,9 @@
 Production pédagogique locale en Python 3.12. Ce dépôt contient actuellement
 **P01 : le socle FastAPI**, **P02 : PostgreSQL**, **P03 : authentification et
 isolation des rêves**, **P20 : interface web Jinja2/Tailwind** et **P19 : stockage
-privé local**, **P04 : capture et import audio**, **P06 : correction du récit**. Worker et modèles IA ne sont
-pas encore implémentés. Aucun service payant n'est nécessaire.
+privé local**, **P04 : capture et import audio**, **P06 : correction du récit** et
+**P05 : transcription locale avec worker PostgreSQL persistant**. Aucun service
+payant n'est nécessaire. Le modèle STT se prépare explicitement hors du dépôt.
 
 ## Installation Windows (PowerShell)
 
@@ -1001,13 +1002,13 @@ existants reçoivent la référence 1, sans date de correction inventée. Les r�
 médias et migrations précédentes sont préservés. Il s'agit d'un compteur de version,
 pas d'un historique de révisions.
 
-Pour compatibilité P03, l'ancien `PATCH /api/v1/dreams/{id}` accepte encore un texte
-sans `expected_text_version` : il incrémente le compteur mais conserve alors le
-comportement du dernier enregistrement gagnant. Fournir ce champ active le contrôle
-de conflit. Les nouvelles routes et le formulaire exigent toujours une version.
+Depuis P05, l'ancien `PATCH /api/v1/dreams/{id}` exige `expected_text_version`
+lorsqu'il modifie le texte : un appel sans version reçoit 409. Les clients doivent
+charger la version actuelle avant correction. Les nouvelles routes et le formulaire
+exigent également une version ; les mutations d'émotion seules restent compatibles.
 Tout futur code P05 doit utiliser le service partagé de correction ; P07 devra
 capturer puis revérifier cette version avant publication. Cette intégration future
-n'est pas implémentée ici ; aucune IA, génération ou liste d'historique n'est ajoutée.
+est implémentée pour P05 ci-dessous ; P07 et la liste d'historique restent à développer.
 
 ### Commandes Windows P06
 
@@ -1060,3 +1061,315 @@ L'avertissement connu de dépréciation Starlette/httpx demeure sans échec.
 Les tests utilisent une base et des comptes fictifs temporaires, sans migration
 de l'instance personnelle existante. Firefox/Safari, accessibilité par lecteur
 d'écran et récupération d'une saisie après panne ne sont pas vérifiés.
+
+## P05 — Transcription française locale
+
+### Choix et conformité
+
+Le sujet officiel de PRODUCTION, lu intégralement (3 pages), autorise FastAPI,
+Whisper ou un moteur équivalent et Docker Compose local. Son plafond de budget API
+n'oblige pas à utiliser une API payante. Il n'impose pas de délai STT chiffré.
+Le backlog corrigé prévoit un adaptateur interchangeable, un essai français réel
+et une mesure de latence ; le fournisseur distant du benchmark reste provisoire.
+
+Le moteur validé est **faster-whisper 1.2.1**, modèle **small multilingue**, langue
+française imposée, **CPU INT8**, quatre threads, un traitement par worker. Il n'y a
+aucun appel distant de transcription ni clé API. Les enregistrements restent dans
+le stockage privé P19 ; les octets sont transmis au sous-processus local par un
+canal standard interne, sans fichier temporaire supplémentaire ni URL publique.
+Le résultat n'est jamais imprimé dans les journaux de l'application.
+
+Seule la préparation explicite du modèle contacte Hugging Face et télécharge ses
+poids : aucun audio ni récit ne lui est transmis. Le coût API est nul ; restent
+le téléchargement, l'espace disque, la RAM et le temps CPU locaux. Qualité et
+latence ne sont pas garanties par le benchmark d'un autre matériel.
+
+### Installation Windows et garde mémoire
+
+Le moteur est optionnel pour FastAPI et les tests automatisés. Pour le worker :
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-stt.txt
+.\.venv\Scripts\python.exe -m pip check
+.\.venv\Scripts\python.exe -c "from backend.app.stt_provider import available_memory_mb; print(available_memory_mb(), 'Mio disponibles')"
+# Seulement après autorisation et avec au moins 3072 Mio disponibles :
+.\.venv\Scripts\python.exe scripts\download_stt_model.py
+```
+
+Le seuil conservateur de **3072 Mio libres** est une garde du projet, pas une
+garantie constructeur. Il est vérifié avant téléchargement, avant lancement du
+sous-processus et immédiatement avant chargement du modèle. Si la mesure échoue
+ou si la RAM est insuffisante, le traitement s'arrête. Fermer les applications
+inutiles puis relancer explicitement ; ne pas diminuer le seuil pour forcer un essai.
+
+Par défaut le modèle se trouve dans
+`%LOCALAPPDATA%/Synthetiseur/models/whisper-small`, hors OneDrive et du dépôt.
+Le script refuse ces deux emplacements, réserve le téléchargement avec un verrou,
+épingle la révision obtenue au premier accès et permet la reprise d'un transfert
+interrompu. Après réussite, un second appel ne contacte plus le réseau. Un verrou
+resté après un arrêt brutal doit être vérifié manuellement avant suppression.
+Ne pas synchroniser ce dossier avec OneDrive. Le chargement utilise un chemin
+local et `local_files_only=True` ; FastAPI, le worker et pytest ne téléchargent
+jamais les poids. Un dossier incomplet donne une erreur, sans téléchargement de secours.
+
+Variables non secrètes documentées dans `.env.example` :
+
+| Variable | Défaut | Usage |
+| --- | --- | --- |
+| `STT_ENGINE` | `faster-whisper` | Sélection explicite ; seul cet adaptateur est fourni |
+| `STT_MODEL_PATH` | Dossier LOCALAPPDATA ci-dessus | Chemin absolu du modèle local |
+| `STT_TIMEOUT_SECONDS` | `600` | Délai du sous-processus, entre 30 et 1800 secondes |
+
+Le contrat `Provider.transcribe(audio)` permet un futur adaptateur sans réécrire
+les routes ou la file de jobs. Un autre moteur demande son implémentation et son
+enregistrement explicite ; une valeur inconnue est refusée, sans repli payant.
+Conserver les variables PostgreSQL, stockage privé et HTTPS existantes.
+
+### Migration et démarrage
+
+La migration **0006** ajoute aux jobs le média, la version initiale du récit, le
+jeton de réservation, le bail et les dates. Les anciennes migrations ne changent
+pas. Un index unique interdit deux jobs STT actifs pour le même rêve, donc pour
+le même audio. Si une base ancienne contient de tels doublons, la migration est
+refusée : les examiner sans supprimer automatiquement de données.
+
+```powershell
+# Démarrer PostgreSQL avec la procédure P02, puis :
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m alembic check
+Push-Location frontend
+npm.cmd run build
+Pop-Location
+# Terminal 1 : serveur web
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8443 --no-access-log --no-proxy-headers --ssl-keyfile tmp/https/key.pem --ssl-certfile tmp/https/cert.pem
+# Terminal 2, depuis la même racine : worker persistant distinct
+.\.venv\Scripts\python.exe -m backend.app.stt_worker
+# Diagnostic : réservation et traitement d'un seul job, puis arrêt
+.\.venv\Scripts\python.exe -m backend.app.stt_worker --once
+```
+
+Le worker est un processus séparé à garder ouvert ; aucune installation de service
+Windows ni redémarrage automatique par le système n'est effectué. Ctrl+C arrête le
+processus ; relancer la commande reprend la file PostgreSQL. Pour un arrêt brutal,
+la réservation n'est récupérable qu'à l'expiration de son bail.
+
+### Jobs, concurrence et protection P06
+
+Les états publics sont `pending`, `processing`, `completed`, `failed`. Ils correspondent
+aux états existants en base `queued`, `running`, `done`, `failed`, conservés pour
+compatibilité. La requête HTTP enregistre le job et répond sans exécuter Whisper.
+Le worker réserve via `FOR UPDATE SKIP LOCKED`, incrémente les tentatives et conserve
+un bail de `STT_TIMEOUT_SECONDS + 60` secondes. Après interruption, le bail expiré
+peut être repris, au maximum trois réservations par job. Une erreur du moteur est
+terminale pour ce job ; l'utilisateur peut demander un nouvel essai.
+
+Un nouveau jeton de réservation empêche un ancien worker de publier tardivement.
+Le résultat et l'état final sont validés dans une seule transaction, après verrou
+du rêve et vérification de son état, du média, de son expiration et de la version
+initiale. Une correction P06 concurrente produit `text_conflict` et reste intacte.
+Le service de texte P06 applique la limite de 20 000 caractères et incrémente la
+version seulement si le texte change. Les résultats invalides ne sont pas enregistrés.
+Une transcription ne modifie pas le statut global du rêve : son suivi est porté
+par le job, sans perturber les futurs traitements de génération.
+
+Les anciens PATCH modifiant le texte doivent maintenant fournir
+`expected_text_version`. Cette rupture ciblée ferme le contournement identifié en
+P06 ; les tests de ces clients ont été adaptés, avec une assertion de refus sans version.
+
+Les limites P04 (15 Mio, 8 minutes), un job actif par rêve, le délai maximal et les
+trois reprises bornent chaque traitement. Il n'y a pas de quota journalier global
+ni de superviseur automatique : cette version vise la démonstration locale. Plusieurs
+workers sont techniquement possibles, mais multiplier les processus consomme davantage
+de mémoire ; commencer par un seul. Aucune facturation externe n'est possible ici.
+
+### Routes et interface
+
+| Méthode | Route | Protection |
+| --- | --- | --- |
+| POST | `/api/v1/dreams/{dream_id}/transcriptions` | Bearer, propriétaire, média et version |
+| GET | `/api/v1/transcriptions/{job_id}` | Bearer, propriétaire |
+| GET | `/reves/{dream_id}/transcription` | Session web HTTPS, propriétaire |
+| POST | `/reves/{dream_id}/transcription` | Session, origine, CSRF et version |
+| GET | `/reves/{dream_id}/transcription/{job_id}` | Session et propriétaire, suivi JSON privé |
+
+Le POST API attend `media_id` et `expected_version`, retourne **202** et un identifiant
+de job. Une double demande ou une version dépassée reçoit **409**. Les jobs et médias
+étrangers/inconnus reçoivent **404**. Les réponses sont `no-store`, sans récit, clé
+de stockage, chemin local ni jeton de réservation. Les erreurs du moteur sont traduites
+en codes et messages constants ; aucun détail brut du fournisseur n'est affiché.
+
+Depuis la confirmation audio P04, suivre **Transcrire l'audio en français**, puis
+**Lancer la transcription locale**. La page indique l'attente, le traitement ou
+l'échec, et interroge le suivi avec le cookie HttpOnly existant. Aucun jeton de session
+n'est exposé à JavaScript. Si un récit existe, le remplacement est annoncé avant
+l'action. Le lien vers P06 reste disponible, même sans IA. Après réussite, ouvrir
+l'éditeur, vérifier le résultat et sauvegarder une correction.
+
+### Recette automatisée et essai réel distinct
+
+```powershell
+# Aucun modèle et aucun réseau IA nécessaires :
+.\.venv\Scripts\python.exe scripts\verify_p20.py
+.\.venv\Scripts\python.exe -m ruff check backend scripts
+.\.venv\Scripts\python.exe -m pip check
+# Essai réel explicite, modèle déjà présent, audio français FICTIF uniquement :
+.\.venv\Scripts\python.exe scripts\verify_stt_real.py --audio C:/CHEMIN/fiction-fr.wav
+```
+
+La dernière commande vérifie la RAM et mesure le temps sans imprimer le récit.
+Elle ne télécharge rien et ne remplace pas la vérification qualitative dans P06.
+Pour la recette manuelle Chrome : enregistrer une phrase française fictive avec
+P04, démarrer les deux processus, déclencher la transcription, attendre le succès,
+contrôler le français dans P06, corriger puis actualiser. Réécouter l'audio conservé.
+Vérifier aussi deux onglets : modifier le récit pendant le traitement ; le résultat
+IA doit échouer en conflit en préservant la correction. Sans worker, le job doit
+rester en attente après actualisation et être repris au démarrage du worker.
+
+Les tests automatisés utilisent exclusivement un faux fournisseur dans les fichiers
+de tests ; aucune option de simulation n'existe dans la configuration de production.
+Ils vérifient les succès, erreurs, timeout simulé, accès/CSRF, doublons, bail expiré,
+jeton de réservation dépassé, préservation audio et correction manuelle tardive.
+Le parcours Chrome teste les pages réelles avec le même faux fournisseur côté worker.
+
+### Résultats P05 du 11 novembre 2026 et validation restante
+
+**236 tests réussis, aucun ignoré, en 208,60 secondes**, avec PostgreSQL 17 réel,
+HTTPS et Chrome installé : 206 tests précédents (adaptation ciblée de l'ancien
+PATCH), 20 cas jobs/worker, 9 cas adaptateur et un parcours Chrome P05. Couverture
+Python instrumenté : **89,59 %** (1454/1623 instructions). Ce chiffre ne mesure
+ni JavaScript ni la reconnaissance vocale réelle dans le sous-processus.
+
+Migrations aller/retour et comparaison modèle/schéma réussies. Tests exécutés :
+succès fictif puis persistance et affichage P06, erreurs fournisseur et timeout
+simulés, refus des résultats vides/trop longs, CSRF et accès intercomptes/UUID,
+double demande concurrente (202/409), correction pendant le traitement conservée,
+bail expiré récupéré, ancien jeton empêché de publier et trois interruptions bornées.
+L'entrée `stt_worker --once` est testée avec un fournisseur injecté fictif.
+La reprise est vérifiée par expiration contrôlée du bail et reconnexion ; aucun
+crash matériel ou arrêt forcé d'un worker Whisper réel n'est simulé comme une réussite.
+
+Le navigateur réel vérifie attente, succès fictif, ouverture P06, échec/timeout
+fictif, navigation authentifiée et affichage mobile. Captures inspectées dans
+`tmp/p05-screenshots`. La recette antérieure vérifie aussi la relecture audio
+après redémarrage effectif de PostgreSQL/Uvicorn. Services temporaires arrêtés ;
+aucune migration de la base personnelle existante. Tailwind local, Ruff, `pip check`
+et `git diff --check` passent ; Git signale seulement sa conversion habituelle LF/CRLF.
+
+**Lors du premier passage, l'essai réel était bloqué par la RAM.** Le PC possède
+un i5-11400H (6 cœurs/12 threads), environ 15,8 Gio de RAM installée et 71,3 Gio de
+disque libres au relevé. La RAM disponible, initialement inférieure à 1 Gio,
+restait sous 3072 Mio : 2089 Mio après arrêt des services de recette, puis 1889 Mio
+lors de la commande d'essai initiale. Les commandes s'arrêtaient avec
+`insufficient_memory` avant tout accès aux poids. Le modèle a depuis été téléchargé
+explicitement ; le diagnostic complémentaire ci-dessous remplace ce blocage initial.
+`pypdf 7.0.1` a uniquement servi à la lecture du sujet, sans ajout aux dépendances
+de production.
+
+Un WAV français fictif a été préparé hors tests automatisés avec la voix Windows
+déjà installée Microsoft Hortense Desktop dans `tmp/p05-real/fiction-fr.wav`,
+ignoré par Git. Il ne contient aucune voix ou donnée personnelle. Pour reproduire
+l'essai, avec le modèle déjà présent et au moins 3 Gio de RAM disponible :
+
+```powershell
+.\.venv\Scripts\python.exe scripts\verify_stt_real.py --audio tmp/p05-real/fiction-fr.wav
+```
+
+Le parcours Chrome complet avec le worker réel est une recette manuelle distincte,
+effectuée ensuite par l'utilisateur et vérifiée en lecture seule ci-dessous.
+Le sujet ne présente aucune incompatibilité avec le choix local validé.
+
+### Diagnostic et correction du décodage PyAV 19
+
+Le test réel, une fois la mémoire libérée, a révélé l'exception technique :
+`TypeError: open() got an unexpected keyword argument 'metadata_errors'`.
+Le décodeur interne de faster-whisper 1.2.1 utilise cet argument, qui n'est plus
+accepté par PyAV 19.0.2. Le chargement CTranslate2 4.9.0 du modèle local en CPU
+INT8 réussissait déjà ; l'échec survenait ensuite pendant le décodage audio.
+Le parent masquait correctement cette exception sous `provider_failed`.
+
+La correction ne modifie aucune dépendance installée. `stt_audio.py` décode le
+WAV privé avec l'API PyAV 19, rééchantillonne en mono 16 kHz et transmet un tableau
+NumPy float32 à l'API publique de Whisper. Le décodeur incompatible de la bibliothèque
+n'est donc plus appelé. Les constantes P04 (15 Mio, huit minutes), la garde de
+3072 Mio, le timeout, le mode local et le versionnement P06 sont conservés.
+Aucune bibliothèque tierce n'est modifiée et aucun modèle n'est retéléchargé.
+
+Vérifications réelles : fichiers JSON du modèle lisibles, poids de 483 546 902 octets,
+empreinte SHA-256 conforme aux métadonnées du cache de téléchargement, import des
+bibliothèques réussi et INT8 présent dans les types de calcul CPU disponibles.
+Le WAV fictif est valide : PCM 16 bits mono, 22 050 Hz, 193 886 échantillons,
+soit 8,793 secondes. Son taux est converti vers 16 kHz avant reconnaissance.
+
+La commande d'origine réussit avec **3364 Mio disponibles**, en **4,38 secondes**,
+pour **130 caractères**, sans journalisation du récit. Un deuxième essai réel,
+avec **3495 Mio disponibles**, prend **4,11 secondes**. Comparaison à la phrase
+fictive connue, en ignorant ponctuation et casse : **25 mots de référence,
+25 mots reconnus, 0 erreur de mot (WER 0 %)**. Il s'agit d'un seul audio français
+synthétique (voix Windows), pas d'une évaluation sur des voix humaines variées
+ni d'une garantie de performance sur huit minutes.
+
+Après correction : **243 tests réussis, aucun ignoré, en 145,93 secondes** sur
+PostgreSQL réel et Chrome ; couverture Python instrumenté **89,53 %** (1479/1652
+instructions). Sept nouveaux cas de décodage vérifient notamment le WAV P04,
+le rééchantillonnage 22,05 vers 16 kHz, les fichiers invalides et la borne de durée.
+Ces tests ne chargent aucun modèle ; le fournisseur IA de la suite reste fictif.
+Ruff et `pip check` réussissent. Le résultat Whisper réel ci-dessus provient
+d'essais explicites distincts, sans installation ni téléchargement supplémentaire.
+
+### Bilan final P05 — deuxième essai microphone du 11 novembre 2026
+
+L'utilisateur a explicitement sélectionné **Microphone (Realtek(R) Audio)** dans
+Chrome et enregistré la même phrase française fictive dans un nouveau rêve.
+Le parcours réel P04 → worker Whisper local → P06 est déclaré réussi par
+l'utilisateur ; sa persistance est confirmée par une vérification PostgreSQL
+en lecture seule. Le nom du périphérique est issu de son relevé Chrome : P04
+ne conserve ni l'identifiant ni le nom du microphone. Le premier périphérique
+n'est donc pas identifié rétrospectivement.
+
+| Mesure | Premier essai, périphérique non identifié | Deuxième essai, Realtek sélectionné |
+| --- | --- | --- |
+| Audio conservé | WAV PCM 16 bits, mono, 16 kHz | WAV PCM 16 bits, mono, 16 kHz |
+| Durée | 8,04 s | 6,24 s |
+| Niveau RMS global | -29,661 dBFS | -20,394 dBFS |
+| Crête | -11,362 dBFS | -0,838 dBFS |
+| Échantillons saturés | 0 % | 0 % |
+| Mots de référence | 15 | 15 |
+| Erreurs de mots | 8 | 0 |
+| WER après normalisation casse/ponctuation | 53,33 % | 0 % |
+| Version du récit enregistré | 1 | 1 |
+| Job STT | done, une tentative, sans erreur | done, une tentative, sans erreur |
+| Délai création → fin du job | 5,170 s | 4,712 s |
+
+Le délai du job comprend l'attente du worker et le traitement ; ce n'est pas une
+mesure isolée de l'inférence. Les durées et pauses diffèrent entre enregistrements,
+ce qui influe aussi sur la comparaison des niveaux RMS globaux.
+
+Le deuxième récit correspond exactement à la phrase de référence, ponctuation
+comprise. Le job a utilisé la version initiale 0, s'est terminé sans erreur et
+a libéré sa réservation ; le texte est présent en version 1 avec date de mise
+à jour. Les fichiers sont prêts dans le stockage privé. Pour les deux audios,
+le décodeur P05 donne exactement les échantillons PCM lus indépendamment avec
+`wave`. Les empreintes audio et les versions/dates/empreintes des récits sont
+identiques avant et après la vérification. Aucune transcription n'a été relancée.
+
+Les essais précédents sur le premier audio ont reproduit 8 erreurs sur 15 mots.
+Amplification en mémoire, silence initial ajouté, VAD, température fixe et beam
+10 n'ont pas amélioré ce résultat. Supprimer les timestamps n'a corrigé qu'un
+mot ; float32 standard a donné un résultat inférieur. Aucun de ces essais ne
+justifie un changement général des paramètres de production. Les tests de la
+chaîne sur la phrase synthétique et sur Chrome avec source fictive reconnaissaient
+déjà les 15 mots sans erreur et ne révélaient pas de troncature par le décodeur.
+
+Le deuxième enregistrement, mieux exploitable, confirme le fonctionnement du
+moteur local et du parcours réel sur cette phrase. L'amélioration est cohérente
+avec la sélection explicite du microphone, mais deux prises ne prouvent pas
+que le périphérique est l'unique cause : diction, distance et acoustique peuvent
+également varier. Aucune garantie de précision générale n'est revendiquée.
+
+**P05 est prêt pour validation utilisateur** : reconnaissance réelle française,
+job persistant, stockage privé, sauvegarde et versionnement P06 vérifiés. Dernière
+suite automatisée : 243 tests réussis, aucun ignoré, couverture Python 89,53 % ;
+elle utilise un faux fournisseur et reste distincte de cette recette humaine.
+La suite n'a pas été relancée pour cette mise à jour documentaire seule.
+Le contrôle final n'a modifié ni code de production, ni audio, ni récit, ni modèle,
+ni configuration. Aucun téléchargement, commit, push ou changement Jira effectué.

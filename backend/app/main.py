@@ -18,6 +18,7 @@ from backend.app.dream_routes import router as dream_router
 from backend.app.errors import register_error_handlers
 from backend.app.media_routes import router as media_router
 from backend.app.schemas import ErrorResponse
+from backend.app.stt_routes import router as stt_router
 from backend.app.transcript_routes import router as transcript_router
 from backend.app.web.routes import WebLoginRequired, web_login_required
 from backend.app.web.routes import router as web_router
@@ -50,7 +51,7 @@ def create_app() -> FastAPI:
         version="0.1.0",
         description=(
             "Backend local pédagogique : API, sessions, interface web et médias privés. "
-            "Capture audio locale et privée, sans intégration IA."
+            "Capture audio privée et transcription locale via worker séparé."
         ),
         docs_url="/api/v1/docs",
         redoc_url="/api/v1/redoc",
@@ -74,6 +75,7 @@ def create_app() -> FastAPI:
     application.include_router(media_router)
     application.include_router(audio_router)
     application.include_router(transcript_router)
+    application.include_router(stt_router)
     application.add_exception_handler(WebLoginRequired, web_login_required)
     application.mount("/static", StaticFiles(directory=Path(__file__).parent / "web/static"),
                       name="static")
@@ -91,7 +93,7 @@ def create_app() -> FastAPI:
                                      status_code=400, headers={"Cache-Control": "no-store"})
         response = await call_next(request)
         if is_web or request.url.path.startswith((
-            "/api/v1/auth/", "/api/v1/dreams/", "/api/v1/media/",
+            "/api/v1/auth/", "/api/v1/dreams/", "/api/v1/media/", "/api/v1/transcriptions/",
         )):
             response.headers["Cache-Control"] = "no-store"
             response.headers["Pragma"] = "no-cache"

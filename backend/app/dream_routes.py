@@ -37,6 +37,8 @@ def update_dream(dream_id: uuid.UUID, payload: DreamUpdate,
     dream = owned_dream(db, user, dream_id)
     changes = payload.model_dump(exclude_unset=True)
     if "transcript" in changes:
+        if payload.expected_text_version is None:
+            return error_response(409, "text_version_required", "Rechargez la version du récit.")
         try:
             apply_correction(db, dream, changes["transcript"], payload.expected_text_version)
         except TextVersionConflict:

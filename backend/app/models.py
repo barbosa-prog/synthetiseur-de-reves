@@ -193,6 +193,8 @@ class Job(Base):
         CheckConstraint("kind IN ('stt','image','tts')", name="ck_job_kind"),
         CheckConstraint("status IN ('queued','running','done','failed')", name="ck_job_status"),
         CheckConstraint("attempts BETWEEN 0 AND 3", name="ck_job_attempts"),
+        Index("uq_active_stt_dream", "dream_id", unique=True,
+              postgresql_where=text("kind = 'stt' AND status IN ('queued','running')")),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -206,4 +208,10 @@ class Job(Base):
     status: Mapped[str] = mapped_column(String(12), server_default="queued")
     attempts: Mapped[int] = mapped_column(Integer, server_default="0")
     error_code: Mapped[str | None] = mapped_column(String(40))
+    media_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("media.id", ondelete="RESTRICT"))
+    expected_text_version: Mapped[int | None] = mapped_column(Integer)
+    claim_token: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    lease_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     dream: Mapped[Dream] = relationship(back_populates="jobs")

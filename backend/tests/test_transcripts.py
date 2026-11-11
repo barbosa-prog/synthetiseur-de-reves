@@ -87,6 +87,9 @@ def test_stale_version_and_legacy_api_are_consistent(environment):
     legacy = f"/api/v1/dreams/{dream}"
     assert client.patch(legacy, headers=owner, json={
         "transcript": "Premier récit fictif",
+    }).status_code == 409
+    assert client.patch(legacy, headers=owner, json={
+        "transcript": "Premier récit fictif", "expected_text_version": 0,
     }).status_code == 200
     assert client.get(api_path(dream), headers=owner).json()["text_version"] == 1
     assert client.patch(api_path(dream), headers=owner, json={

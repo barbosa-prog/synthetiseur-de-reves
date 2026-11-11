@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Transcription locale · Synthétiseur de rêves{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl px-5 py-12 sm:px-8" data-protected-page data-expires-at="{{ expires_at }}">
+  <a href="/reves/{{ dream.id }}/audio" class="text-sm text-muted hover:text-ink">← Votre audio</a>
+  <section class="surface mt-8 p-7 sm:p-10">
+    <p class="eyebrow mb-3">02 · Transcription locale</p>
+    <h1 class="text-3xl font-semibold">Retrouver les mots du rêve.</h1>
+    <p class="mt-5 leading-7 text-muted">La reconnaissance vocale française s’exécute sur ce PC avec Whisper. Aucun audio n’est envoyé à un service externe. L’audio privé est conservé. Le traitement démarre uniquement à votre demande.</p>
+    {% if dream.transcript %}<p class="mt-5 rounded-xl border border-slate-700 p-4 text-sm text-muted">Un récit existe déjà (version {{ dream.text_version }}). Une nouvelle transcription le remplacera uniquement s’il n’a pas changé entre-temps. Vous pouvez conserver votre texte et continuer sans IA.</p>{% endif %}
+    {% if error %}<p role="alert" class="mt-5 text-rose-100">{{ error }}</p>{% endif %}
+    {% if job %}<div id="stt-progress" data-status="{{ job.status }}" data-url="/reves/{{ dream.id }}/transcription/{{ job.id }}" class="mt-6 rounded-xl border border-slate-700 p-5" aria-live="polite">
+      <p id="stt-status">{% if job.status == 'pending' %}En attente du worker local…{% elif job.status == 'processing' %}Transcription en cours…{% elif job.status == 'completed' %}Transcription enregistrée. Vous pouvez vérifier et corriger le récit.{% else %}{{ job.message }}{% endif %}</p>
+      <p class="mt-3 text-xs text-muted">Si le worker est arrêté, la demande reste enregistrée. Le délai dépend de la durée de l’audio et des ressources du PC.</p>
+    </div>{% endif %}
+    {% if media %}<form method="post" action="/reves/{{ dream.id }}/transcription" class="mt-7">
+      <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="media_id" value="{{ media.id }}"><input type="hidden" name="expected_version" value="{{ dream.text_version }}">
+      <button id="stt-start" type="submit" class="btn btn-primary disabled:opacity-50" {% if job and job.status in ['pending','processing'] %}disabled{% endif %}>Lancer la transcription locale</button>
+    </form>{% else %}<p class="mt-6 text-rose-100">Aucun audio P04 disponible pour ce rêve.</p>{% endif %}
+    <a class="btn btn-secondary mt-5" href="/reves/{{ dream.id }}/recit">Ouvrir l’éditeur du récit</a>
+    <p class="mt-5 text-sm leading-7 text-muted">Vérifiez toujours le résultat : la reconnaissance vocale peut se tromper. La saisie manuelle reste disponible sans transcription.</p>
+  </section>
+</div>
+<script src="{{ url_for('static', path='js/stt.js') }}" defer></script>
+{% endblock %}
