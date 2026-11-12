@@ -16,6 +16,7 @@ from backend.app.audio_routes import router as audio_router
 from backend.app.auth_routes import router as auth_router
 from backend.app.dream_routes import router as dream_router
 from backend.app.errors import register_error_handlers
+from backend.app.image_routes import router as image_router
 from backend.app.media_routes import router as media_router
 from backend.app.schemas import ErrorResponse
 from backend.app.stt_routes import router as stt_router
@@ -76,6 +77,7 @@ def create_app() -> FastAPI:
     application.include_router(audio_router)
     application.include_router(transcript_router)
     application.include_router(stt_router)
+    application.include_router(image_router)
     application.add_exception_handler(WebLoginRequired, web_login_required)
     application.mount("/static", StaticFiles(directory=Path(__file__).parent / "web/static"),
                       name="static")

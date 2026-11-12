@@ -5,6 +5,7 @@
   <a href="/accueil" class="text-sm text-muted hover:text-ink">← Mon espace</a>
   <p class="eyebrow mt-8 mb-3">02 · Le récit</p>
   <h1 class="text-4xl font-semibold tracking-tight">Les mots de votre rêve.</h1>
+  {% if dream.transcript %}<a class="btn btn-secondary mt-5" href="/reves/{{ dream.id }}/image">Créer une image du rêve</a>{% endif %}
   <p class="mt-4 max-w-2xl leading-7 text-muted">Écrivez votre récit à votre rythme. Vous pourrez ensuite le retrouver et le corriger avant les futures étapes de création.</p>
   <div class="mt-8 grid items-start gap-6 lg:grid-cols-[1fr_300px]">
     <section class="surface p-6 sm:p-8" aria-labelledby="editor-title">

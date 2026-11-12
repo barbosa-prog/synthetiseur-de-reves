@@ -15,7 +15,7 @@ from sqlalchemy import (
     func,
     text,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.database import Base
@@ -195,6 +195,8 @@ class Job(Base):
         CheckConstraint("attempts BETWEEN 0 AND 3", name="ck_job_attempts"),
         Index("uq_active_stt_dream", "dream_id", unique=True,
               postgresql_where=text("kind = 'stt' AND status IN ('queued','running')")),
+        Index("uq_active_image_dream", "dream_id", unique=True,
+              postgresql_where=text("kind = 'image' AND status IN ('queued','running')")),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -215,3 +217,44 @@ class Job(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     dream: Mapped[Dream] = relationship(back_populates="jobs")
+
+
+class ImageDescription(Base):
+    """Description courante privée ; propriétaire déterminé par le rêve associé."""
+
+    __tablename__ = "image_descriptions"
+    __table_args__ = (
+        CheckConstraint("version >= 1 AND text_version >= 1", name="ck_image_description_versions"),
+        CheckConstraint("length(btrim(description)) BETWEEN 1 AND 500",
+                        name="ck_image_description_length"),
+    )
+    dream_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("dreams.id", ondelete="RESTRICT"), primary_key=True)
+    description: Mapped[str] = mapped_column(Text)
+    version: Mapped[int] = mapped_column(Integer)
+    text_version: Mapped[int] = mapped_column(Integer)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ImageGeneration(Base):
+    """Snapshot privé immuable par le service ; le Job porte le cycle de vie commun."""
+
+    __tablename__ = "image_generations"
+    __table_args__ = (
+        CheckConstraint("text_version >= 1 AND description_version >= 1",
+                        name="ck_image_generation_versions"),
+        CheckConstraint("length(btrim(description)) BETWEEN 1 AND 500",
+                        name="ck_image_generation_description"),
+        CheckConstraint("length(btrim(transcript)) BETWEEN 1 AND 20000",
+                        name="ck_image_generation_text"),
+        CheckConstraint("jsonb_typeof(parameters) = 'object'",
+                        name="ck_image_generation_parameters"),
+    )
+    job_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("jobs.id", ondelete="RESTRICT"),
+                                             primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="RESTRICT"))
+    transcript: Mapped[str] = mapped_column(Text)
+    text_version: Mapped[int] = mapped_column(Integer)
+    description: Mapped[str] = mapped_column(Text)
+    description_version: Mapped[int] = mapped_column(Integer)
+    parameters: Mapped[dict] = mapped_column(JSONB)
