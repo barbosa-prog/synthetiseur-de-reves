@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Mes rêves · Synthétiseur de rêves{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14" data-protected-page data-expires-at="{{ expires_at }}">
+  <p class="eyebrow mb-3">Votre journal privé</p>
+  <h1 class="text-4xl font-semibold">Mes rêves</h1>
+  <p class="mt-4 text-muted">Du plus récent au plus ancien, y compris les rêves encore incomplets.</p>
+  <form action="/mes-reves" method="get" class="surface mt-7 flex flex-wrap items-end gap-4 p-5">
+    <div><label for="emotion-filter" class="mb-2 block text-sm font-medium">Émotion</label>
+      <select id="emotion-filter" name="emotion" class="field">
+        <option value="" {% if history.emotion is none %}selected{% endif %}>Toutes</option>
+        {% for value, label in emotions.items() %}<option value="{{ value }}" {% if history.emotion == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Filtrer</button>
+    <a href="/mes-reves" class="btn btn-secondary">Réinitialiser</a>
+  </form>
+  <p class="mt-5 text-sm text-muted" role="status">{{ history.total }} rêve{{ 's' if history.total != 1 else '' }} · 12 par page</p>
+  {% if history.items %}<div id="dream-list" class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+    {% for dream in history.items %}<article class="surface flex flex-col p-6" data-dream-id="{{ dream.id }}">
+      <h2 class="text-lg font-semibold">Rêve du <time datetime="{{ dream.created_at.isoformat() }}">{{ utc_date(dream.created_at).strftime('%d/%m/%Y') }}</time></h2>
+      <p class="mt-2 text-xs text-muted">{{ utc_date(dream.created_at).strftime('%H:%M') }} UTC · {{ states.get(dream.status, 'Enregistré') }}</p>
+      <p class="mt-3 text-sm text-lavender">{{ emotions.get(dream.emotion, 'Non renseignée') }}</p>
+      <p class="mt-4 mb-5 break-words text-sm leading-7 text-muted">{{ dream.excerpt if dream.has_transcript else 'Aucun récit enregistré pour le moment.' }}{% if dream.excerpt and dream.excerpt|length == 200 %}…{% endif %}</p>
+      <a class="btn btn-secondary mt-auto" href="/reves/{{ dream.id }}">Ouvrir le rêve</a>
+    </article>{% endfor %}
+  </div>{% else %}<section class="surface mt-6 p-7">
+    <h2 class="text-xl font-semibold">{{ 'Aucun rêve sur cette page' if history.total else 'Aucun rêve à afficher' }}</h2>
+    <p class="mt-3 text-muted">{% if history.emotion %}Aucun résultat sur cette page avec ce filtre. Essayez une autre émotion ou revenez à la première page.{% else %}Vous pouvez enregistrer un audio ou revenir à la première page de votre journal.{% endif %}</p>
+    <a class="btn btn-secondary mt-5" href="/mes-reves{% if history.emotion %}?emotion={{ history.emotion }}{% endif %}">Première page</a>
+    <a class="btn btn-primary mt-5" href="/nouveau-reve">Capturer un rêve</a>
+  </section>{% endif %}
+  <nav aria-label="Pagination des rêves" class="mt-7 flex flex-wrap items-center justify-between gap-4">
+    {% if previous_url %}<a class="btn btn-secondary" rel="prev" href="{{ previous_url }}">Page précédente</a>{% endif %}
+    <span class="text-sm text-muted">Page {{ history.page }}{% if history.total_pages and history.page <= history.total_pages %} sur {{ history.total_pages }}{% elif history.total_pages %} · hors des résultats{% endif %}</span>
+    {% if next_url %}<a class="btn btn-secondary" rel="next" href="{{ next_url }}">Page suivante</a>{% endif %}
+  </nav>
+</div>
+{% endblock %}

@@ -1,15 +1,18 @@
 """Accès minimal P03 aux rêves existants, toujours filtré par propriétaire."""
 
 import uuid
+from typing import Annotated
 
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Query, Response
 from sqlalchemy import func, select
 
 from backend.app.auth import CurrentUser, Database
 from backend.app.auth_schemas import DreamResponse, DreamUpdate
 from backend.app.errors import error_response
+from backend.app.history_schemas import HistoryPage, HistoryQuery
 from backend.app.models import Dream
 from backend.app.schemas import ErrorResponse
+from backend.app.services.history import list_dreams
 from backend.app.services.transcripts import TextVersionConflict, apply_correction
 from backend.app.services.transcripts import owned_dream as find_owned_dream
 
@@ -22,6 +25,12 @@ router = APIRouter(prefix="/api/v1/dreams", tags=["Rêves privés"], responses={
 def owned_dream(db, user, dream_id: uuid.UUID) -> Dream:
     """Même 404 pour un UUID absent, supprimé ou appartenant à un autre compte."""
     return find_owned_dream(db, user.id, dream_id, lock=True)
+
+
+@router.get("", response_model=HistoryPage)
+def history(user: CurrentUser, db: Database, query: Annotated[HistoryQuery, Query()]):
+    """Historique Bearer, sans lecture des fichiers privés ni lancement IA."""
+    return list_dreams(db, user.id, query)
 
 
 @router.get("/{dream_id}", response_model=DreamResponse)

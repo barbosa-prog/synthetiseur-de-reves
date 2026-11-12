@@ -1,5 +1,6 @@
 """Recette P07/P05/P06 sur PostgreSQL natif temporaire, sans IA ni base personnelle."""
 
+import argparse
 import os
 import secrets
 import socket
@@ -14,6 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--history-only", action="store_true")
+    history_only = parser.parse_args().history_only
     pg = Path(os.getenv("P20_POSTGRES_BIN", r"C:\Program Files\PostgreSQL\17\bin"))
     if not (pg / "initdb.exe").is_file():
         raise SystemExit("PostgreSQL natif absent ; utiliser TEST_DATABASE_URL dédié.")
@@ -47,15 +51,21 @@ def main():
                              host="127.0.0.1", port=port, database="p07_validation")
             env["TEST_DATABASE_URL"] = url.render_as_string(hide_password=False)
             print("PostgreSQL temporaire démarré ; aucune base personnelle utilisée.", flush=True)
-            return subprocess.run([
-                sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
-                "--basetemp", str(directory / "pytest"), "--tb=short",
+            checks = [
+                "backend/tests/test_history.py", "backend/tests/test_history_rules.py",
+                "backend/tests/test_history_web.py", "-x",
+            ] if history_only else [
                 "backend/tests/test_image_jobs.py", "backend/tests/test_image_provider.py",
                 "backend/tests/test_image_job_rules.py",
                 "backend/tests/test_image_execution.py", "backend/tests/test_image_runner.py",
                 "backend/tests/test_media.py", "backend/tests/test_private_storage.py",
                 "backend/tests/test_stt.py", "backend/tests/test_transcripts.py",
-                "backend/tests/test_stt_provider.py", "backend/tests/test_text_rules.py", "-q",
+                "backend/tests/test_stt_provider.py", "backend/tests/test_text_rules.py",
+            ]
+            return subprocess.run([
+                sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
+                "--basetemp", str(directory / "pytest"), "--tb=short",
+                *checks, "-q",
             ], env=env, cwd=ROOT, timeout=600).returncode
         finally:
             if started:

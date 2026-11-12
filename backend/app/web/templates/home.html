@@ -6,17 +6,18 @@
   <section class="dream-sky relative overflow-hidden rounded-3xl border border-slate-700 px-6 py-10 sm:px-10" aria-labelledby="home-title">
     <p class="mb-4 flex items-center gap-2 text-sm text-lavender">{{ icon('moon') }} Une place pour vos souvenirs</p>
     <h1 id="home-title" class="max-w-xl text-4xl font-semibold tracking-tight sm:text-5xl">Votre espace,<br>au calme.</h1>
-    <p class="mt-5 max-w-xl leading-7 text-muted">Bienvenue dans votre journal de rêves. Votre connexion est sécurisée ; les prochaines étapes du parcours seront ajoutées progressivement.</p>
+    <p class="mt-5 max-w-xl leading-7 text-muted">Retrouvez vos rêves enregistrés, corrigez leurs récits et explorez leurs illustrations privées.</p>
     <div class="mt-7 inline-flex items-center gap-2 rounded-lg border border-slate-600 bg-night/60 px-3 py-2 text-xs text-muted">{{ icon('lock', 'h-4 w-4') }} {{ user.email }}</div>
   </section>
   <div class="mt-8 grid gap-6 lg:grid-cols-[1fr_300px]">
     <section class="surface p-6 sm:p-8" aria-labelledby="journey-title">
-      <p class="eyebrow mb-3">Le parcours à venir</p><h2 id="journey-title" class="text-2xl font-semibold">Du réveil au souvenir</h2>
-      <p class="mt-3 text-sm leading-6 text-muted">Enregistrez ou importez votre audio privé. La transcription et les autres traitements seront ajoutés plus tard.</p>
+      <p class="eyebrow mb-3">Votre parcours</p><h2 id="journey-title" class="text-2xl font-semibold">Du réveil au souvenir</h2>
+      <p class="mt-3 text-sm leading-6 text-muted">Enregistrez votre audio, demandez sa transcription, corrigez le récit et créez une illustration. Votre historique conserve aussi les rêves incomplets.</p>
       <a href="/nouveau-reve" class="btn btn-primary mt-5">Capturer un rêve {{ icon('arrow', 'h-4 w-4') }}</a>
+      <a href="/mes-reves" class="btn btn-secondary mt-5">Mes rêves</a>
       <ol class="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         {% for name in ['Audio', 'Transcription', 'Illustration', 'Émotion', 'Historique'] %}
-        <li class="rounded-xl border border-slate-700 bg-night p-4"><span class="block text-xs text-lavender">0{{ loop.index }}</span><span class="mt-3 block text-sm font-medium">{{ name }}</span><span class="mt-2 block text-xs text-muted">{{ 'Disponible' if loop.first else 'À venir' }}</span></li>
+        <li class="rounded-xl border border-slate-700 bg-night p-4"><span class="block text-xs text-lavender">0{{ loop.index }}</span><span class="mt-3 block text-sm font-medium">{{ name }}</span><span class="mt-2 block text-xs text-muted">{{ 'Suggestion à venir' if name == 'Émotion' else 'Disponible' }}</span></li>
         {% endfor %}
       </ol>
       <p class="mt-7 flex items-center gap-2 text-sm text-muted">{{ icon('spark', 'h-5 w-5 text-lavender') }} Utilisez un récit fictif pour la démonstration.</p>

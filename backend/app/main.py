@@ -16,6 +16,7 @@ from backend.app.audio_routes import router as audio_router
 from backend.app.auth_routes import router as auth_router
 from backend.app.dream_routes import router as dream_router
 from backend.app.errors import register_error_handlers
+from backend.app.history_routes import router as history_router
 from backend.app.image_routes import router as image_router
 from backend.app.media_routes import router as media_router
 from backend.app.schemas import ErrorResponse
@@ -78,6 +79,7 @@ def create_app() -> FastAPI:
     application.include_router(transcript_router)
     application.include_router(stt_router)
     application.include_router(image_router)
+    application.include_router(history_router)
     application.add_exception_handler(WebLoginRequired, web_login_required)
     application.mount("/static", StaticFiles(directory=Path(__file__).parent / "web/static"),
                       name="static")
@@ -86,7 +88,7 @@ def create_app() -> FastAPI:
     async def private_responses(request, call_next):
         is_web = request.url.path.startswith(("/web/media/", "/reves/")) or request.url.path in {
             "/", "/connexion", "/inscription", "/accueil", "/deconnexion", "/web/session",
-            "/nouveau-reve", "/web/audio",
+            "/nouveau-reve", "/web/audio", "/mes-reves",
         }
         if is_web and (
             request.url.scheme != "https" or request.headers.get("host") != parts.netloc
@@ -94,7 +96,7 @@ def create_app() -> FastAPI:
             return PlainTextResponse("Utilisez l’origine HTTPS configurée pour l’interface.",
                                      status_code=400, headers={"Cache-Control": "no-store"})
         response = await call_next(request)
-        if is_web or request.url.path.startswith((
+        if is_web or request.url.path == "/api/v1/dreams" or request.url.path.startswith((
             "/api/v1/auth/", "/api/v1/dreams/", "/api/v1/media/", "/api/v1/transcriptions/",
         )):
             response.headers["Cache-Control"] = "no-store"

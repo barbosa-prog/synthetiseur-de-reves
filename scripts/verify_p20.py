@@ -112,7 +112,7 @@ def main() -> int:
                 sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
                 "--basetemp", str(directory / "pytest"), "--tb=short",
                 *checks,
-            ], cwd=ROOT, env=env, capture_output=True, text=True, timeout=300)
+            ], cwd=ROOT, env=env, capture_output=True, text=True, timeout=600)
             output = result.stdout + result.stderr
             for secret in (raw_url, password, role):
                 output = output.replace(secret, "[MASQUÉ]")
@@ -169,6 +169,11 @@ def main() -> int:
                         response = client.get(endpoint, headers=headers)
                         if response.status_code != 200 or response.content != payload:
                             raise RuntimeError("Lecture privée HTTP initiale échouée.")
+                        history_before = client.get(origin + "/api/v1/dreams", headers=headers)
+                        if (history_before.status_code != 200
+                                or history_before.json()["total"] != 1
+                                or history_before.json()["items"][0]["id"] != str(dream_id)):
+                            raise RuntimeError("Historique P09 initial non validé.")
                     server.terminate()
                     server.wait(timeout=15)
                     server = None
@@ -190,6 +195,12 @@ def main() -> int:
                         response = client.get(endpoint, headers=headers)
                         if response.status_code != 200 or response.content != payload:
                             raise RuntimeError("Persistance après redémarrage non validée.")
+                        history_after = client.get(origin + "/api/v1/dreams", headers=headers)
+                        if (history_after.status_code != 200
+                                or history_after.json() != history_before.json()):
+                            raise RuntimeError("Historique P09 perdu après redémarrage.")
+                        print("P09 : historique identique après redémarrage PostgreSQL/Uvicorn.",
+                              flush=True)
                         if uploaded is not None:
                             recorded_response = client.get(
                                 origin + f"/api/v1/media/{uploaded[0]}/content",

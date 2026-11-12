@@ -19,10 +19,11 @@
         <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-400/25 bg-violet-400/10 text-lavender">{{ icon('moon', 'h-6 w-6') }}</span>
         <span><strong class="block text-base font-semibold tracking-tight">Synthétiseur de rêves</strong><span class="text-xs text-muted">Les souvenirs de vos nuits.</span></span>
       </a>
-      <button class="btn btn-secondary md:hidden" type="button" id="menu-toggle" aria-controls="navigation" aria-expanded="false" aria-label="Ouvrir la navigation">{{ icon('menu') }}</button>
-      <nav id="navigation" class="hidden items-center gap-3 md:flex" aria-label="Navigation principale">
+      <button class="btn btn-secondary lg:hidden" type="button" id="menu-toggle" aria-controls="navigation" aria-expanded="false" aria-label="Ouvrir la navigation">{{ icon('menu') }}</button>
+      <nav id="navigation" class="hidden items-center gap-3 lg:flex" aria-label="Navigation principale">
         {% if user is defined %}
-        <a class="nav-link" href="/accueil" aria-current="page">Mon espace</a>
+        <a class="nav-link" href="/accueil" {% if request.url.path == '/accueil' %}aria-current="page"{% endif %}>Mon espace</a>
+        <a class="nav-link" href="/mes-reves" {% if request.url.path == '/mes-reves' %}aria-current="page"{% endif %}>Mes rêves</a>
         <a class="nav-link" href="/nouveau-reve">Capturer un rêve</a>
         <form action="/deconnexion" method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn-secondary" type="submit">Se déconnecter</button></form>
         {% else %}
