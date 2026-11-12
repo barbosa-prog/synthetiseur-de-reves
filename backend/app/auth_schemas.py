@@ -78,6 +78,7 @@ class DreamUpdate(BaseModel):
     transcript: str | None = Field(default=None, max_length=20000)
     emotion: Literal["heureux", "stressant", "neutre", "triste", "autre"] | None = None
     expected_text_version: int | None = Field(default=None, ge=0, le=2147483646, strict=True)
+    expected_emotion_revision: int | None = Field(default=None, ge=0, strict=True)
 
     @field_validator("transcript", mode="before")
     @classmethod

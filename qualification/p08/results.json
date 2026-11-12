@@ -1,0 +1,2364 @@
+{
+  "model": {
+    "repo": "MoritzLaurer/multilingual-MiniLMv2-L6-mnli-xnli",
+    "revision": "0a71e92a985b6e1ad1828cf67ce9c459639c1dca",
+    "license": "mit",
+    "files": {
+      "README.md": {
+        "bytes": 6741,
+        "sha256": "f28aebb1babf603b5c5c107670645f2b00e09a2e9a39132293ad0a9a7ab6fa34",
+        "lfs_verified": false
+      },
+      "config.json": {
+        "bytes": 1032,
+        "sha256": "79862295be1538a947e0f56d495ef8d658c3eaebcfb42c7ad96229d195ca745d",
+        "lfs_verified": false
+      },
+      "tokenizer.json": {
+        "bytes": 17082758,
+        "sha256": "098c131bb4423163db239755e309facaa6850059f850f9f3d88a78344a4b631c",
+        "lfs_verified": true
+      },
+      "tokenizer_config.json": {
+        "bytes": 565,
+        "sha256": "86139ce1f39e814bcdb99a6fe30c0c4983911508aad07417e616d994fb74eb25",
+        "lfs_verified": false
+      },
+      "special_tokens_map.json": {
+        "bytes": 280,
+        "sha256": "06e405a36dfe4b9604f484f6a1e619af1a7f7d09e34a8555eb0b77b66318067f",
+        "lfs_verified": false
+      },
+      "model.safetensors": {
+        "bytes": 427997022,
+        "sha256": "91b323ccf247ec1e3b5925d566230bae7c52de8147e6062b42e250089a3fc80b",
+        "lfs_verified": true
+      }
+    }
+  },
+  "dependencies": {
+    "torch": "2.7.1+cpu",
+    "transformers": "4.57.3",
+    "tokenizers": "0.22.2",
+    "safetensors": "0.7.0",
+    "psutil": "7.1.3"
+  },
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "torch_cuda": null,
+  "tokenizer_class": "XLMRobertaTokenizerFast",
+  "tokenizer_max": 512,
+  "model_max_positions": 514,
+  "id2label": {
+    "0": "entailment",
+    "1": "neutral",
+    "2": "contradiction"
+  },
+  "dataset_sha256": "4a52b1687300bbaa946c7d6a178bef898ece8fec42db6b3c76f6b37e6195b043",
+  "parameters": {
+    "variant": 0,
+    "threshold": 0.55,
+    "margin": 0.05,
+    "metrics": {
+      "matrix": {
+        "heureux": {
+          "heureux": 2,
+          "stressant": 0,
+          "neutre": 0,
+          "triste": 0,
+          "autre": 0,
+          "abstention": 0
+        },
+        "stressant": {
+          "heureux": 0,
+          "stressant": 0,
+          "neutre": 0,
+          "triste": 0,
+          "autre": 0,
+          "abstention": 2
+        },
+        "neutre": {
+          "heureux": 0,
+          "stressant": 0,
+          "neutre": 2,
+          "triste": 0,
+          "autre": 0,
+          "abstention": 0
+        },
+        "triste": {
+          "heureux": 0,
+          "stressant": 0,
+          "neutre": 0,
+          "triste": 1,
+          "autre": 0,
+          "abstention": 1
+        },
+        "autre": {
+          "heureux": 0,
+          "stressant": 0,
+          "neutre": 0,
+          "triste": 0,
+          "autre": 0,
+          "abstention": 2
+        }
+      },
+      "per_class": {
+        "heureux": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2
+        },
+        "stressant": {
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0,
+          "support": 2
+        },
+        "neutre": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2
+        },
+        "triste": {
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
+          "support": 2
+        },
+        "autre": {
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0,
+          "support": 2
+        }
+      },
+      "macro_f1": 0.5333333333333333,
+      "accuracy": 0.5,
+      "abstention_rate": 0.5
+    },
+    "hypotheses": [
+      "Ce récit exprime de la joie et du bonheur.",
+      "Ce récit exprime de la peur et du stress.",
+      "Ce récit exprime une absence d'émotion particulière.",
+      "Ce récit exprime de la tristesse.",
+      "Ce récit exprime une autre émotion : surprise, curiosité, colère ou dégoût."
+    ],
+    "chunk_tokens": 300,
+    "max_characters": 20000,
+    "min_tokens": 5,
+    "aggregation": "mean",
+    "seed": 42,
+    "threads": 2
+  },
+  "dev_candidates": [
+    {
+      "variant": 0,
+      "threshold": 0.35,
+      "margin": 0.05,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 1,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 1
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 1,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 1
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.4666666666666667,
+        "accuracy": 0.5,
+        "abstention_rate": 0.3
+      }
+    },
+    {
+      "variant": 0,
+      "threshold": 0.35,
+      "margin": 0.15,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 1,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 1
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "f1": 0.8,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.49333333333333335,
+        "accuracy": 0.5,
+        "abstention_rate": 0.4
+      }
+    },
+    {
+      "variant": 0,
+      "threshold": 0.35,
+      "margin": 0.25,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 1,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 1
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "f1": 0.8,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.49333333333333335,
+        "accuracy": 0.5,
+        "abstention_rate": 0.4
+      }
+    },
+    {
+      "variant": 0,
+      "threshold": 0.45,
+      "margin": 0.05,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 1,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 1
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 1,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 1
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 0.5,
+            "recall": 1.0,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.4666666666666667,
+        "accuracy": 0.5,
+        "abstention_rate": 0.3
+      }
+    },
+    {
+      "variant": 0,
+      "threshold": 0.45,
+      "margin": 0.15,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 1,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 1
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "f1": 0.8,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.49333333333333335,
+        "accuracy": 0.5,
+        "abstention_rate": 0.4
+      }
+    },
+    {
+      "variant": 0,
+      "threshold": 0.45,
+      "margin": 0.25,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 1,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 1
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "f1": 0.8,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.49333333333333335,
+        "accuracy": 0.5,
+        "abstention_rate": 0.4
+      }
+    },
+    {
+      "variant": 0,
+      "threshold": 0.55,
+      "margin": 0.05,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.5333333333333333,
+        "accuracy": 0.5,
+        "abstention_rate": 0.5
+      }
+    },
+    {
+      "variant": 0,
+      "threshold": 0.55,
+      "margin": 0.15,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.5333333333333333,
+        "accuracy": 0.5,
+        "abstention_rate": 0.5
+      }
+    },
+    {
+      "variant": 0,
+      "threshold": 0.55,
+      "margin": 0.25,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.5333333333333333,
+        "accuracy": 0.5,
+        "abstention_rate": 0.5
+      }
+    },
+    {
+      "variant": 1,
+      "threshold": 0.35,
+      "margin": 0.05,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 1,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 0
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 1,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 0
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 0.3333333333333333,
+            "recall": 0.5,
+            "f1": 0.4,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.48,
+        "accuracy": 0.5,
+        "abstention_rate": 0.1
+      }
+    },
+    {
+      "variant": 1,
+      "threshold": 0.35,
+      "margin": 0.15,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 1,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 0
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 0.3333333333333333,
+            "recall": 0.5,
+            "f1": 0.4,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.48,
+        "accuracy": 0.5,
+        "abstention_rate": 0.2
+      }
+    },
+    {
+      "variant": 1,
+      "threshold": 0.35,
+      "margin": 0.25,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.5333333333333333,
+        "accuracy": 0.5,
+        "abstention_rate": 0.5
+      }
+    },
+    {
+      "variant": 1,
+      "threshold": 0.45,
+      "margin": 0.05,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.5,
+        "accuracy": 0.5,
+        "abstention_rate": 0.4
+      }
+    },
+    {
+      "variant": 1,
+      "threshold": 0.45,
+      "margin": 0.15,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 0.5,
+            "recall": 0.5,
+            "f1": 0.5,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.5,
+        "accuracy": 0.5,
+        "abstention_rate": 0.4
+      }
+    },
+    {
+      "variant": 1,
+      "threshold": 0.45,
+      "margin": 0.25,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 2,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.5333333333333333,
+        "accuracy": 0.5,
+        "abstention_rate": 0.5
+      }
+    },
+    {
+      "variant": 1,
+      "threshold": 0.55,
+      "margin": 0.05,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.3333333333333333,
+        "accuracy": 0.3,
+        "abstention_rate": 0.7
+      }
+    },
+    {
+      "variant": 1,
+      "threshold": 0.55,
+      "margin": 0.15,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.3333333333333333,
+        "accuracy": 0.3,
+        "abstention_rate": 0.7
+      }
+    },
+    {
+      "variant": 1,
+      "threshold": 0.55,
+      "margin": 0.25,
+      "metrics": {
+        "matrix": {
+          "heureux": {
+            "heureux": 2,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 2
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 2
+          },
+          "stressant": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "neutre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.5,
+            "f1": 0.6666666666666666,
+            "support": 2
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 2
+          }
+        },
+        "macro_f1": 0.3333333333333333,
+        "accuracy": 0.3,
+        "abstention_rate": 0.7
+      }
+    }
+  ],
+  "final": {
+    "matrix": {
+      "heureux": {
+        "heureux": 3,
+        "stressant": 0,
+        "neutre": 0,
+        "triste": 0,
+        "autre": 0,
+        "abstention": 0
+      },
+      "stressant": {
+        "heureux": 0,
+        "stressant": 0,
+        "neutre": 1,
+        "triste": 1,
+        "autre": 0,
+        "abstention": 1
+      },
+      "neutre": {
+        "heureux": 0,
+        "stressant": 0,
+        "neutre": 2,
+        "triste": 0,
+        "autre": 0,
+        "abstention": 1
+      },
+      "triste": {
+        "heureux": 0,
+        "stressant": 0,
+        "neutre": 0,
+        "triste": 1,
+        "autre": 0,
+        "abstention": 2
+      },
+      "autre": {
+        "heureux": 0,
+        "stressant": 0,
+        "neutre": 0,
+        "triste": 1,
+        "autre": 0,
+        "abstention": 2
+      }
+    },
+    "per_class": {
+      "heureux": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 3
+      },
+      "stressant": {
+        "precision": 0,
+        "recall": 0.0,
+        "f1": 0,
+        "support": 3
+      },
+      "neutre": {
+        "precision": 0.6666666666666666,
+        "recall": 0.6666666666666666,
+        "f1": 0.6666666666666666,
+        "support": 3
+      },
+      "triste": {
+        "precision": 0.3333333333333333,
+        "recall": 0.3333333333333333,
+        "f1": 0.3333333333333333,
+        "support": 3
+      },
+      "autre": {
+        "precision": 0,
+        "recall": 0.0,
+        "f1": 0,
+        "support": 3
+      }
+    },
+    "macro_f1": 0.39999999999999997,
+    "accuracy": 0.4,
+    "abstention_rate": 0.4
+  },
+  "groups": {
+    "ambiguous": {
+      "count": 10,
+      "abstention_rate": 0.7,
+      "incompatible_suggestions": [
+        "ambiguous-2",
+        "ambiguous-4"
+      ]
+    },
+    "incomplete": {
+      "count": 5,
+      "abstention_rate": 1.0,
+      "incompatible_suggestions": []
+    }
+  },
+  "rows": [
+    {
+      "id": "heureux-3",
+      "group": "explicit",
+      "split": "test",
+      "text": "Mon chien revenait enfin et je riais de bonheur en jouant avec lui.",
+      "expected": "heureux",
+      "acceptable": [
+        "heureux"
+      ],
+      "scores": [
+        0.8424032926559448,
+        0.02690829336643219,
+        0.017947658896446228,
+        0.07093202322721481,
+        0.04180876538157463
+      ],
+      "prediction": "heureux",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.14667759999792906
+    },
+    {
+      "id": "heureux-4",
+      "group": "explicit",
+      "split": "test",
+      "text": "Je gagnais un concours et ressentais une immense joie entouré de mes proches.",
+      "expected": "heureux",
+      "acceptable": [
+        "heureux"
+      ],
+      "scores": [
+        0.886909544467926,
+        0.013283129781484604,
+        0.022064710035920143,
+        0.026651455089449883,
+        0.051091235131025314
+      ],
+      "prediction": "heureux",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.04177449999770033
+    },
+    {
+      "id": "heureux-5",
+      "group": "explicit",
+      "split": "test",
+      "text": "Je volais au-dessus des champs, comblé et joyeux, un sourire aux lèvres.",
+      "expected": "heureux",
+      "acceptable": [
+        "heureux"
+      ],
+      "scores": [
+        0.7772078514099121,
+        0.01624382846057415,
+        0.035242777317762375,
+        0.06261175125837326,
+        0.10869372636079788
+      ],
+      "prediction": "heureux",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.05066860000079032
+    },
+    {
+      "id": "stressant-3",
+      "group": "explicit",
+      "split": "test",
+      "text": "Les murs se refermaient et je cherchais désespérément une sortie, angoissé.",
+      "expected": "stressant",
+      "acceptable": [
+        "stressant"
+      ],
+      "scores": [
+        0.012029346078634262,
+        0.06369738280773163,
+        0.5559335947036743,
+        0.24576827883720398,
+        0.12257138639688492
+      ],
+      "prediction": "neutre",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.04952269999921555
+    },
+    {
+      "id": "stressant-4",
+      "group": "explicit",
+      "split": "test",
+      "text": "Je perdais mon enfant dans la foule et une peur intense me paralysait.",
+      "expected": "stressant",
+      "acceptable": [
+        "stressant"
+      ],
+      "scores": [
+        0.020344723016023636,
+        0.19190260767936707,
+        0.19931331276893616,
+        0.45913973450660706,
+        0.1292996108531952
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.042010799999843584
+    },
+    {
+      "id": "stressant-5",
+      "group": "explicit",
+      "split": "test",
+      "text": "Un incendie approchait ; je tremblais de terreur sans pouvoir m'enfuir.",
+      "expected": "stressant",
+      "acceptable": [
+        "stressant"
+      ],
+      "scores": [
+        0.036917295306921005,
+        0.07769478112459183,
+        0.17744915187358856,
+        0.5983468890190125,
+        0.10959186404943466
+      ],
+      "prediction": "triste",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.04269100000237813
+    },
+    {
+      "id": "neutre-3",
+      "group": "explicit",
+      "split": "test",
+      "text": "Je prenais le bus comme chaque jour, sans joie, peur ni tristesse.",
+      "expected": "neutre",
+      "acceptable": [
+        "neutre"
+      ],
+      "scores": [
+        0.014982035383582115,
+        0.13727790117263794,
+        0.41182491183280945,
+        0.14808905124664307,
+        0.2878260910511017
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.03710080000018934
+    },
+    {
+      "id": "neutre-4",
+      "group": "explicit",
+      "split": "test",
+      "text": "Je comptais des carreaux ; cette activité me laissait totalement neutre.",
+      "expected": "neutre",
+      "acceptable": [
+        "neutre"
+      ],
+      "scores": [
+        0.009217343293130398,
+        0.022553399205207825,
+        0.5733602046966553,
+        0.35148075222969055,
+        0.043388351798057556
+      ],
+      "prediction": "neutre",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.04404889999932493
+    },
+    {
+      "id": "neutre-5",
+      "group": "explicit",
+      "split": "test",
+      "text": "Je rangeais des chaussettes, sans ressentir quoi que ce soit de spécial.",
+      "expected": "neutre",
+      "acceptable": [
+        "neutre"
+      ],
+      "scores": [
+        0.019265668466687202,
+        0.016203155741095543,
+        0.859052836894989,
+        0.07175177335739136,
+        0.033726535737514496
+      ],
+      "prediction": "neutre",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.03715340000053402
+    },
+    {
+      "id": "triste-3",
+      "group": "explicit",
+      "split": "test",
+      "text": "Je retrouvais une lettre d'un proche disparu et sanglotais, accablé de peine.",
+      "expected": "triste",
+      "acceptable": [
+        "triste"
+      ],
+      "scores": [
+        0.028524307534098625,
+        0.16878539323806763,
+        0.3774309754371643,
+        0.31564074754714966,
+        0.10961852967739105
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.039944600001035724
+    },
+    {
+      "id": "triste-4",
+      "group": "explicit",
+      "split": "test",
+      "text": "Personne ne venait à mon anniversaire et je me sentais abandonné et triste.",
+      "expected": "triste",
+      "acceptable": [
+        "triste"
+      ],
+      "scores": [
+        0.026422984898090363,
+        0.35455217957496643,
+        0.24391937255859375,
+        0.20821142196655273,
+        0.1668941080570221
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.04020740000123624
+    },
+    {
+      "id": "triste-5",
+      "group": "explicit",
+      "split": "test",
+      "text": "Je voyais mon jardin détruit et pleurais la perte de mes souvenirs.",
+      "expected": "triste",
+      "acceptable": [
+        "triste"
+      ],
+      "scores": [
+        0.1372235268354416,
+        0.05737736076116562,
+        0.1020011380314827,
+        0.6013423204421997,
+        0.10205569118261337
+      ],
+      "prediction": "triste",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.038877400002093054
+    },
+    {
+      "id": "autre-3",
+      "group": "explicit",
+      "split": "test",
+      "text": "On m'accusait injustement et je bouillonnais de colère, sans peur ni chagrin.",
+      "expected": "autre",
+      "acceptable": [
+        "autre"
+      ],
+      "scores": [
+        0.025138910859823227,
+        0.08580376952886581,
+        0.2510747015476227,
+        0.25188007950782776,
+        0.3861026167869568
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.048139099999389146
+    },
+    {
+      "id": "autre-4",
+      "group": "explicit",
+      "split": "test",
+      "text": "Une odeur infecte envahissait la cuisine et je ressentais du dégoût.",
+      "expected": "autre",
+      "acceptable": [
+        "autre"
+      ],
+      "scores": [
+        0.0851106345653534,
+        0.11534755676984787,
+        0.13449427485466003,
+        0.5511283874511719,
+        0.11391913145780563
+      ],
+      "prediction": "triste",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.048748600001999876
+    },
+    {
+      "id": "autre-5",
+      "group": "explicit",
+      "split": "test",
+      "text": "Un visage changeait sans cesse ; mon sentiment dominant était l'étonnement.",
+      "expected": "autre",
+      "acceptable": [
+        "autre"
+      ],
+      "scores": [
+        0.030295072123408318,
+        0.052225880324840546,
+        0.32287362217903137,
+        0.33710071444511414,
+        0.25750473141670227
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.03833029999805149
+    },
+    {
+      "id": "ambiguous-1",
+      "group": "ambiguous",
+      "split": "test",
+      "text": "J'étais poursuivi puis sauvé ; la peur et la joie se mélangeaient.",
+      "expected": null,
+      "acceptable": [
+        "stressant",
+        "heureux"
+      ],
+      "scores": [
+        0.17159561812877655,
+        0.22921708226203918,
+        0.03875948116183281,
+        0.22320456802845,
+        0.33722320199012756
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.03973440000117989
+    },
+    {
+      "id": "ambiguous-2",
+      "group": "ambiguous",
+      "split": "test",
+      "text": "Je souriais en retrouvant un souvenir, mais je pleurais aussi son absence.",
+      "expected": null,
+      "acceptable": [
+        "heureux",
+        "triste"
+      ],
+      "scores": [
+        0.008507488295435905,
+        0.017502369359135628,
+        0.8434877395629883,
+        0.07446946203708649,
+        0.05603288114070892
+      ],
+      "prediction": "neutre",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.048456000000442145
+    },
+    {
+      "id": "ambiguous-3",
+      "group": "ambiguous",
+      "split": "test",
+      "text": "Une forêt violette s'étendait devant moi.",
+      "expected": null,
+      "acceptable": [],
+      "scores": [
+        0.15571366250514984,
+        0.0954546108841896,
+        0.2240610271692276,
+        0.4366874694824219,
+        0.08808327466249466
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.06142650000037975
+    },
+    {
+      "id": "ambiguous-4",
+      "group": "ambiguous",
+      "split": "test",
+      "text": "Une lune énorme flottait dans ma chambre ; je ne sais plus ce que je ressentais.",
+      "expected": null,
+      "acceptable": [],
+      "scores": [
+        0.09273359179496765,
+        0.03865106776356697,
+        0.6658337116241455,
+        0.12070752680301666,
+        0.0820741280913353
+      ],
+      "prediction": "neutre",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.03922460000103456
+    },
+    {
+      "id": "ambiguous-5",
+      "group": "ambiguous",
+      "split": "test",
+      "text": "Je n'avais pas peur, contrairement aux autres qui criaient.",
+      "expected": null,
+      "acceptable": [
+        "neutre",
+        "autre"
+      ],
+      "scores": [
+        0.04911736026406288,
+        0.021402426064014435,
+        0.6578091382980347,
+        0.22029146552085876,
+        0.051379650831222534
+      ],
+      "prediction": "neutre",
+      "chunks": 1,
+      "reason": null,
+      "seconds": 0.032008199999836506
+    },
+    {
+      "id": "ambiguous-6",
+      "group": "ambiguous",
+      "split": "test",
+      "text": "La fête était magnifique mais je craignais qu'elle s'arrête.",
+      "expected": null,
+      "acceptable": [
+        "heureux",
+        "stressant"
+      ],
+      "scores": [
+        0.33593398332595825,
+        0.22663240134716034,
+        0.11349517107009888,
+        0.208626389503479,
+        0.11531208455562592
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.03376189999835333
+    },
+    {
+      "id": "ambiguous-7",
+      "group": "ambiguous",
+      "split": "test",
+      "text": "Tout le monde riait pendant que je restais seul avec mon chagrin.",
+      "expected": null,
+      "acceptable": [
+        "triste"
+      ],
+      "scores": [
+        0.01767580583691597,
+        0.13007256388664246,
+        0.46182337403297424,
+        0.32535266876220703,
+        0.0650755986571312
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.0330154000002949
+    },
+    {
+      "id": "ambiguous-8",
+      "group": "ambiguous",
+      "split": "test",
+      "text": "Un monstre me servait gentiment du thé et je trouvais cela amusant.",
+      "expected": null,
+      "acceptable": [
+        "heureux",
+        "autre"
+      ],
+      "scores": [
+        0.3480832874774933,
+        0.0752125233411789,
+        0.20290444791316986,
+        0.2976619005203247,
+        0.07613784074783325
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.034877999998570886
+    },
+    {
+      "id": "ambiguous-9",
+      "group": "ambiguous",
+      "split": "test",
+      "text": "Je tombais sans fin, peut-être avec plaisir, peut-être avec peur.",
+      "expected": null,
+      "acceptable": [
+        "heureux",
+        "stressant"
+      ],
+      "scores": [
+        0.459454745054245,
+        0.026905130594968796,
+        0.15765590965747833,
+        0.11886515468358994,
+        0.23711906373500824
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.033910099999047816
+    },
+    {
+      "id": "ambiguous-10",
+      "group": "ambiguous",
+      "split": "test",
+      "text": "Je marchais dans une rue et regardais les vitrines.",
+      "expected": null,
+      "acceptable": [],
+      "scores": [
+        0.20034316182136536,
+        0.1384373903274536,
+        0.08937601745128632,
+        0.39146435260772705,
+        0.18037912249565125
+      ],
+      "prediction": null,
+      "chunks": 1,
+      "reason": "ambiguous",
+      "seconds": 0.032192099999519996
+    },
+    {
+      "id": "incomplete-1",
+      "group": "incomplete",
+      "split": "test",
+      "text": "",
+      "expected": null,
+      "acceptable": [],
+      "scores": null,
+      "prediction": null,
+      "chunks": 0,
+      "reason": "invalid_text",
+      "seconds": 2.9999973776284605e-06
+    },
+    {
+      "id": "incomplete-2",
+      "group": "incomplete",
+      "split": "test",
+      "text": " \n\t",
+      "expected": null,
+      "acceptable": [],
+      "scores": null,
+      "prediction": null,
+      "chunks": 0,
+      "reason": "invalid_text",
+      "seconds": 1.0999974620062858e-06
+    },
+    {
+      "id": "incomplete-3",
+      "group": "incomplete",
+      "split": "test",
+      "text": "Je…",
+      "expected": null,
+      "acceptable": [],
+      "scores": null,
+      "prediction": null,
+      "chunks": 0,
+      "reason": "insufficient_information",
+      "seconds": 0.00013610000314656645
+    },
+    {
+      "id": "incomplete-4",
+      "group": "incomplete",
+      "split": "test",
+      "text": "Une porte.",
+      "expected": null,
+      "acceptable": [],
+      "scores": null,
+      "prediction": null,
+      "chunks": 0,
+      "reason": "insufficient_information",
+      "seconds": 5.500000042957254e-05
+    },
+    {
+      "id": "incomplete-5",
+      "group": "incomplete",
+      "split": "test",
+      "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": null,
+      "acceptable": [],
+      "scores": null,
+      "prediction": null,
+      "chunks": 0,
+      "reason": "invalid_text",
+      "seconds": 1.3999997463542968e-06
+    }
+  ],
+  "long_check": {
+    "characters": 11000,
+    "chunks": 8,
+    "reason": null,
+    "prediction": null,
+    "seconds": 2.025713099999848
+  },
+  "load_seconds": 1.0688755000010133,
+  "latency_median": 0.042010799999843584,
+  "latency_max": 0.14667759999792906
+}

@@ -1,0 +1,21 @@
+{
+  "exit_code": 0,
+  "stop_reason": null,
+  "seconds": 9.290510200000426,
+  "reserve_mib": 1536.0,
+  "private_limit_mib": 3072.0,
+  "timeout_seconds": 600,
+  "available_before_mib": 3797.578125,
+  "available_min_mib": 2849.08203125,
+  "available_after_mib": 3731.02734375,
+  "peak_rss_mib": 959.39453125,
+  "peak_private_mib": 1743.1328125,
+  "group_private_peak_mib": 1707.078125,
+  "per_process_private_peak_mib": {
+    "35896": 0.8984375,
+    "8804": 1743.1328125
+  },
+  "commit_headroom_before_mib": 16624.79296875,
+  "commit_headroom_after_mib": 16584.26953125,
+  "process_gone": true
+}

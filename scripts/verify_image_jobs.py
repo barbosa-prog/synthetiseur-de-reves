@@ -17,7 +17,10 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--history-only", action="store_true")
-    history_only = parser.parse_args().history_only
+    parser.add_argument("--emotion-only", action="store_true")
+    parser.add_argument("--emotion-real", action="store_true")
+    args = parser.parse_args()
+    history_only = args.history_only
     pg = Path(os.getenv("P20_POSTGRES_BIN", r"C:\Program Files\PostgreSQL\17\bin"))
     if not (pg / "initdb.exe").is_file():
         raise SystemExit("PostgreSQL natif absent ; utiliser TEST_DATABASE_URL dédié.")
@@ -62,6 +65,15 @@ def main():
                 "backend/tests/test_stt.py", "backend/tests/test_transcripts.py",
                 "backend/tests/test_stt_provider.py", "backend/tests/test_text_rules.py",
             ]
+            if args.emotion_only:
+                checks = ["backend/tests/test_emotion_contract.py",
+                          "backend/tests/test_emotion_postgresql.py",
+                          "backend/tests/test_emotion_worker.py",
+                          "backend/tests/test_emotion_web.py",
+                          "backend/tests/test_postgresql.py"]
+            if args.emotion_real:
+                env["RUN_EMOTION_REAL"] = "1"
+                checks = ["backend/tests/test_emotion_real.py", "-x"]
             return subprocess.run([
                 sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
                 "--basetemp", str(directory / "pytest"), "--tb=short",

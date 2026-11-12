@@ -45,6 +45,15 @@ def update_dream(dream_id: uuid.UUID, payload: DreamUpdate,
     """Mutation minimale ; user_id, statut et clés de stockage ne sont pas acceptés."""
     dream = owned_dream(db, user, dream_id)
     changes = payload.model_dump(exclude_unset=True)
+    if "emotion" in changes:
+        if payload.expected_emotion_revision is None:
+            return error_response(409, "emotion_revision_required",
+                                  "Rechargez le choix émotionnel.")
+        from backend.app.emotion_rules import check_revision
+        from backend.app.services.emotions import metadata, state_for, translate
+
+        translate(check_revision, state_for(db, dream, metadata(db, dream)),
+                  payload.expected_emotion_revision)
     if "transcript" in changes:
         if payload.expected_text_version is None:
             return error_response(409, "text_version_required", "Rechargez la version du récit.")
@@ -53,7 +62,9 @@ def update_dream(dream_id: uuid.UUID, payload: DreamUpdate,
         except TextVersionConflict:
             return error_response(409, "text_version_conflict", "Version plus récente disponible.")
     if "emotion" in changes:
-        dream.emotion = changes["emotion"]
+        from backend.app.services.emotions import set_choice
+
+        set_choice(db, dream, changes["emotion"])
     db.commit()
     return dream
 

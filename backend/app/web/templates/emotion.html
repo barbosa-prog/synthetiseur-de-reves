@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Émotion du rêve · Synthétiseur de rêves{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl px-5 py-10 sm:px-8" data-protected-page data-expires-at="{{ expires_at }}">
+  <a href="/reves/{{ dream.id }}" class="text-sm text-muted">← Détail du rêve</a>
+  <h1 class="mt-7 text-3xl font-semibold">Émotion du rêve</h1>
+  <p class="mt-4 text-muted">Moteur expérimental : ses suggestions peuvent être inexactes. Aucun choix n’est enregistré automatiquement.</p>
+  <aside class="surface mt-5 p-5" id="emotion-warning"><p class="text-sm leading-7 text-lavender">{{ warning }}</p></aside>
+  {% if error %}<p role="alert" class="mt-5 text-rose-100">{{ error }}</p>{% endif %}
+  {% if request.query_params.get('enregistre') %}<p role="status" class="mt-5 text-emerald-100">Action enregistrée. Votre choix reste explicite.</p>{% endif %}
+  <section class="surface mt-6 p-6">
+    <h2 class="text-xl font-semibold">Récit actuel · version {{ dream.text_version }}</h2>
+    <p class="mt-4 whitespace-pre-wrap break-words leading-7 text-muted">{{ dream.transcript or 'Aucun récit enregistré.' }}</p>
+    <a class="btn btn-secondary mt-5" href="/reves/{{ dream.id }}/recit">Corriger le récit</a>
+  </section>
+  <div id="emotion-controller" data-url="/reves/{{ dream.id }}/emotion/statut" data-version="{{ dream.text_version }}" data-revision="{{ progress.revision }}" data-job="{{ progress.job_id or '' }}" data-busy="{{ '1' if progress.busy else '0' }}">
+    <p id="emotion-reload" role="alert" class="mt-5 text-rose-100" hidden>Le récit ou le choix a changé. Rechargez la page avant de continuer.</p>
+    <section class="surface mt-6 p-6">
+      <h2 class="text-xl font-semibold">Émotion retenue</h2>
+      <p id="retained-emotion" class="mt-4 text-lavender">{{ progress.value_label }}</p>
+      <p id="emotion-origin" class="mt-2 text-sm text-muted">{{ progress.origin_label }}</p>
+      {% if progress.selected_text_version is not none and progress.selected_text_version != dream.text_version %}<p class="mt-3 text-sm text-muted">Choix conservé depuis la version {{ progress.selected_text_version }} du récit.</p>{% endif %}
+      <form method="post" action="/reves/{{ dream.id }}/emotion/choisir" class="mt-5">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="revision" value="{{ dream.text_version }}:{{ progress.revision }}">
+        <label for="manual-emotion" class="mb-2 block text-sm font-medium">Choix manuel</label>
+        <select id="manual-emotion" name="emotion" class="field" required>
+          <option value="" disabled {% if not progress.value %}selected{% endif %}>Choisir une émotion</option>
+          {% for value, label in labels.items() %}<option value="{{ value }}" {% if progress.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+        <button class="btn btn-primary mt-4" type="submit">Enregistrer mon choix</button>
+      </form>
+      <form method="post" action="/reves/{{ dream.id }}/emotion/retirer" class="mt-4">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="revision" value="{{ dream.text_version }}:{{ progress.revision }}">
+        <button class="btn btn-secondary" type="submit">Retirer mon choix</button>
+      </form>
+    </section>
+    <section class="surface mt-6 p-6" aria-labelledby="suggestion-title">
+      <h2 class="text-xl font-semibold" id="suggestion-title">Suggestion IA · séparée de votre choix</h2>
+      <p id="emotion-status" role="status" class="mt-4 text-muted">{{ progress.message }}</p>
+      <p id="emotion-disabled" class="mt-3 text-sm text-muted" {% if progress.enabled %}hidden{% endif %}>Moteur expérimental désactivé. Vous pouvez choisir une émotion manuellement.</p>
+      <p class="mt-3 text-xs leading-6 text-muted">La demande ne démarre qu’après votre clic. Si le worker CPU est arrêté, elle reste en attente. Vous pouvez toujours choisir manuellement.</p>
+      <form method="post" action="/reves/{{ dream.id }}/emotion/suggerer" class="mt-5">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="revision" value="{{ dream.text_version }}:{{ progress.revision }}"><input type="hidden" name="text_version" value="{{ dream.text_version }}">
+        <button id="emotion-request" class="btn btn-secondary disabled:opacity-50" type="submit" {% if not progress.enabled or not progress.ready or progress.busy %}disabled{% endif %}>Suggérer une émotion</button>
+      </form>
+      {% if not dream.transcript %}<p class="mt-3 text-sm text-muted">Enregistrez un récit avant de demander une suggestion.</p>{% endif %}
+      <div id="emotion-suggestion" class="mt-5" {% if not progress.suggestion %}hidden{% endif %}>
+        <p id="suggested-emotion" class="font-medium text-lavender">{% if progress.suggestion %}{{ labels.get(progress.suggestion.emotion, 'Abstention — aucune émotion proposée') }}{% endif %}</p>
+        <form method="post" action="/reves/{{ dream.id }}/emotion/accepter" class="mt-4">
+          <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="revision" value="{{ dream.text_version }}:{{ progress.revision }}"><input type="hidden" id="suggestion-id" name="suggestion_id" value="{{ progress.suggestion.request_id if progress.suggestion else '' }}">
+          <button id="emotion-accept" type="submit" class="btn btn-primary disabled:opacity-50" {% if not progress.suggestion or not progress.suggestion.emotion %}disabled{% endif %}>Accepter cette suggestion</button>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>
+<script src="{{ url_for('static', path='js/emotion.js') }}" defer></script>
+{% endblock %}

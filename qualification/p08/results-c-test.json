@@ -1,0 +1,4808 @@
+{
+  "hashes": {
+    "reliability_data.py": "31842a6d0d12f9884a50a1679c28c524d3e3c842e1970937887a46d235184aee",
+    "reliability.py": "b3204c03f616a5a7806cf35346806e7e0ca9521eaa74d1b8848cafe3225a9003"
+  },
+  "model": {
+    "repo": "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
+    "revision": "8adb042d524ecd5c26d3e3ba0e3fbcf7e2d0864c",
+    "license": "mit",
+    "files": {
+      "README.md": {
+        "bytes": 6514,
+        "sha256": "c6cc8ca44d55e6ff3dd75672c8fcc41c22ca18b551aa52fb5d611d720a5f966b",
+        "lfs_verified": false
+      },
+      "config.json": {
+        "bytes": 1066,
+        "sha256": "4e4430c95100d613df80fa01276f231931e1b535557cf62fbb3cc50323e50cca",
+        "lfs_verified": false
+      },
+      "tokenizer.json": {
+        "bytes": 16331396,
+        "sha256": "3aca3ce69a0a35aeb144a52c4f1d41c4246b8785f8f398315cc8fb6b24057810",
+        "lfs_verified": true
+      },
+      "tokenizer_config.json": {
+        "bytes": 1256,
+        "sha256": "df9fd3a4482cc4a866788244824573fab8e74dadd1609d4f0e5997f9e96921dc",
+        "lfs_verified": false
+      },
+      "special_tokens_map.json": {
+        "bytes": 286,
+        "sha256": "9463f61e1b109a8eb4688b829260d7c6b1e6dff04c98ff7269bb89e2b92369b9",
+        "lfs_verified": false
+      },
+      "added_tokens.json": {
+        "bytes": 23,
+        "sha256": "fb697283833d25e2c711f1bc37730ecd8b20f4bd5f015db1d84aefe0adc9155a",
+        "lfs_verified": false
+      },
+      "model.safetensors": {
+        "bytes": 557652046,
+        "sha256": "65af59b1ff4450b09ecbf13ca35c840dbf038b26ff8e10e5ea89ca724828ed1e",
+        "lfs_verified": true
+      }
+    }
+  },
+  "load_seconds": 1.3117020999998203,
+  "cuda": null,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "dependencies": {
+    "torch": "2.7.1+cpu",
+    "transformers": "4.57.3",
+    "tokenizers": "0.22.2",
+    "safetensors": "0.7.0",
+    "psutil": "7.1.3"
+  },
+  "frozen": {
+    "parameters": {
+      "variant": 1,
+      "threshold": 0.45,
+      "margin": 0.05,
+      "gate_threshold": 0.4,
+      "lexical_guard": false
+    },
+    "hashes": {
+      "reliability_data.py": "31842a6d0d12f9884a50a1679c28c524d3e3c842e1970937887a46d235184aee",
+      "reliability.py": "b3204c03f616a5a7806cf35346806e7e0ca9521eaa74d1b8848cafe3225a9003"
+    },
+    "rule": "minimize negative DEV suggestions then maximize explicit macro-F1"
+  },
+  "baseline_parameters": {
+    "variant": 0,
+    "threshold": 0.55,
+    "margin": 0.05,
+    "metrics": {
+      "matrix": {
+        "heureux": {
+          "heureux": 2,
+          "stressant": 0,
+          "neutre": 0,
+          "triste": 0,
+          "autre": 0,
+          "abstention": 0
+        },
+        "stressant": {
+          "heureux": 0,
+          "stressant": 0,
+          "neutre": 0,
+          "triste": 0,
+          "autre": 0,
+          "abstention": 2
+        },
+        "neutre": {
+          "heureux": 0,
+          "stressant": 0,
+          "neutre": 2,
+          "triste": 0,
+          "autre": 0,
+          "abstention": 0
+        },
+        "triste": {
+          "heureux": 0,
+          "stressant": 0,
+          "neutre": 0,
+          "triste": 1,
+          "autre": 0,
+          "abstention": 1
+        },
+        "autre": {
+          "heureux": 0,
+          "stressant": 0,
+          "neutre": 0,
+          "triste": 0,
+          "autre": 0,
+          "abstention": 2
+        }
+      },
+      "per_class": {
+        "heureux": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2
+        },
+        "stressant": {
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0,
+          "support": 2
+        },
+        "neutre": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 2
+        },
+        "triste": {
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
+          "support": 2
+        },
+        "autre": {
+          "precision": 0,
+          "recall": 0.0,
+          "f1": 0,
+          "support": 2
+        }
+      },
+      "macro_f1": 0.5333333333333333,
+      "accuracy": 0.5,
+      "abstention_rate": 0.5
+    },
+    "hypotheses": [
+      "Ce récit exprime de la joie et du bonheur.",
+      "Ce récit exprime de la peur et du stress.",
+      "Ce récit exprime une absence d'émotion particulière.",
+      "Ce récit exprime de la tristesse.",
+      "Ce récit exprime une autre émotion : surprise, curiosité, colère ou dégoût."
+    ],
+    "chunk_tokens": 300,
+    "max_characters": 20000,
+    "min_tokens": 5,
+    "aggregation": "mean",
+    "seed": 42,
+    "threads": 2
+  },
+  "summaries": {
+    "baseline": {
+      "explicit": {
+        "matrix": {
+          "heureux": {
+            "heureux": 9,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 1
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 9,
+            "neutre": 0,
+            "triste": 1,
+            "autre": 0,
+            "abstention": 0
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 10,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 0
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 1,
+            "triste": 8,
+            "autre": 0,
+            "abstention": 1
+          },
+          "autre": {
+            "heureux": 1,
+            "stressant": 2,
+            "neutre": 3,
+            "triste": 2,
+            "autre": 1,
+            "abstention": 1
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 0.9,
+            "recall": 0.9,
+            "f1": 0.9,
+            "support": 10
+          },
+          "stressant": {
+            "precision": 0.8181818181818182,
+            "recall": 0.9,
+            "f1": 0.8571428571428572,
+            "support": 10
+          },
+          "neutre": {
+            "precision": 0.7142857142857143,
+            "recall": 1.0,
+            "f1": 0.8333333333333333,
+            "support": 10
+          },
+          "triste": {
+            "precision": 0.7272727272727273,
+            "recall": 0.8,
+            "f1": 0.761904761904762,
+            "support": 10
+          },
+          "autre": {
+            "precision": 1.0,
+            "recall": 0.1,
+            "f1": 0.18181818181818182,
+            "support": 10
+          }
+        },
+        "macro_f1": 0.7068398268398268,
+        "accuracy": 0.74,
+        "abstention_rate": 0.06
+      },
+      "coverage": 0.94,
+      "emitted_accuracy": 0.7872340425531915,
+      "groups": {
+        "ambiguous": {
+          "count": 8,
+          "suggestions": 7,
+          "abstention_rate": 0.125
+        },
+        "invalid": {
+          "count": 5,
+          "suggestions": 0,
+          "abstention_rate": 1.0
+        },
+        "multiple": {
+          "count": 8,
+          "suggestions": 7,
+          "abstention_rate": 0.125
+        },
+        "undetermined": {
+          "count": 12,
+          "suggestions": 7,
+          "abstention_rate": 0.4166666666666667
+        }
+      }
+    },
+    "candidate": {
+      "explicit": {
+        "matrix": {
+          "heureux": {
+            "heureux": 3,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 7
+          },
+          "stressant": {
+            "heureux": 0,
+            "stressant": 3,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 7
+          },
+          "neutre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 10
+          },
+          "triste": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 3,
+            "autre": 0,
+            "abstention": 7
+          },
+          "autre": {
+            "heureux": 0,
+            "stressant": 0,
+            "neutre": 0,
+            "triste": 0,
+            "autre": 0,
+            "abstention": 10
+          }
+        },
+        "per_class": {
+          "heureux": {
+            "precision": 1.0,
+            "recall": 0.3,
+            "f1": 0.4615384615384615,
+            "support": 10
+          },
+          "stressant": {
+            "precision": 1.0,
+            "recall": 0.3,
+            "f1": 0.4615384615384615,
+            "support": 10
+          },
+          "neutre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 10
+          },
+          "triste": {
+            "precision": 1.0,
+            "recall": 0.3,
+            "f1": 0.4615384615384615,
+            "support": 10
+          },
+          "autre": {
+            "precision": 0,
+            "recall": 0.0,
+            "f1": 0,
+            "support": 10
+          }
+        },
+        "macro_f1": 0.2769230769230769,
+        "accuracy": 0.18,
+        "abstention_rate": 0.82
+      },
+      "coverage": 0.18,
+      "emitted_accuracy": 1.0,
+      "groups": {
+        "ambiguous": {
+          "count": 8,
+          "suggestions": 0,
+          "abstention_rate": 1.0
+        },
+        "invalid": {
+          "count": 5,
+          "suggestions": 0,
+          "abstention_rate": 1.0
+        },
+        "multiple": {
+          "count": 8,
+          "suggestions": 0,
+          "abstention_rate": 1.0
+        },
+        "undetermined": {
+          "count": 12,
+          "suggestions": 0,
+          "abstention_rate": 1.0
+        }
+      }
+    }
+  },
+  "rows": [
+    {
+      "id": "final-heureux-1",
+      "group": "explicit",
+      "expected": "heureux",
+      "text": "Je fêtais mes retrouvailles avec ma cousine, rempli de joie.",
+      "outputs": {
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.9986691474914551,
+              0.000253872771281749,
+              0.00028937350725755095,
+              0.00032000866485759616,
+              0.00046759715769439936
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.6986968999990495
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.01496983878314495,
+              9.268800931749865e-05,
+              0.00013720720016863197,
+              8.774598245508969e-05,
+              0.0025719257537275553
+            ],
+            "elementary": [
+              0.01496983878314495,
+              9.268800931749865e-05,
+              0.00013720720016863197,
+              8.774598245508969e-05,
+              0.00010891006968449801,
+              0.0025719257537275553,
+              0.0005231417599134147,
+              0.0005993974627926946
+            ],
+            "gates": [
+              0.012898328714072704,
+              9.840426355367526e-05,
+              0.007977234199643135
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.2261066999999457
+        }
+      }
+    },
+    {
+      "id": "final-heureux-2",
+      "group": "explicit",
+      "expected": "heureux",
+      "text": "J'accueillais des chatons et ressentais un bonheur profond.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.004438167437911034,
+              0.00013734698586631566,
+              0.0002230940735898912,
+              0.000118203905003611,
+              0.000761930423323065
+            ],
+            "elementary": [
+              0.004438167437911034,
+              0.00013734698586631566,
+              0.0002230940735898912,
+              0.000118203905003611,
+              0.00011214711412321776,
+              0.000761930423323065,
+              0.0006614520098082721,
+              0.0006964329513721168
+            ],
+            "gates": [
+              0.0014147649053484201,
+              0.00012687953130807728,
+              0.044699471443891525
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.3349984000014956
+        },
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.9988357424736023,
+              0.0002657560689840466,
+              0.0002190179657191038,
+              0.00026614515809342265,
+              0.00041345503996126354
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5730408000017633
+        }
+      }
+    },
+    {
+      "id": "final-heureux-3",
+      "group": "explicit",
+      "expected": "heureux",
+      "text": "La musique me faisait danser, j'étais vraiment heureux.",
+      "outputs": {
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.998384952545166,
+              0.00019958300981670618,
+              0.00024144847702700645,
+              0.00022374994296114892,
+              0.0009501797612756491
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5144149999978254
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.007712508086115122,
+              0.00024606799706816673,
+              0.00021863376605324447,
+              0.00016668419993948191,
+              0.00082891940837726
+            ],
+            "elementary": [
+              0.007712508086115122,
+              0.00024606799706816673,
+              0.00021863376605324447,
+              0.00016668419993948191,
+              0.0001196568991872482,
+              0.0005357661284506321,
+              0.0006412033108063042,
+              0.00082891940837726
+            ],
+            "gates": [
+              0.0010734590468928218,
+              0.0010202518897131085,
+              0.014035334810614586
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.0892487999954028
+        }
+      }
+    },
+    {
+      "id": "final-heureux-4",
+      "group": "explicit",
+      "expected": "heureux",
+      "text": "Je terminais ma construction et me sentais très satisfait et joyeux.",
+      "outputs": {
+        "candidate": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.5850813388824463,
+              0.0001317319110967219,
+              0.0003358660906087607,
+              0.00011623559839790687,
+              0.0032996146474033594
+            ],
+            "elementary": [
+              0.5850813388824463,
+              0.0001317319110967219,
+              0.0003358660906087607,
+              0.00011623559839790687,
+              0.00013758553541265428,
+              0.0032996146474033594,
+              0.0008745162631385028,
+              0.0007713350933045149
+            ],
+            "gates": [
+              0.0016805666964501143,
+              0.00010221818229183555,
+              0.07531453669071198
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.090690100005304
+        },
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.9990863800048828,
+              0.00023143875296227634,
+              0.00026187533512711525,
+              0.00023929787857923657,
+              0.00018104404443874955
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.45926609999878565
+        }
+      }
+    },
+    {
+      "id": "final-heureux-5",
+      "group": "explicit",
+      "expected": "heureux",
+      "text": "Un ami me faisait un cadeau ; j'étais enchanté et rayonnant de bonheur.",
+      "outputs": {
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.9989877343177795,
+              0.0002224993659183383,
+              0.00022491502750199288,
+              0.00025853735860437155,
+              0.000306268542772159
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.47783580000395887
+        },
+        "candidate": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.9920816421508789,
+              0.00010277904220856726,
+              0.00019982646335847676,
+              0.00010159419616684318,
+              0.3929879665374756
+            ],
+            "elementary": [
+              0.9920816421508789,
+              0.00010277904220856726,
+              0.00019982646335847676,
+              0.00010159419616684318,
+              9.56937947194092e-05,
+              0.3929879665374756,
+              0.019661221653223038,
+              0.00079877715324983
+            ],
+            "gates": [
+              0.0023325560614466667,
+              8.221330062951893e-05,
+              0.008282000198960304
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.118634500002372
+        }
+      }
+    },
+    {
+      "id": "final-heureux-6",
+      "group": "explicit",
+      "expected": "heureux",
+      "text": "Je riais avec mon équipe, emporté par une joie immense.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0036728032864630222,
+              0.00017212057719007134,
+              0.00019860020256601274,
+              0.00013342616148293018,
+              0.001133691635914147
+            ],
+            "elementary": [
+              0.0036728032864630222,
+              0.00017212057719007134,
+              0.00019860020256601274,
+              0.00013342616148293018,
+              0.00011626378545770422,
+              0.001133691635914147,
+              0.00061202043434605,
+              0.0006081150495447218
+            ],
+            "gates": [
+              0.0007626825827173889,
+              0.00010189894237555563,
+              0.9071276187896729
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.0639779999983148
+        },
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.9985283613204956,
+              0.0002694340073503554,
+              0.0003277400101069361,
+              0.0003095310239586979,
+              0.0005648858495987952
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5226036999956705
+        }
+      }
+    },
+    {
+      "id": "final-heureux-7",
+      "group": "explicit",
+      "expected": "heureux",
+      "text": "Je regardais le lever du jour, comblé de bonheur.",
+      "outputs": {
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.9989633560180664,
+              0.0001983438414754346,
+              0.000231548459851183,
+              0.00025306124007329345,
+              0.00035366014344617724
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5044473999951151
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.008610857650637627,
+              0.000137999581056647,
+              0.00027968030190095305,
+              0.00010610995377646759,
+              0.001208183472044766
+            ],
+            "elementary": [
+              0.008610857650637627,
+              0.000137999581056647,
+              0.00027968030190095305,
+              0.00010610995377646759,
+              0.0001282223965972662,
+              0.001208183472044766,
+              0.0007257679244503379,
+              0.0007886031526140869
+            ],
+            "gates": [
+              0.0009156889282166958,
+              9.628931002225727e-05,
+              0.006326149217784405
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.0304235000003246
+        }
+      }
+    },
+    {
+      "id": "final-heureux-8",
+      "group": "explicit",
+      "expected": "heureux",
+      "text": "Je savourais la réussite de mon spectacle, fou de joie.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.989935576915741,
+              0.00019211991457268596,
+              0.0002726869424805045,
+              0.00013823938206769526,
+              0.9850031733512878
+            ],
+            "elementary": [
+              0.989935576915741,
+              0.00019211991457268596,
+              0.0002726869424805045,
+              0.00013823938206769526,
+              0.7664567828178406,
+              0.9850031733512878,
+              0.03913617506623268,
+              0.0032629859633743763
+            ],
+            "gates": [
+              0.0533897764980793,
+              0.0001539107906864956,
+              0.05925135686993599
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.125672999995004
+        },
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.998588502407074,
+              0.00020794790179934353,
+              0.00025462376652285457,
+              0.0002524929295759648,
+              0.0006964459316805005
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.45440249999955995
+        }
+      }
+    },
+    {
+      "id": "final-heureux-9",
+      "group": "explicit",
+      "expected": "heureux",
+      "text": "Je retrouvais ma peluche et je me sentais ravi.",
+      "outputs": {
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.9980691075325012,
+              0.0003423281596042216,
+              0.00031989297713153064,
+              0.0004203690914437175,
+              0.0008483351557515562
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4310237000026973
+        },
+        "candidate": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.933759868144989,
+              0.0001770372036844492,
+              0.0003322763950563967,
+              0.00012070891534676775,
+              0.27760347723960876
+            ],
+            "elementary": [
+              0.933759868144989,
+              0.0001770372036844492,
+              0.0003322763950563967,
+              0.00012070891534676775,
+              0.0001468198752263561,
+              0.27760347723960876,
+              0.003256923984736204,
+              0.0008811656734906137
+            ],
+            "gates": [
+              0.010751370340585709,
+              0.0005601983284577727,
+              0.09373239427804947
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.0609661000053165
+        }
+      }
+    },
+    {
+      "id": "final-heureux-10",
+      "group": "explicit",
+      "expected": "heureux",
+      "text": "Je courais dans le verger en éprouvant une grande allégresse.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.002818005857989192,
+              0.00870693102478981,
+              0.00027154473355039954,
+              0.051742445677518845,
+              0.0018277381313964725
+            ],
+            "elementary": [
+              0.002818005857989192,
+              0.00870693102478981,
+              0.00027154473355039954,
+              0.051742445677518845,
+              0.0018277381313964725,
+              0.00152702780906111,
+              0.0008936525555327535,
+              0.0009629362029954791
+            ],
+            "gates": [
+              0.0012452646624296904,
+              0.0033982524182647467,
+              0.6154986023902893
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1041679000045406
+        },
+        "baseline": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "scores": [
+              0.14019198715686798,
+              0.17566217482089996,
+              0.07339490205049515,
+              0.20160892605781555,
+              0.40914198756217957
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4778772999998182
+        }
+      }
+    },
+    {
+      "id": "final-stressant-1",
+      "group": "explicit",
+      "expected": "stressant",
+      "text": "Un loup avançait vers moi et je ressentais une peur terrible.",
+      "outputs": {
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0005829635774716735,
+              0.9690520763397217,
+              0.0008007127908058465,
+              0.028354523703455925,
+              0.0012097975704818964
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4563389000031748
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0001237545657204464,
+              0.2306903898715973,
+              0.0005390244768932462,
+              0.0031476242002099752,
+              0.0012968311784788966
+            ],
+            "elementary": [
+              0.0001237545657204464,
+              0.2306903898715973,
+              0.0005390244768932462,
+              0.0031476242002099752,
+              0.0009729409939609468,
+              0.0012968311784788966,
+              0.0012175627052783966,
+              0.0011366838589310646
+            ],
+            "gates": [
+              0.002222419949248433,
+              0.010016458109021187,
+              0.4350566864013672
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1605813999995007
+        }
+      }
+    },
+    {
+      "id": "final-stressant-2",
+      "group": "explicit",
+      "expected": "stressant",
+      "text": "Je redoutais l'arrivée du contrôleur ; j'étais très anxieux.",
+      "outputs": {
+        "candidate": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00011558514961507171,
+              0.4806797206401825,
+              0.001210185931995511,
+              0.00092449871590361,
+              0.000907447247300297
+            ],
+            "elementary": [
+              0.00011558514961507171,
+              0.4806797206401825,
+              0.001210185931995511,
+              0.00092449871590361,
+              0.0005598778952844441,
+              0.0004860773915424943,
+              0.000907447247300297,
+              0.0008856751956045628
+            ],
+            "gates": [
+              0.0023033753968775272,
+              0.003847471671178937,
+              0.16169126331806183
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.23391730000003
+        },
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0001497806515544653,
+              0.9468808770179749,
+              0.00027559258160181344,
+              0.05198938772082329,
+              0.000704405305441469
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5236997999963933
+        }
+      }
+    },
+    {
+      "id": "final-stressant-3",
+      "group": "explicit",
+      "expected": "stressant",
+      "text": "Je n'arrivais pas à appeler à l'aide et j'étais paniqué.",
+      "outputs": {
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00020074300118722022,
+              0.9735983610153198,
+              0.0005030547617934644,
+              0.02492661029100418,
+              0.0007712332298979163
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.549862399995618
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              9.719270747154951e-05,
+              0.005178275052458048,
+              0.0017393352463841438,
+              0.0007034674054011703,
+              0.0005822112434543669
+            ],
+            "elementary": [
+              9.719270747154951e-05,
+              0.005178275052458048,
+              0.0017393352463841438,
+              0.0007034674054011703,
+              0.000539309112355113,
+              0.00037428110954351723,
+              0.00044204690493643284,
+              0.0005822112434543669
+            ],
+            "gates": [
+              0.0006153471185825765,
+              0.001186317065730691,
+              0.04538663476705551
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.2104742000010447
+        }
+      }
+    },
+    {
+      "id": "final-stressant-4",
+      "group": "explicit",
+      "expected": "stressant",
+      "text": "Les marches s'écroulaient et je tremblais de terreur.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00011630199878709391,
+              0.007902846671640873,
+              0.00030368060106411576,
+              0.14226195216178894,
+              0.0015589653048664331
+            ],
+            "elementary": [
+              0.00011630199878709391,
+              0.007902846671640873,
+              0.00030368060106411576,
+              0.14226195216178894,
+              0.0013492319267243147,
+              0.0015589653048664331,
+              0.0013226307928562164,
+              0.000990969012491405
+            ],
+            "gates": [
+              0.0014656735584139824,
+              0.0019639062229543924,
+              0.07340196520090103
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.130121300004248
+        },
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00015736329078208655,
+              0.6737740635871887,
+              0.00017779399058781564,
+              0.32504802942276,
+              0.0008427292923443019
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4525333999990835
+        }
+      }
+    },
+    {
+      "id": "final-stressant-5",
+      "group": "explicit",
+      "expected": "stressant",
+      "text": "Mon avion plongeait et j'étais mort de peur.",
+      "outputs": {
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00025623312103562057,
+              0.8001042604446411,
+              0.000556561048142612,
+              0.19816353917121887,
+              0.0009194930316880345
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.43235570000251755
+        },
+        "candidate": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0001831242989283055,
+              0.8279967904090881,
+              0.00157790700905025,
+              0.011513735167682171,
+              0.000991292530670762
+            ],
+            "elementary": [
+              0.0001831242989283055,
+              0.8279967904090881,
+              0.00157790700905025,
+              0.011513735167682171,
+              0.0009652982116676867,
+              0.000991292530670762,
+              0.0009516471181996167,
+              0.0009226711117662489
+            ],
+            "gates": [
+              0.01752803474664688,
+              0.10118832439184189,
+              0.21895532310009003
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.088588799997524
+        }
+      }
+    },
+    {
+      "id": "final-stressant-6",
+      "group": "explicit",
+      "expected": "stressant",
+      "text": "Je devais parler devant mille personnes, submergé d'angoisse.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              9.037464042194188e-05,
+              0.15795958042144775,
+              0.00011395197361707687,
+              0.15414020419120789,
+              0.0014980718260630965
+            ],
+            "elementary": [
+              9.037464042194188e-05,
+              0.15795958042144775,
+              0.00011395197361707687,
+              0.15414020419120789,
+              0.0014980718260630965,
+              0.0005302891950123012,
+              0.0012042511953040957,
+              0.0011884444393217564
+            ],
+            "gates": [
+              0.0006250705337151885,
+              0.03369519114494324,
+              0.04826170206069946
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.088712700002361
+        },
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00017213427054230124,
+              0.9223452210426331,
+              0.00035341863986104727,
+              0.07535362243652344,
+              0.0017756173620000482
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.47317060000204947
+        }
+      }
+    },
+    {
+      "id": "final-stressant-7",
+      "group": "explicit",
+      "expected": "stressant",
+      "text": "Une ombre grattait au carreau et je me sentais terrifié.",
+      "outputs": {
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00027828250313177705,
+              0.2750869691371918,
+              0.0006305622518993914,
+              0.721910834312439,
+              0.002093394286930561
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.43414559999655467
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              9.966491779778153e-05,
+              0.005746921524405479,
+              0.00023895852791611105,
+              0.004304731264710426,
+              0.0011588872876018286
+            ],
+            "elementary": [
+              9.966491779778153e-05,
+              0.005746921524405479,
+              0.00023895852791611105,
+              0.004304731264710426,
+              0.000978585914708674,
+              0.0010703704319894314,
+              0.0011588872876018286,
+              0.0010644799331203103
+            ],
+            "gates": [
+              0.0011683735065162182,
+              0.0009835889795795083,
+              0.10744310915470123
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.0389572999993106
+        }
+      }
+    },
+    {
+      "id": "final-stressant-8",
+      "group": "explicit",
+      "expected": "stressant",
+      "text": "L'eau montait autour de moi ; la panique me paralysait.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00012696093472186476,
+              0.015244883485138416,
+              0.0003124148934148252,
+              0.0031712509226053953,
+              0.0012764293933287263
+            ],
+            "elementary": [
+              0.00012696093472186476,
+              0.015244883485138416,
+              0.0003124148934148252,
+              0.0031712509226053953,
+              0.0012094639241695404,
+              0.0007102051167748868,
+              0.0007504593813791871,
+              0.0012764293933287263
+            ],
+            "gates": [
+              0.0021724977996200323,
+              0.005794724449515343,
+              0.027214931324124336
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.0722247999947285
+        },
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00023301148030441254,
+              0.9953625202178955,
+              0.00025006040232256055,
+              0.0032183886505663395,
+              0.0009360110852867365
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.43144610000308603
+        }
+      }
+    },
+    {
+      "id": "final-stressant-9",
+      "group": "explicit",
+      "expected": "stressant",
+      "text": "Je cherchais mon passeport, stressé à l'idée de manquer mon départ.",
+      "outputs": {
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00016144091205205768,
+              0.7633118629455566,
+              0.00023056748614180833,
+              0.23570318520069122,
+              0.0005928800092078745
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4707004000010784
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00014122042921371758,
+              0.9979357719421387,
+              0.00047311277012340724,
+              0.6855586171150208,
+              0.0012543401680886745
+            ],
+            "elementary": [
+              0.00014122042921371758,
+              0.9979357719421387,
+              0.00047311277012340724,
+              0.6855586171150208,
+              0.0012543401680886745,
+              0.0004886667593382299,
+              0.0003937221772503108,
+              0.0010213233763352036
+            ],
+            "gates": [
+              0.028973707929253578,
+              0.06243286654353142,
+              0.5799985527992249
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.308809399997699
+        }
+      }
+    },
+    {
+      "id": "final-stressant-10",
+      "group": "explicit",
+      "expected": "stressant",
+      "text": "Je craignais le chien qui aboyait et j'étais effrayé.",
+      "outputs": {
+        "candidate": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0001100371009670198,
+              0.7130603790283203,
+              0.002453061519190669,
+              0.027304865419864655,
+              0.009528710506856441
+            ],
+            "elementary": [
+              0.0001100371009670198,
+              0.7130603790283203,
+              0.002453061519190669,
+              0.027304865419864655,
+              0.0030491219367831945,
+              0.009528710506856441,
+              0.0012227187398821115,
+              0.0011527937604114413
+            ],
+            "gates": [
+              0.005858108401298523,
+              0.1952958106994629,
+              0.351207971572876
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.2085866000052192
+        },
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00019131303997710347,
+              0.9802292585372925,
+              0.00023425614926964045,
+              0.009089921601116657,
+              0.010255251079797745
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.48463300000003073
+        }
+      }
+    },
+    {
+      "id": "final-neutre-1",
+      "group": "explicit",
+      "expected": "neutre",
+      "text": "Je triais des boutons, sans éprouver d'émotion particulière.",
+      "outputs": {
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00018747134890872985,
+              8.486895239911973e-05,
+              0.9990323781967163,
+              0.0004649375332519412,
+              0.00023036885249894112
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4257129999969038
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.001307701924815774,
+              0.0010194055503234267,
+              0.002124157501384616,
+              0.0015591237461194396,
+              0.0008796656620688736
+            ],
+            "elementary": [
+              0.001307701924815774,
+              0.0010194055503234267,
+              0.002124157501384616,
+              0.0015591237461194396,
+              0.00014520573313347995,
+              0.00077741191489622,
+              0.000826875795610249,
+              0.0008796656620688736
+            ],
+            "gates": [
+              0.0015582512132823467,
+              0.001744318869896233,
+              0.25546202063560486
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.049013500000001
+        }
+      }
+    },
+    {
+      "id": "final-neutre-2",
+      "group": "explicit",
+      "expected": "neutre",
+      "text": "Je lisais un horaire ; je me sentais émotionnellement neutre.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0010047151008620858,
+              0.001541417557746172,
+              0.0005896170623600483,
+              0.0007728540804237127,
+              0.0006369224283844233
+            ],
+            "elementary": [
+              0.0010047151008620858,
+              0.001541417557746172,
+              0.0005896170623600483,
+              0.0007728540804237127,
+              0.0004400712496135384,
+              0.0003708217409439385,
+              0.0004587228177115321,
+              0.0006369224283844233
+            ],
+            "gates": [
+              0.0005131378420628607,
+              0.0012062484165653586,
+              0.0013471104903146625
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.3013208999982453
+        },
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              8.229050581576303e-05,
+              4.630068360711448e-05,
+              0.9993407130241394,
+              0.00030747527489438653,
+              0.0002232350525446236
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5587681999968481
+        }
+      }
+    },
+    {
+      "id": "final-neutre-3",
+      "group": "explicit",
+      "expected": "neutre",
+      "text": "Je traversais un couloir sans joie, sans peine et sans peur.",
+      "outputs": {
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0038695442490279675,
+              0.0008407253189943731,
+              0.9928334951400757,
+              0.0015386590966954827,
+              0.0009175752056762576
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5239882000023499
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0023940582759678364,
+              0.0004441060300450772,
+              0.0008185656042769551,
+              0.00069132458884269,
+              0.0005369095015339553
+            ],
+            "elementary": [
+              0.0023940582759678364,
+              0.0004441060300450772,
+              0.0008185656042769551,
+              0.00069132458884269,
+              0.0003730905009433627,
+              0.0003324500285089016,
+              0.0003813852381426841,
+              0.0005369095015339553
+            ],
+            "gates": [
+              0.0009072824032045901,
+              0.0006962887127883732,
+              0.6912593245506287
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.2304752999989432
+        }
+      }
+    },
+    {
+      "id": "final-neutre-4",
+      "group": "explicit",
+      "expected": "neutre",
+      "text": "Je posais une règle sur le bureau en restant indifférent.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0004969158326275647,
+              0.0004418538010213524,
+              0.0005708958487957716,
+              0.00033088919008150697,
+              0.0006401509162969887
+            ],
+            "elementary": [
+              0.0004969158326275647,
+              0.0004418538010213524,
+              0.0005708958487957716,
+              0.00033088919008150697,
+              0.0005298891919665039,
+              0.00038396893069148064,
+              0.0005401524831540883,
+              0.0006401509162969887
+            ],
+            "gates": [
+              0.0007321335724554956,
+              0.0007456021849066019,
+              0.002233072416856885
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.3874588999970001
+        },
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.000422712997533381,
+              0.0008234230917878449,
+              0.9947868585586548,
+              0.0026051399763673544,
+              0.0013618944212794304
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4797625000064727
+        }
+      }
+    },
+    {
+      "id": "final-neutre-5",
+      "group": "explicit",
+      "expected": "neutre",
+      "text": "Je comptais des poteaux et ne ressentais rien de spécial.",
+      "outputs": {
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00017847576236817986,
+              0.00011414846812840551,
+              0.998129665851593,
+              0.0014341025380417705,
+              0.0001436563761672005
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.528184599999804
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0019921627826988697,
+              0.0003977038722950965,
+              0.002064227592200041,
+              0.0013068370753899217,
+              0.0015900835860520601
+            ],
+            "elementary": [
+              0.0019921627826988697,
+              0.0003977038722950965,
+              0.002064227592200041,
+              0.0013068370753899217,
+              0.0007875688024796546,
+              0.0015900835860520601,
+              0.0010249557672068477,
+              0.000577619532123208
+            ],
+            "gates": [
+              0.00435898220166564,
+              0.005594453774392605,
+              0.0008021069224923849
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.392376300005708
+        }
+      }
+    },
+    {
+      "id": "final-neutre-6",
+      "group": "explicit",
+      "expected": "neutre",
+      "text": "Je regardais le plafond avec une totale indifférence.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00041442891233600676,
+              0.0006244025425985456,
+              0.0006269178702495992,
+              0.0003392973158042878,
+              0.00045014041825197637
+            ],
+            "elementary": [
+              0.00041442891233600676,
+              0.0006244025425985456,
+              0.0006269178702495992,
+              0.0003392973158042878,
+              0.0004414909635670483,
+              0.00045014041825197637,
+              0.0003574092988856137,
+              0.000325474189594388
+            ],
+            "gates": [
+              0.001143625588156283,
+              0.0007010918925516307,
+              0.0022610339801758528
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.216370599999209
+        },
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0005978242261335254,
+              0.0016298716655001044,
+              0.9922769069671631,
+              0.0037913292180746794,
+              0.0017038965597748756
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.45578860000387067
+        }
+      }
+    },
+    {
+      "id": "final-neutre-7",
+      "group": "explicit",
+      "expected": "neutre",
+      "text": "Je changeais une ampoule, sans aucune réaction émotionnelle.",
+      "outputs": {
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0001787059591151774,
+              0.00010589048906695098,
+              0.999530553817749,
+              8.387347043026239e-05,
+              0.00010104025568580255
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.46594410000398057
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0003594371664803475,
+              0.0008170102955773473,
+              0.006993979215621948,
+              0.001211340306326747,
+              0.0010636089136824012
+            ],
+            "elementary": [
+              0.0003594371664803475,
+              0.0008170102955773473,
+              0.006993979215621948,
+              0.001211340306326747,
+              0.00011864904809044674,
+              0.00015010083734523505,
+              0.0010636089136824012,
+              0.0007349543157033622
+            ],
+            "gates": [
+              0.0012267151614651084,
+              0.0018152480479329824,
+              0.0006164116784930229
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.2866737000003923
+        }
+      }
+    },
+    {
+      "id": "final-neutre-8",
+      "group": "explicit",
+      "expected": "neutre",
+      "text": "Je remplissais un formulaire ; mes sentiments restaient neutres.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0007219710969366133,
+              0.001159597304649651,
+              0.001218928024172783,
+              0.0005350809078663588,
+              0.0007558539509773254
+            ],
+            "elementary": [
+              0.0007219710969366133,
+              0.001159597304649651,
+              0.001218928024172783,
+              0.0005350809078663588,
+              0.00012875130050815642,
+              0.0007370217936113477,
+              0.0005599792930297554,
+              0.0007558539509773254
+            ],
+            "gates": [
+              0.0006711924797855318,
+              0.001019193441607058,
+              0.0012681192019954324
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1848726000025636
+        },
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              5.949535989202559e-05,
+              0.00014937161176931113,
+              0.9993070363998413,
+              0.00028358676354400814,
+              0.00020047540601808578
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5393485000022338
+        }
+      }
+    },
+    {
+      "id": "final-neutre-9",
+      "group": "explicit",
+      "expected": "neutre",
+      "text": "Je recopiais une adresse sans émotion ni intérêt particulier.",
+      "outputs": {
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00015241977234836668,
+              0.00015466802869923413,
+              0.9992740750312805,
+              0.0002932920469902456,
+              0.00012554806016851217
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4667291000005207
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0006002855952829123,
+              0.0010222481796517968,
+              0.0008796603651717305,
+              0.0006383233121596277,
+              0.0011910294415429235
+            ],
+            "elementary": [
+              0.0006002855952829123,
+              0.0010222481796517968,
+              0.0008796603651717305,
+              0.0006383233121596277,
+              0.0006699600489810109,
+              0.0008290151017718017,
+              0.0011910294415429235,
+              0.00030998236616142094
+            ],
+            "gates": [
+              0.0006465286714956164,
+              0.000913487805519253,
+              0.00044796892325393856
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.07320030000119
+        }
+      }
+    },
+    {
+      "id": "final-neutre-10",
+      "group": "explicit",
+      "expected": "neutre",
+      "text": "J'attendais mon tour sans impatience, sans joie et sans inquiétude.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.9258718490600586,
+              0.000879553786944598,
+              0.0046602897346019745,
+              0.0005710367695428431,
+              0.0031142784282565117
+            ],
+            "elementary": [
+              0.9258718490600586,
+              0.000879553786944598,
+              0.0046602897346019745,
+              0.0005710367695428431,
+              0.0013211111072450876,
+              0.0031142784282565117,
+              0.0011986065655946732,
+              0.0011487080482766032
+            ],
+            "gates": [
+              0.0029070875607430935,
+              0.011589381843805313,
+              0.9178830981254578
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.08563690000301
+        },
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.002518107183277607,
+              0.0006647863192483783,
+              0.9951935410499573,
+              0.0005048912717029452,
+              0.0011186235351487994
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5238683999996283
+        }
+      }
+    },
+    {
+      "id": "final-triste-1",
+      "group": "explicit",
+      "expected": "triste",
+      "text": "Je perdais mon album de famille et pleurais de tristesse.",
+      "outputs": {
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0001864756632130593,
+              0.06524592638015747,
+              0.00043647090205922723,
+              0.9338454008102417,
+              0.0002858179504983127
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5685471999968286
+        },
+        "candidate": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0001581397809786722,
+              0.024918997660279274,
+              0.00033576556597836316,
+              0.988490104675293,
+              0.07257537543773651
+            ],
+            "elementary": [
+              0.0001581397809786722,
+              0.024918997660279274,
+              0.00033576556597836316,
+              0.988490104675293,
+              0.003249289933592081,
+              0.07257537543773651,
+              0.001155890873633325,
+              0.0007575860945507884
+            ],
+            "gates": [
+              0.00038804978248663247,
+              0.001881528994999826,
+              0.19548414647579193
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.0743916999999783
+        }
+      }
+    },
+    {
+      "id": "final-triste-2",
+      "group": "explicit",
+      "expected": "triste",
+      "text": "Mes voisins m'oubliaient ; je me sentais seul et profondément triste.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              9.164272341877222e-05,
+              0.000779045803938061,
+              0.0005920767434872687,
+              0.002503413939848542,
+              0.0005006605642847717
+            ],
+            "elementary": [
+              9.164272341877222e-05,
+              0.000779045803938061,
+              0.0005920767434872687,
+              0.002503413939848542,
+              0.00029483239632099867,
+              0.000361173995770514,
+              0.0005006605642847717,
+              0.00042863955604843795
+            ],
+            "gates": [
+              0.000904905900824815,
+              0.0007310343207791448,
+              0.4632471203804016
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1138778000022285
+        },
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00012553362466860563,
+              0.0009431009530089796,
+              0.2958033084869385,
+              0.7029205560684204,
+              0.00020756891171913594
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4746824000030756
+        }
+      }
+    },
+    {
+      "id": "final-triste-3",
+      "group": "explicit",
+      "expected": "triste",
+      "text": "Je voyais ma sœur partir et ressentais une grande peine.",
+      "outputs": {
+        "baseline": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "scores": [
+              0.00019923948275391012,
+              0.4913932681083679,
+              0.0002384138642810285,
+              0.5078163146972656,
+              0.00035270481021143496
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4683440000007977
+        },
+        "candidate": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00012263016833458096,
+              0.0215056873857975,
+              0.00024753808975219727,
+              0.9487816095352173,
+              0.0011625754414126277
+            ],
+            "elementary": [
+              0.00012263016833458096,
+              0.0215056873857975,
+              0.00024753808975219727,
+              0.9487816095352173,
+              0.0006729303859174252,
+              0.0011625754414126277,
+              0.0008912520715966821,
+              0.0007345166523009539
+            ],
+            "gates": [
+              0.009604326449334621,
+              0.0012960750609636307,
+              0.006639611441642046
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1059543000010308
+        }
+      }
+    },
+    {
+      "id": "final-triste-4",
+      "group": "explicit",
+      "expected": "triste",
+      "text": "Je cherchais ma maison disparue, accablé de chagrin.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0001340418093604967,
+              0.9612130522727966,
+              0.0003303379053249955,
+              0.9934715032577515,
+              0.003444607136771083
+            ],
+            "elementary": [
+              0.0001340418093604967,
+              0.9612130522727966,
+              0.0003303379053249955,
+              0.9934715032577515,
+              0.003444607136771083,
+              0.0032562948763370514,
+              0.0004475644091144204,
+              0.0004949799622409046
+            ],
+            "gates": [
+              0.004804203752428293,
+              0.00461967196315527,
+              0.3406451642513275
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1490398999958416
+        },
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00012187380343675613,
+              0.25506827235221863,
+              0.00038084533298388124,
+              0.7437453866004944,
+              0.0006837078253738582
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4844347999969614
+        }
+      }
+    },
+    {
+      "id": "final-triste-5",
+      "group": "explicit",
+      "expected": "triste",
+      "text": "Je lisais une lettre d'adieu et mes larmes coulaient de tristesse.",
+      "outputs": {
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0002069538604700938,
+              0.0004312268865760416,
+              0.00031622187816537917,
+              0.9987794756889343,
+              0.0002661486796569079
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.514857199996186
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00012403438449837267,
+              0.000942705140914768,
+              0.00017849546566139907,
+              0.13816051185131073,
+              0.001848782179877162
+            ],
+            "elementary": [
+              0.00012403438449837267,
+              0.000942705140914768,
+              0.00017849546566139907,
+              0.13816051185131073,
+              0.000807696720585227,
+              0.001848782179877162,
+              0.0006823135772719979,
+              0.0007018111064098775
+            ],
+            "gates": [
+              0.0003300423559267074,
+              0.0006093729753047228,
+              0.018051451072096825
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.21522069999628
+        }
+      }
+    },
+    {
+      "id": "final-triste-6",
+      "group": "explicit",
+      "expected": "triste",
+      "text": "Un ami refusait de me reconnaître, ce qui me rendait malheureux.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0001329915103269741,
+              0.0013155504129827023,
+              0.0014556030509993434,
+              0.008362245745956898,
+              0.003095770487561822
+            ],
+            "elementary": [
+              0.0001329915103269741,
+              0.0013155504129827023,
+              0.0014556030509993434,
+              0.008362245745956898,
+              0.000702858145814389,
+              0.003095770487561822,
+              0.0016898351022973657,
+              0.0008555841632187366
+            ],
+            "gates": [
+              0.003869607811793685,
+              0.0008265489595942199,
+              0.15422497689723969
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1470656000019517
+        },
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.000372993090422824,
+              0.0030393972992897034,
+              0.20333056151866913,
+              0.7896320819854736,
+              0.00362500362098217
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.46706039999844506
+        }
+      }
+    },
+    {
+      "id": "final-triste-7",
+      "group": "explicit",
+      "expected": "triste",
+      "text": "Je retrouvais le panier vide de mon chat disparu et sanglotais.",
+      "outputs": {
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0007139944937080145,
+              0.13044330477714539,
+              0.12390337884426117,
+              0.741096019744873,
+              0.003843287006020546
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5162581000040518
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00018843523866962641,
+              0.003002435201779008,
+              0.0003090444952249527,
+              0.010558155365288258,
+              0.002391287824138999
+            ],
+            "elementary": [
+              0.00018843523866962641,
+              0.003002435201779008,
+              0.0003090444952249527,
+              0.010558155365288258,
+              0.002391287824138999,
+              0.0007232662755995989,
+              0.0007570560555905104,
+              0.0006790278130210936
+            ],
+            "gates": [
+              0.0013450718251988292,
+              0.0015227250987663865,
+              0.8466589450836182
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.1858597000027657
+        }
+      }
+    },
+    {
+      "id": "final-triste-8",
+      "group": "explicit",
+      "expected": "triste",
+      "text": "Je disais adieu à mes camarades, le cœur rempli de chagrin.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              8.988391346065328e-05,
+              0.0018891331274062395,
+              0.00035049355938099325,
+              0.003535044379532337,
+              0.0007669110782444477
+            ],
+            "elementary": [
+              8.988391346065328e-05,
+              0.0018891331274062395,
+              0.00035049355938099325,
+              0.003535044379532337,
+              0.0007669110782444477,
+              0.00048712053103372455,
+              0.0003042980097234249,
+              0.000372077280189842
+            ],
+            "gates": [
+              0.001060505281202495,
+              0.0009455730323679745,
+              0.12342305481433868
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.2177628999997978
+        },
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00016612828767392784,
+              0.06996869295835495,
+              0.0005348868435248733,
+              0.928735077381134,
+              0.0005952207720838487
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.50076049999916
+        }
+      }
+    },
+    {
+      "id": "final-triste-9",
+      "group": "explicit",
+      "expected": "triste",
+      "text": "Je n'avais plus personne à qui parler et ressentais une immense solitude.",
+      "outputs": {
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              8.739082841202617e-05,
+              0.000579502375330776,
+              0.5896671414375305,
+              0.40951529145240784,
+              0.0001507010165369138
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.451042900000175
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00044697304838337004,
+              0.0004123101243749261,
+              0.000344015279551968,
+              0.0006359953549690545,
+              0.00034613002208061516
+            ],
+            "elementary": [
+              0.00044697304838337004,
+              0.0004123101243749261,
+              0.000344015279551968,
+              0.0006359953549690545,
+              0.0002536454703658819,
+              0.0002641092869453132,
+              0.00034613002208061516,
+              0.0003207449917681515
+            ],
+            "gates": [
+              0.0006032665260136127,
+              0.0008108780020847917,
+              0.9238099455833435
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1052961999957915
+        }
+      }
+    },
+    {
+      "id": "final-triste-10",
+      "group": "explicit",
+      "expected": "triste",
+      "text": "Ma fleur préférée se fanait ; j'étais triste et abattu.",
+      "outputs": {
+        "candidate": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0004383775230962783,
+              0.003167862771078944,
+              0.0012094731209799647,
+              0.9952367544174194,
+              0.00684297876432538
+            ],
+            "elementary": [
+              0.0004383775230962783,
+              0.003167862771078944,
+              0.0012094731209799647,
+              0.9952367544174194,
+              0.005596546456217766,
+              0.00684297876432538,
+              0.0010407535592094064,
+              0.0008149338536895812
+            ],
+            "gates": [
+              0.35596945881843567,
+              0.006207501050084829,
+              0.1376560628414154
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1507549000016297
+        },
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00022609494044445455,
+              0.00470087630674243,
+              0.0017996806418523192,
+              0.992985188961029,
+              0.0002880785323213786
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.49755200000072364
+        }
+      }
+    },
+    {
+      "id": "final-autre-1",
+      "group": "explicit",
+      "expected": "autre",
+      "text": "Je découvrais un piano minuscule ; ma seule émotion était la surprise.",
+      "outputs": {
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.001011535176075995,
+              0.0013033297145739198,
+              0.9956433773040771,
+              0.0014404122484847903,
+              0.0006013867678120732
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4672266000052332
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.007585023995488882,
+              0.0031155969481915236,
+              0.0035022336523979902,
+              0.00047539864317514,
+              0.0017947899177670479
+            ],
+            "elementary": [
+              0.007585023995488882,
+              0.0031155969481915236,
+              0.0035022336523979902,
+              0.00047539864317514,
+              0.0007171310135163367,
+              0.0017947899177670479,
+              0.0011425679549574852,
+              0.0011030687019228935
+            ],
+            "gates": [
+              0.0026819552294909954,
+              0.006290058139711618,
+              0.0005145902978256345
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.2341345000022557
+        }
+      }
+    },
+    {
+      "id": "final-autre-2",
+      "group": "explicit",
+      "expected": "autre",
+      "text": "Une pomme chantait et j'étais stupéfait, sans joie ni peur.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.2505405843257904,
+              0.012984972447156906,
+              0.014011647552251816,
+              0.002232687547802925,
+              0.05811404809355736
+            ],
+            "elementary": [
+              0.2505405843257904,
+              0.012984972447156906,
+              0.014011647552251816,
+              0.002232687547802925,
+              0.0012699440121650696,
+              0.05811404809355736,
+              0.015397835522890091,
+              0.005105141084641218
+            ],
+            "gates": [
+              0.0011711495462805033,
+              0.015048188157379627,
+              0.8486384153366089
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.3125516000000061
+        },
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.011009172536432743,
+              0.0005210067029111087,
+              0.9852333664894104,
+              0.0003641407529357821,
+              0.00287230615504086
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.536607300004107
+        }
+      }
+    },
+    {
+      "id": "final-autre-3",
+      "group": "explicit",
+      "expected": "autre",
+      "text": "Une étoile entrait dans ma poche et je ressentais de l'étonnement.",
+      "outputs": {
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.9857660531997681,
+              0.0030600985046476126,
+              0.0028528529219329357,
+              0.003269864246249199,
+              0.005051079206168652
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5537591999964206
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0027717025950551033,
+              0.0020590934436768293,
+              0.0007712506339885294,
+              0.00015405834710691124,
+              0.0008158287382684648
+            ],
+            "elementary": [
+              0.0027717025950551033,
+              0.0020590934436768293,
+              0.0007712506339885294,
+              0.00015405834710691124,
+              0.0007409587851725519,
+              0.0007246770546771586,
+              0.0008158287382684648,
+              0.000694986607413739
+            ],
+            "gates": [
+              0.0005669043748639524,
+              0.0008695234428159893,
+              0.06364808976650238
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1586976000035065
+        }
+      }
+    },
+    {
+      "id": "final-autre-4",
+      "group": "explicit",
+      "expected": "autre",
+      "text": "Une invention étrange éveillait en moi une grande curiosité.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0029168715700507164,
+              0.0006655428442172706,
+              0.0003174450248479843,
+              0.00011468303273431957,
+              0.002380507066845894
+            ],
+            "elementary": [
+              0.0029168715700507164,
+              0.0006655428442172706,
+              0.0003174450248479843,
+              0.00011468303273431957,
+              0.0011644583428278565,
+              0.002380507066845894,
+              0.0014745380030944943,
+              0.0020854303147643805
+            ],
+            "gates": [
+              0.0006217533955350518,
+              0.0005987025797367096,
+              0.02098250761628151
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1581499000021722
+        },
+        "baseline": {
+          "prediction": "autre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.09387562423944473,
+              0.08288121968507767,
+              0.1055016964673996,
+              0.10825109481811523,
+              0.6094903349876404
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5071860000025481
+        }
+      }
+    },
+    {
+      "id": "final-autre-5",
+      "group": "explicit",
+      "expected": "autre",
+      "text": "Je voulais comprendre cette énigme et me sentais curieux, pas inquiet.",
+      "outputs": {
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00032083867699839175,
+              0.0005324884550645947,
+              0.9720730185508728,
+              0.0004703648737631738,
+              0.02660333923995495
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5159428999977536
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.004659670405089855,
+              0.0004978543147444725,
+              0.0005547703476622701,
+              0.0001691472134552896,
+              0.0008131958311423659
+            ],
+            "elementary": [
+              0.004659670405089855,
+              0.0004978543147444725,
+              0.0005547703476622701,
+              0.0001691472134552896,
+              0.0007105579134076834,
+              0.0008131958311423659,
+              0.000668098742607981,
+              0.0006246254197321832
+            ],
+            "gates": [
+              0.0005931754130870104,
+              0.0005897864466533065,
+              0.09096480906009674
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.2903364000012516
+        }
+      }
+    },
+    {
+      "id": "final-autre-6",
+      "group": "explicit",
+      "expected": "autre",
+      "text": "Quelqu'un déchirait mon dessin et j'étais en colère.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00012031559163006023,
+              0.23136268556118011,
+              0.0002078591351164505,
+              0.001369975507259369,
+              0.006678370293229818
+            ],
+            "elementary": [
+              0.00012031559163006023,
+              0.23136268556118011,
+              0.0002078591351164505,
+              0.001369975507259369,
+              0.0031807231716811657,
+              0.0015713023021817207,
+              0.006678370293229818,
+              0.0005479830433614552
+            ],
+            "gates": [
+              0.0026022428646683693,
+              0.0002776535402517766,
+              0.04894522577524185
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1466411000001244
+        },
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0031113752629607916,
+              0.5564616322517395,
+              0.004276682622730732,
+              0.0381125882267952,
+              0.3980376422405243
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4813990000038757
+        }
+      }
+    },
+    {
+      "id": "final-autre-7",
+      "group": "explicit",
+      "expected": "autre",
+      "text": "On m'avait volé ma médaille et j'éprouvais une fureur intense.",
+      "outputs": {
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.04554576799273491,
+              0.6285861730575562,
+              0.05783620849251747,
+              0.07719400525093079,
+              0.19083790481090546
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5723905000049854
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00016883014177437872,
+              0.04497620090842247,
+              0.0002804548421408981,
+              0.0003161905915476382,
+              0.018992837518453598
+            ],
+            "elementary": [
+              0.00016883014177437872,
+              0.04497620090842247,
+              0.0002804548421408981,
+              0.0003161905915476382,
+              0.007898001931607723,
+              0.018992837518453598,
+              0.0026210311334580183,
+              0.0011273316340520978
+            ],
+            "gates": [
+              0.032727353274822235,
+              0.0004437039024196565,
+              0.3056568205356598
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.1937805000052322
+        }
+      }
+    },
+    {
+      "id": "final-autre-8",
+      "group": "explicit",
+      "expected": "autre",
+      "text": "Je protestais contre une injustice, furieux plutôt que triste.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0001575200876686722,
+              0.9159712195396423,
+              0.013301425613462925,
+              0.02966233715415001,
+              0.010793767869472504
+            ],
+            "elementary": [
+              0.0001575200876686722,
+              0.9159712195396423,
+              0.013301425613462925,
+              0.02966233715415001,
+              0.0007491526775993407,
+              0.010793767869472504,
+              0.0022477267775684595,
+              0.0018240810604766011
+            ],
+            "gates": [
+              0.003844629740342498,
+              0.004364003427326679,
+              0.9832286834716797
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.0642657999997027
+        },
+        "baseline": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "scores": [
+              0.00018315608031116426,
+              0.16135434806346893,
+              0.3614966571331024,
+              0.0005510259652510285,
+              0.47641485929489136
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5146382000020822
+        }
+      }
+    },
+    {
+      "id": "final-autre-9",
+      "group": "explicit",
+      "expected": "autre",
+      "text": "Je goûtais un aliment pourri et ressentais un profond dégoût.",
+      "outputs": {
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00024233973817899823,
+              0.04344593361020088,
+              0.00042343311361037195,
+              0.9537605047225952,
+              0.0021277456544339657
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.6066562999985763
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00019545902614481747,
+              0.010938809253275394,
+              0.026811562478542328,
+              0.855182409286499,
+              0.00465580215677619
+            ],
+            "elementary": [
+              0.00019545902614481747,
+              0.010938809253275394,
+              0.026811562478542328,
+              0.855182409286499,
+              0.0014209018554538488,
+              0.00465580215677619,
+              0.0011127908946946263,
+              0.0006533392006531358
+            ],
+            "gates": [
+              0.004319833591580391,
+              0.0027954343240708113,
+              0.9114680886268616
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.272035900001356
+        }
+      }
+    },
+    {
+      "id": "final-autre-10",
+      "group": "explicit",
+      "expected": "autre",
+      "text": "Des vers couvraient mon assiette ; j'étais écœuré, sans peur.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.03609747067093849,
+              0.0017526650335639715,
+              0.0023496029898524284,
+              0.004605862312018871,
+              0.84036785364151
+            ],
+            "elementary": [
+              0.03609747067093849,
+              0.0017526650335639715,
+              0.0023496029898524284,
+              0.004605862312018871,
+              0.0021517248824238777,
+              0.84036785364151,
+              0.018926460295915604,
+              0.002097498858347535
+            ],
+            "gates": [
+              0.000633337942417711,
+              0.00103831198066473,
+              0.9787553548812866
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.4368669999967096
+        },
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0004714438400696963,
+              0.0008719915058463812,
+              0.001671622390858829,
+              0.9959373474121094,
+              0.0010476650204509497
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5806996999963303
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-1",
+      "group": "undetermined",
+      "expected": null,
+      "text": "Une valise verte se trouvait sous une table en métal.",
+      "outputs": {
+        "baseline": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "scores": [
+              0.30709049105644226,
+              0.14124636352062225,
+              0.05617363750934601,
+              0.2951505482196808,
+              0.2003389298915863
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.45944759999838425
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0004908278351649642,
+              0.000704164442140609,
+              0.000699908472597599,
+              0.0006094889831729233,
+              0.001176847843453288
+            ],
+            "elementary": [
+              0.0004908278351649642,
+              0.000704164442140609,
+              0.000699908472597599,
+              0.0006094889831729233,
+              0.000589524453971535,
+              0.0004891050048172474,
+              0.0009322138503193855,
+              0.001176847843453288
+            ],
+            "gates": [
+              0.0007754963589832187,
+              0.0011716927401721478,
+              0.01792842149734497
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.0347135999982129
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-2",
+      "group": "undetermined",
+      "expected": null,
+      "text": "Je longeais un mur couvert d'affiches et tournais à gauche.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00023627950577065349,
+              0.00026103874552063644,
+              0.0002418184740236029,
+              0.00024875570670701563,
+              0.0005354306194931269
+            ],
+            "elementary": [
+              0.00023627950577065349,
+              0.00026103874552063644,
+              0.0002418184740236029,
+              0.00024875570670701563,
+              0.00020433927420526743,
+              0.00023518512898590416,
+              0.0003681608650367707,
+              0.0005354306194931269
+            ],
+            "gates": [
+              0.00035319942981004715,
+              0.00031616163323633373,
+              0.01687576435506344
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.142260400003579
+        },
+        "baseline": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "scores": [
+              0.16499952971935272,
+              0.19395606219768524,
+              0.06605547666549683,
+              0.23252414166927338,
+              0.342464804649353
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.46579470000142464
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-3",
+      "group": "undetermined",
+      "expected": null,
+      "text": "Des oiseaux passaient devant un phare au bord d'une route.",
+      "outputs": {
+        "baseline": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "scores": [
+              0.19199001789093018,
+              0.08816872537136078,
+              0.025088313966989517,
+              0.19308073818683624,
+              0.5016722679138184
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5134256000019377
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00045652544940821826,
+              0.0005031436448916793,
+              0.0005111675127409399,
+              0.0003729651216417551,
+              0.00166038959287107
+            ],
+            "elementary": [
+              0.00045652544940821826,
+              0.0005031436448916793,
+              0.0005111675127409399,
+              0.0003729651216417551,
+              0.0006606676033698022,
+              0.00036095030372962356,
+              0.0007405283977277577,
+              0.00166038959287107
+            ],
+            "gates": [
+              0.0016130309086292982,
+              0.0007463348447345197,
+              0.060974862426519394
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.0372501999954693
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-4",
+      "group": "undetermined",
+      "expected": null,
+      "text": "J'ouvrais un livre dont les pages montraient des rectangles.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00036788740544579923,
+              0.0005662677576765418,
+              0.0003870796936098486,
+              0.0004902589716948569,
+              0.0006417351542040706
+            ],
+            "elementary": [
+              0.00036788740544579923,
+              0.0005662677576765418,
+              0.0003870796936098486,
+              0.0004902589716948569,
+              0.00031405233312398195,
+              0.0003260234370827675,
+              0.00044202571734786034,
+              0.0006417351542040706
+            ],
+            "gates": [
+              0.0004981171805411577,
+              0.0006584314396604896,
+              0.017236700281500816
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.0438036000050488
+        },
+        "baseline": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "scores": [
+              0.17697089910507202,
+              0.1837085783481598,
+              0.10692908614873886,
+              0.2417699098587036,
+              0.2906215190887451
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.42770000000018626
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-5",
+      "group": "undetermined",
+      "expected": null,
+      "text": "Une lampe éclairait le tapis, puis la scène changeait.",
+      "outputs": {
+        "baseline": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "scores": [
+              0.11361491680145264,
+              0.13308599591255188,
+              0.02676357515156269,
+              0.18007992208003998,
+              0.5464556217193604
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5315049999990151
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00040497773443348706,
+              0.0006480158190242946,
+              0.0007382120820693672,
+              0.0004893796285614371,
+              0.001213260111398995
+            ],
+            "elementary": [
+              0.00040497773443348706,
+              0.0006480158190242946,
+              0.0007382120820693672,
+              0.0004893796285614371,
+              0.00039233663119375706,
+              0.0004191615153104067,
+              0.001213260111398995,
+              0.0011253075208514929
+            ],
+            "gates": [
+              0.0013760904548689723,
+              0.0008837416535243392,
+              0.013730809092521667
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.058192099997541
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-6",
+      "group": "undetermined",
+      "expected": null,
+      "text": "Je tenais un billet de train mais mon ressenti n'est pas connu.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.001061889692209661,
+              0.0004971661837771535,
+              0.000871733296662569,
+              0.0004694082017522305,
+              0.0012123101623728871
+            ],
+            "elementary": [
+              0.001061889692209661,
+              0.0004971661837771535,
+              0.000871733296662569,
+              0.0004694082017522305,
+              0.0006693506729789078,
+              0.0003480060549918562,
+              0.0010729467030614614,
+              0.0012123101623728871
+            ],
+            "gates": [
+              0.010318207554519176,
+              0.29934316873550415,
+              0.00556945102289319
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.1042763000004925
+        },
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0014904252020642161,
+              0.00805831141769886,
+              0.9663387537002563,
+              0.012525134719908237,
+              0.011587386019527912
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4489728999978979
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-7",
+      "group": "undetermined",
+      "expected": null,
+      "text": "La scène montrait un théâtre ; j'ai oublié ce que je ressentais.",
+      "outputs": {
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00011445573181845248,
+              0.00031860097078606486,
+              0.9980599284172058,
+              0.0008489683386869729,
+              0.0006579409819096327
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.49398939999809954
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0002218010340584442,
+              0.0007000815821811557,
+              0.0018875205423682928,
+              0.000695287948474288,
+              0.00109579018317163
+            ],
+            "elementary": [
+              0.0002218010340584442,
+              0.0007000815821811557,
+              0.0018875205423682928,
+              0.000695287948474288,
+              0.0004164873680565506,
+              0.00044286888442002237,
+              0.0007749202777631581,
+              0.00109579018317163
+            ],
+            "gates": [
+              0.002167797414585948,
+              0.0017528969328850508,
+              0.0032325005158782005
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.1521049000002677
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-8",
+      "group": "undetermined",
+      "expected": null,
+      "text": "Je voyais une montagne, sans pouvoir dire quelle était mon émotion.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "undetermined",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.009515993297100067,
+              0.001624496653676033,
+              0.0011078794486820698,
+              0.0008687312947586179,
+              0.011962095275521278
+            ],
+            "elementary": [
+              0.009515993297100067,
+              0.001624496653676033,
+              0.0011078794486820698,
+              0.0008687312947586179,
+              0.002585657173767686,
+              0.011962095275521278,
+              0.0065033636055886745,
+              0.0023380762431770563
+            ],
+            "gates": [
+              0.9005376100540161,
+              0.9914143681526184,
+              0.9957138299942017
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.1289509999987786
+        },
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.001178191159851849,
+              0.002294882433488965,
+              0.9883500337600708,
+              0.005143462680280209,
+              0.0030333485919982195
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5312609000029624
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-9",
+      "group": "undetermined",
+      "expected": null,
+      "text": "Un enfant était heureux ; le rêve ne dit pas comment moi je me sentais.",
+      "outputs": {
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.36055463552474976,
+              0.00025824474869295955,
+              0.6361150741577148,
+              0.0006880585569888353,
+              0.0023838826455175877
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.46896710000146413
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "undetermined",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.9965051412582397,
+              0.006005993578583002,
+              0.0007743437890894711,
+              0.0073790899477899075,
+              0.009013700298964977
+            ],
+            "elementary": [
+              0.9965051412582397,
+              0.006005993578583002,
+              0.0007743437890894711,
+              0.0073790899477899075,
+              0.00019772880477830768,
+              0.009013700298964977,
+              0.002247185679152608,
+              0.0015756308566778898
+            ],
+            "gates": [
+              0.9989436268806458,
+              0.9984073042869568,
+              0.09932085126638412
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.085136200003035
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-10",
+      "group": "undetermined",
+      "expected": null,
+      "text": "Une femme semblait effrayée, mais mon propre sentiment reste inconnu.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00013504354865290225,
+              0.0009720111847855151,
+              0.00024849968031048775,
+              0.0008061120752245188,
+              0.0016755516408011317
+            ],
+            "elementary": [
+              0.00013504354865290225,
+              0.0009720111847855151,
+              0.00024849968031048775,
+              0.0008061120752245188,
+              0.0005898839444853365,
+              0.0011121551506221294,
+              0.0011845686240121722,
+              0.0016755516408011317
+            ],
+            "gates": [
+              0.008215808309614658,
+              0.017253465950489044,
+              0.07463954389095306
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.0503361000010045
+        },
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0003180659841746092,
+              0.00298489211127162,
+              0.9750569462776184,
+              0.00126827962230891,
+              0.020371848717331886
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.48554880000301637
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-11",
+      "group": "undetermined",
+      "expected": null,
+      "text": "Je notais le mot tristesse sur un panneau, sans souvenir de mon ressenti.",
+      "outputs": {
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              9.174175647785887e-05,
+              0.00017393329471815377,
+              0.6477384567260742,
+              0.3518761992454529,
+              0.0001196625962620601
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4761106000005384
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00011285609798505902,
+              0.001210935995914042,
+              0.0027753449976444244,
+              0.0008202915778383613,
+              0.001205022563226521
+            ],
+            "elementary": [
+              0.00011285609798505902,
+              0.001210935995914042,
+              0.0027753449976444244,
+              0.0008202915778383613,
+              0.00022368048666976392,
+              0.0008500950061716139,
+              0.001205022563226521,
+              0.0004614882345777005
+            ],
+            "gates": [
+              0.0011396449990570545,
+              0.001915211440064013,
+              0.13522014021873474
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1760556000008364
+        }
+      }
+    },
+    {
+      "id": "final-undetermined-12",
+      "group": "undetermined",
+      "expected": null,
+      "text": "Je racontais seulement les événements ; aucune information sur mes émotions.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0009271706803701818,
+              0.000914302421733737,
+              0.0017955047078430653,
+              0.0006480040610767901,
+              0.0007218423415906727
+            ],
+            "elementary": [
+              0.0009271706803701818,
+              0.000914302421733737,
+              0.0017955047078430653,
+              0.0006480040610767901,
+              0.000521866895724088,
+              0.0005268416716717184,
+              0.000561012071557343,
+              0.0007218423415906727
+            ],
+            "gates": [
+              0.0005353835294954479,
+              0.0035529746674001217,
+              0.0009808008326217532
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.0983822999987751
+        },
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00010001170448958874,
+              8.44791647978127e-05,
+              0.9996022582054138,
+              0.00010889338591368869,
+              0.00010439527977723628
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4941076000031899
+        }
+      }
+    },
+    {
+      "id": "final-ambiguous-1",
+      "group": "ambiguous",
+      "expected": null,
+      "text": "Mon sourire pouvait cacher de la joie ou de l'angoisse, je ne sais pas.",
+      "outputs": {
+        "baseline": {
+          "prediction": "autre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.057898420840501785,
+              0.0029005759861320257,
+              0.0020789687987416983,
+              0.0007161812973208725,
+              0.9364058375358582
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5154996999990544
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.003806766588240862,
+              0.0031772584188729525,
+              0.0003839239361695945,
+              0.03327253833413124,
+              0.0013872067211195827
+            ],
+            "elementary": [
+              0.003806766588240862,
+              0.0031772584188729525,
+              0.0003839239361695945,
+              0.03327253833413124,
+              0.0009038933203555644,
+              0.0013872067211195827,
+              0.0011373659363016486,
+              0.0013676952803507447
+            ],
+            "gates": [
+              0.0036618257872760296,
+              0.00229271175339818,
+              0.01219288632273674
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1945575999998255
+        }
+      }
+    },
+    {
+      "id": "final-ambiguous-2",
+      "group": "ambiguous",
+      "expected": null,
+      "text": "Je me sentais bizarre et je ne peux préciser mon émotion.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00059601099928841,
+              0.0011406280100345612,
+              0.0004162538971286267,
+              0.0007060681818984449,
+              0.0009127395460382104
+            ],
+            "elementary": [
+              0.00059601099928841,
+              0.0011406280100345612,
+              0.0004162538971286267,
+              0.0007060681818984449,
+              0.0004777308495249599,
+              0.0006351852789521217,
+              0.0008823630050756037,
+              0.0009127395460382104
+            ],
+            "gates": [
+              0.0011186175979673862,
+              0.007060738280415535,
+              0.00811204593628645
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.0453175000002375
+        },
+        "baseline": {
+          "prediction": "neutre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0004773388500325382,
+              0.004571097902953625,
+              0.9890611171722412,
+              0.003117648884654045,
+              0.002772719832137227
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4427496999996947
+        }
+      }
+    },
+    {
+      "id": "final-ambiguous-3",
+      "group": "ambiguous",
+      "expected": null,
+      "text": "Je crois que j'étais triste, ou simplement fatigué, sans certitude.",
+      "outputs": {
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00012193099973956123,
+              0.17735743522644043,
+              0.0010151753667742014,
+              0.6893630623817444,
+              0.13214243948459625
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4425924999959534
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "undetermined",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00019313431403134018,
+              0.8158984780311584,
+              0.0037338524125516415,
+              0.014920718967914581,
+              0.0019808656070381403
+            ],
+            "elementary": [
+              0.00019313431403134018,
+              0.8158984780311584,
+              0.0037338524125516415,
+              0.014920718967914581,
+              0.0019808656070381403,
+              0.0015690501313656569,
+              0.0011218911968171597,
+              0.0009362568962387741
+            ],
+            "gates": [
+              0.5789611339569092,
+              0.902728259563446,
+              0.3277159333229065
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1309442999991006
+        }
+      }
+    },
+    {
+      "id": "final-ambiguous-4",
+      "group": "ambiguous",
+      "expected": null,
+      "text": "Je ne savais pas si ce tremblement venait de peur ou d'excitation.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "undetermined",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0026109206955879927,
+              0.08620726317167282,
+              0.0011680683819577098,
+              0.007776358630508184,
+              0.002032223856076598
+            ],
+            "elementary": [
+              0.0026109206955879927,
+              0.08620726317167282,
+              0.0011680683819577098,
+              0.007776358630508184,
+              0.001078781671822071,
+              0.0016230164328590035,
+              0.002032223856076598,
+              0.0019006583606824279
+            ],
+            "gates": [
+              0.977594256401062,
+              0.8506877422332764,
+              0.05529189109802246
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.145001400000183
+        },
+        "baseline": {
+          "prediction": "autre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.000373716902686283,
+              0.013865821994841099,
+              0.01172014232724905,
+              0.0007744760951027274,
+              0.9732657670974731
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5003059000009671
+        }
+      }
+    },
+    {
+      "id": "final-ambiguous-5",
+      "group": "ambiguous",
+      "expected": null,
+      "text": "Mon émotion était incertaine, entre curiosité et inquiétude.",
+      "outputs": {
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.00013938946358393878,
+              0.6969244480133057,
+              0.0006164914229884744,
+              0.0004021039349026978,
+              0.30191755294799805
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4337161000003107
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0005877367802895606,
+              0.002814158797264099,
+              0.0009176955791190267,
+              0.0009362194105051458,
+              0.001290026819333434
+            ],
+            "elementary": [
+              0.0005877367802895606,
+              0.002814158797264099,
+              0.0009176955791190267,
+              0.0009362194105051458,
+              0.0005137866246514022,
+              0.001129701267927885,
+              0.001290026819333434,
+              0.0010892777936533093
+            ],
+            "gates": [
+              0.0011490051401779056,
+              0.0051508028991520405,
+              0.23918551206588745
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1830061999935424
+        }
+      }
+    },
+    {
+      "id": "final-ambiguous-6",
+      "group": "ambiguous",
+      "expected": null,
+      "text": "Je ne suis pas sûr d'avoir ressenti du bonheur plutôt que de la surprise.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0010943873785436153,
+              0.0010693097719922662,
+              0.001214735209941864,
+              0.0010294006206095219,
+              0.001838691416196525
+            ],
+            "elementary": [
+              0.0010943873785436153,
+              0.0010693097719922662,
+              0.001214735209941864,
+              0.0010294006206095219,
+              0.0006844520103186369,
+              0.0008851474849507213,
+              0.0014948006719350815,
+              0.001838691416196525
+            ],
+            "gates": [
+              0.3707069158554077,
+              0.04224184527993202,
+              0.008384838700294495
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.2402063999979873
+        },
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.016185371205210686,
+              0.564019501209259,
+              0.2266310304403305,
+              0.12285364419221878,
+              0.07031053304672241
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5022596999988309
+        }
+      }
+    },
+    {
+      "id": "final-ambiguous-7",
+      "group": "ambiguous",
+      "expected": null,
+      "text": "Ma réaction est confuse ; je ne sais pas si j'étais neutre ou triste.",
+      "outputs": {
+        "baseline": {
+          "prediction": "autre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0004687613109126687,
+              0.005151010118424892,
+              0.02903599478304386,
+              0.3802836835384369,
+              0.5850605368614197
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4856835000027786
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0005620565498247743,
+              0.0009530194220133126,
+              0.000291330274194479,
+              0.0006860686116851866,
+              0.0009468235075473785
+            ],
+            "elementary": [
+              0.0005620565498247743,
+              0.0009530194220133126,
+              0.000291330274194479,
+              0.0006860686116851866,
+              0.0002884858113247901,
+              0.00037424388574436307,
+              0.0007299293647520244,
+              0.0009468235075473785
+            ],
+            "gates": [
+              0.0010988307185471058,
+              0.0031821380835026503,
+              0.017435960471630096
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1366055000034976
+        }
+      }
+    },
+    {
+      "id": "final-ambiguous-8",
+      "group": "ambiguous",
+      "expected": null,
+      "text": "Je me rappelle une émotion, mais impossible de dire laquelle.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0011679873568937182,
+              0.0011851905146613717,
+              0.0001508651621406898,
+              0.0009501658496446908,
+              0.0020589553751051426
+            ],
+            "elementary": [
+              0.0011679873568937182,
+              0.0011851905146613717,
+              0.0001508651621406898,
+              0.0009501658496446908,
+              0.0005841068923473358,
+              0.0010871365666389465,
+              0.0017238514265045524,
+              0.0020589553751051426
+            ],
+            "gates": [
+              0.0011892564361914992,
+              0.022528594359755516,
+              0.007816336117684841
+            ],
+            "lexical_evidence": false,
+            "chunks": 1
+          },
+          "seconds": 1.1280732999948668
+        },
+        "baseline": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "scores": [
+              0.06587182730436325,
+              0.17622068524360657,
+              0.38131365180015564,
+              0.14247062802314758,
+              0.23412324488162994
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.47358900000108406
+        }
+      }
+    },
+    {
+      "id": "final-multiple-1",
+      "group": "multiple",
+      "expected": null,
+      "text": "Je ressentais simultanément de la joie et de la tristesse, aussi fortes l'une que l'autre.",
+      "outputs": {
+        "baseline": {
+          "prediction": "autre",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0028720502741634846,
+              0.006819625850766897,
+              0.0006025963230058551,
+              0.39167189598083496,
+              0.5980337858200073
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.6517366000043694
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0009538834565319121,
+              0.0023067963775247335,
+              0.00018085146439261734,
+              0.000997680937871337,
+              0.0008342952933162451
+            ],
+            "elementary": [
+              0.0009538834565319121,
+              0.0023067963775247335,
+              0.00018085146439261734,
+              0.000997680937871337,
+              0.0004890408599749207,
+              0.0006192047731019557,
+              0.0007381932227872312,
+              0.0008342952933162451
+            ],
+            "gates": [
+              0.0007681438000872731,
+              0.0008685557986609638,
+              0.9967537522315979
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.370843299999251
+        }
+      }
+    },
+    {
+      "id": "final-multiple-2",
+      "group": "multiple",
+      "expected": null,
+      "text": "La peur et la colère étaient toutes deux très présentes, aucune ne dominait.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00011403044481994584,
+              0.0032146915327757597,
+              0.0003527082153595984,
+              0.012804524041712284,
+              0.0015097677242010832
+            ],
+            "elementary": [
+              0.00011403044481994584,
+              0.0032146915327757597,
+              0.0003527082153595984,
+              0.012804524041712284,
+              0.0006411767099052668,
+              0.0008288416429422796,
+              0.0008149087079800665,
+              0.0015097677242010832
+            ],
+            "gates": [
+              0.0036718056071549654,
+              0.005831544753164053,
+              0.9979096055030823
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.2019634999960545
+        },
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.000197390909306705,
+              0.9294691681861877,
+              0.0007032885914668441,
+              0.0006376257515512407,
+              0.06899260729551315
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4871430999992299
+        }
+      }
+    },
+    {
+      "id": "final-multiple-3",
+      "group": "multiple",
+      "expected": null,
+      "text": "J'éprouvais autant de bonheur que d'angoisse au même instant.",
+      "outputs": {
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.6392136812210083,
+              0.08411619067192078,
+              0.0001816721196519211,
+              0.0003713849000632763,
+              0.27611714601516724
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.46149359999981243
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0038505762349814177,
+              0.7849469780921936,
+              0.0003797439276240766,
+              0.028566574677824974,
+              0.0031393738463521004
+            ],
+            "elementary": [
+              0.0038505762349814177,
+              0.7849469780921936,
+              0.0003797439276240766,
+              0.028566574677824974,
+              0.0021684053353965282,
+              0.0031393738463521004,
+              0.0016248722095042467,
+              0.0014045990537852049
+            ],
+            "gates": [
+              0.00438638124614954,
+              0.0014092650962993503,
+              0.9953011274337769
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.2256836000015028
+        }
+      }
+    },
+    {
+      "id": "final-multiple-4",
+      "group": "multiple",
+      "expected": null,
+      "text": "J'étais à la fois dégoûté et triste, sans sentiment principal.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0008173990645445883,
+              0.001399749075062573,
+              0.0019096441101282835,
+              0.0015377247473224998,
+              0.0006824980373494327
+            ],
+            "elementary": [
+              0.0008173990645445883,
+              0.001399749075062573,
+              0.0019096441101282835,
+              0.0015377247473224998,
+              0.0005093858926557004,
+              0.0006824980373494327,
+              0.00042636055150069296,
+              0.0005552120856009424
+            ],
+            "gates": [
+              0.002806594595313072,
+              0.050994906574487686,
+              0.9984017014503479
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1536638999969
+        },
+        "baseline": {
+          "prediction": null,
+          "reason": "uncertain_scores",
+          "raw": {
+            "scores": [
+              6.584897346328944e-05,
+              0.2036137580871582,
+              0.38245582580566406,
+              0.37741005420684814,
+              0.036454517394304276
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5897942000010516
+        }
+      }
+    },
+    {
+      "id": "final-multiple-5",
+      "group": "multiple",
+      "expected": null,
+      "text": "Une surprise intense se mêlait à une peur aussi intense.",
+      "outputs": {
+        "baseline": {
+          "prediction": "stressant",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0005440303357318044,
+              0.7632129788398743,
+              0.0009473523823544383,
+              0.0014552996726706624,
+              0.23384036123752594
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5405937000032282
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.00011944550351472571,
+              0.003898987080901861,
+              0.0004864647053182125,
+              0.001677169930189848,
+              0.0009675341425463557
+            ],
+            "elementary": [
+              0.00011944550351472571,
+              0.003898987080901861,
+              0.0004864647053182125,
+              0.001677169930189848,
+              0.0006263184477575123,
+              0.0009675341425463557,
+              0.0006915570702403784,
+              0.0007291109650395811
+            ],
+            "gates": [
+              0.0015898324782028794,
+              0.0023218130227178335,
+              0.9899237751960754
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.3422432000006665
+        }
+      }
+    },
+    {
+      "id": "final-multiple-6",
+      "group": "multiple",
+      "expected": null,
+      "text": "Je riais de bonheur et pleurais de chagrin, avec la même intensité.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.016412226483225822,
+              0.02773146703839302,
+              0.0004922556108795106,
+              0.529546320438385,
+              0.006949109956622124
+            ],
+            "elementary": [
+              0.016412226483225822,
+              0.02773146703839302,
+              0.0004922556108795106,
+              0.529546320438385,
+              0.004587219562381506,
+              0.006949109956622124,
+              0.001593103283084929,
+              0.0011001756647601724
+            ],
+            "gates": [
+              0.002830043900758028,
+              0.0015073022805154324,
+              0.9954074025154114
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.3300489000030211
+        },
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.689120888710022,
+              0.011268621310591698,
+              0.000467902806121856,
+              0.23531869053840637,
+              0.06382381170988083
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5545109000013326
+        }
+      }
+    },
+    {
+      "id": "final-multiple-7",
+      "group": "multiple",
+      "expected": null,
+      "text": "Je me sentais furieux et heureux à parts égales.",
+      "outputs": {
+        "baseline": {
+          "prediction": "heureux",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.9359753727912903,
+              0.000519546854775399,
+              0.00026724193594418466,
+              0.0003042800526600331,
+              0.06293363124132156
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.5344750000003842
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0008310281555168331,
+              0.00043525194632820785,
+              0.00032471268787048757,
+              0.00015268247807398438,
+              0.0016934745945036411
+            ],
+            "elementary": [
+              0.0008310281555168331,
+              0.00043525194632820785,
+              0.00032471268787048757,
+              0.00015268247807398438,
+              0.0005389797152020037,
+              0.0016934745945036411,
+              0.0008381549851037562,
+              0.0008230009116232395
+            ],
+            "gates": [
+              0.0013665864244103432,
+              0.0008977942052297294,
+              0.9745585322380066
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.0797275000004447
+        }
+      }
+    },
+    {
+      "id": "final-multiple-8",
+      "group": "multiple",
+      "expected": null,
+      "text": "Je ressentais deux émotions dominantes opposées : joie et tristesse.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "multiple",
+          "raw": {
+            "invalid": null,
+            "categories": [
+              0.0009222176158800721,
+              0.00462697446346283,
+              0.00028937816387042403,
+              0.0014794898452237248,
+              0.0013032699935138226
+            ],
+            "elementary": [
+              0.0009222176158800721,
+              0.00462697446346283,
+              0.00028937816387042403,
+              0.0014794898452237248,
+              0.0007681327406316996,
+              0.0012912763049826026,
+              0.0009344154968857765,
+              0.0013032699935138226
+            ],
+            "gates": [
+              0.0009013110538944602,
+              0.0010662516579031944,
+              0.9861122965812683
+            ],
+            "lexical_evidence": true,
+            "chunks": 1
+          },
+          "seconds": 1.1408436999990954
+        },
+        "baseline": {
+          "prediction": "triste",
+          "reason": null,
+          "raw": {
+            "scores": [
+              0.0165471863001585,
+              0.01909186691045761,
+              0.007807657588273287,
+              0.8077955842018127,
+              0.1487577259540558
+            ],
+            "chunks": 1
+          },
+          "seconds": 0.4620657999985269
+        }
+      }
+    },
+    {
+      "id": "final-invalid-1",
+      "group": "invalid",
+      "expected": null,
+      "text": "",
+      "outputs": {
+        "baseline": {
+          "prediction": null,
+          "reason": "invalid_text",
+          "raw": {
+            "scores": null,
+            "chunks": 0
+          },
+          "seconds": 1.1099997209385037e-05
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "invalid_text",
+          "raw": {
+            "invalid": "invalid_text"
+          },
+          "seconds": 3.7999998312443495e-06
+        }
+      }
+    },
+    {
+      "id": "final-invalid-2",
+      "group": "invalid",
+      "expected": null,
+      "text": " \t\n",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "invalid_text",
+          "raw": {
+            "invalid": "invalid_text"
+          },
+          "seconds": 2.1999949240125716e-06
+        },
+        "baseline": {
+          "prediction": null,
+          "reason": "invalid_text",
+          "raw": {
+            "scores": null,
+            "chunks": 0
+          },
+          "seconds": 1.0000003385357559e-06
+        }
+      }
+    },
+    {
+      "id": "final-invalid-3",
+      "group": "invalid",
+      "expected": null,
+      "text": "Moi…",
+      "outputs": {
+        "baseline": {
+          "prediction": null,
+          "reason": "insufficient_information",
+          "raw": {
+            "scores": null,
+            "chunks": 0
+          },
+          "seconds": 0.00017169999773614109
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "insufficient_information",
+          "raw": {
+            "invalid": "insufficient_information"
+          },
+          "seconds": 4.400000034365803e-05
+        }
+      }
+    },
+    {
+      "id": "final-invalid-4",
+      "group": "invalid",
+      "expected": null,
+      "text": "Un banc.",
+      "outputs": {
+        "candidate": {
+          "prediction": null,
+          "reason": "insufficient_information",
+          "raw": {
+            "invalid": "insufficient_information"
+          },
+          "seconds": 5.959999543847516e-05
+        },
+        "baseline": {
+          "prediction": null,
+          "reason": "insufficient_information",
+          "raw": {
+            "scores": null,
+            "chunks": 0
+          },
+          "seconds": 3.51999988197349e-05
+        }
+      }
+    },
+    {
+      "id": "final-invalid-5",
+      "group": "invalid",
+      "expected": null,
+      "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "outputs": {
+        "baseline": {
+          "prediction": null,
+          "reason": "invalid_text",
+          "raw": {
+            "scores": null,
+            "chunks": 0
+          },
+          "seconds": 1.8999999156221747e-06
+        },
+        "candidate": {
+          "prediction": null,
+          "reason": "invalid_text",
+          "raw": {
+            "invalid": "invalid_text"
+          },
+          "seconds": 1.0000003385357559e-06
+        }
+      }
+    }
+  ],
+  "latencies": {
+    "baseline": {
+      "median": 0.4910925000003772,
+      "maximum": 0.6986968999990495
+    },
+    "candidate": {
+      "median": 1.154452400001901,
+      "maximum": 1.4368669999967096
+    }
+  }
+}

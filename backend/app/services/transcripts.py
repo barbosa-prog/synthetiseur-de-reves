@@ -38,6 +38,9 @@ def apply_correction(db: Session, dream: Dream, text: str, expected_version: int
     if expected_version is not None and expected_version != dream.text_version:
         raise TextVersionConflict
     if normalized != dream.transcript:
+        from backend.app.services.emotions import invalidate_for_text
+
+        invalidate_for_text(db, dream, dream.text_version+1)
         dream.transcript = normalized
         dream.text_version += 1
         dream.text_updated_at = db.scalar(select(func.clock_timestamp()))

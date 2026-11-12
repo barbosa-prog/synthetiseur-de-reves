@@ -39,6 +39,8 @@ def main() -> int:
     """Ne touche à aucune base ou service existant et n'affiche aucun secret."""
     parser = argparse.ArgumentParser(description="Recette locale isolée des tickets développés.")
     parser.add_argument("--browser-only", action="store_true", help="Tests navigateur seulement")
+    parser.add_argument("--emotion-web-test", action="store_true",
+                        help="Disponibilité P08 simulée dans le serveur temporaire, sans worker")
     args = parser.parse_args()
     pg = Path(os.getenv("P20_POSTGRES_BIN", r"C:\Program Files\PostgreSQL\17\bin"))
     if not (pg / "initdb.exe").is_file():
@@ -79,6 +81,7 @@ def main() -> int:
             env.update(DATABASE_URL=raw_url, TEST_DATABASE_URL=raw_url,
                        WEB_ORIGIN=origin, WEB_TEST_URL=origin,
                        PRIVATE_MEDIA_ROOT=str(directory / "private_media"))
+            env["EMOTION_ENABLED"] = "1" if args.emotion_web_test else "0"
             result = subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"],
                                     cwd=ROOT, env=env, capture_output=True, timeout=60)
             if result.returncode:

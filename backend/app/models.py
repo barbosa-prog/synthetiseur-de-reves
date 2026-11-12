@@ -190,13 +190,15 @@ class Job(Base):
 
     __tablename__ = "jobs"
     __table_args__ = (
-        CheckConstraint("kind IN ('stt','image','tts')", name="ck_job_kind"),
+        CheckConstraint("kind IN ('stt','image','tts','emotion')", name="ck_job_kind"),
         CheckConstraint("status IN ('queued','running','done','failed')", name="ck_job_status"),
         CheckConstraint("attempts BETWEEN 0 AND 3", name="ck_job_attempts"),
         Index("uq_active_stt_dream", "dream_id", unique=True,
               postgresql_where=text("kind = 'stt' AND status IN ('queued','running')")),
         Index("uq_active_image_dream", "dream_id", unique=True,
               postgresql_where=text("kind = 'image' AND status IN ('queued','running')")),
+        Index("uq_active_emotion_dream", "dream_id", unique=True,
+              postgresql_where=text("kind = 'emotion' AND status IN ('queued','running')")),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -258,3 +260,47 @@ class ImageGeneration(Base):
     description: Mapped[str] = mapped_column(Text)
     description_version: Mapped[int] = mapped_column(Integer)
     parameters: Mapped[dict] = mapped_column(JSONB)
+
+
+class DreamEmotion(Base):
+    """Provenance du choix ; la valeur reste dans dreams.emotion pour P09."""
+
+    __tablename__ = "dream_emotions"
+    __table_args__ = (
+        CheckConstraint("source IN ('unset','manual','accepted','withdrawn','legacy')",
+                        name="ck_emotion_source"),
+        CheckConstraint("revision >= 0", name="ck_emotion_revision"),
+        CheckConstraint("selected_text_version IS NULL OR selected_text_version >= 0",
+                        name="ck_emotion_selected_version"),
+    )
+    dream_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("dreams.id", ondelete="RESTRICT"),
+                                              primary_key=True)
+    source: Mapped[str] = mapped_column(String(12), server_default="unset")
+    revision: Mapped[int] = mapped_column(Integer, server_default="0")
+    selected_text_version: Mapped[int | None] = mapped_column(Integer)
+    active_request: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("jobs.id", ondelete="RESTRICT"))
+    suggestion_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("jobs.id", ondelete="RESTRICT"))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class EmotionAnalysis(Base):
+    """Instantané privé du récit et résultat facultatif, séparé du choix."""
+
+    __tablename__ = "emotion_analyses"
+    __table_args__ = (
+        CheckConstraint("text_version >= 1 AND choice_revision >= 0", name="ck_analysis_versions"),
+        CheckConstraint("length(btrim(transcript)) BETWEEN 1 AND 20000", name="ck_analysis_text"),
+        CheckConstraint("jsonb_typeof(parameters) = 'object'", name="ck_analysis_parameters"),
+        CheckConstraint("result IS NULL OR jsonb_typeof(result) = 'object'",
+                        name="ck_analysis_result"),
+    )
+    job_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("jobs.id", ondelete="RESTRICT"),
+                                            primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="RESTRICT"))
+    transcript: Mapped[str] = mapped_column(Text)
+    text_version: Mapped[int] = mapped_column(Integer)
+    choice_revision: Mapped[int] = mapped_column(Integer)
+    parameters: Mapped[dict] = mapped_column(JSONB)
+    result: Mapped[dict | None] = mapped_column(JSONB(none_as_null=True))

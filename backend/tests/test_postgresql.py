@@ -25,6 +25,7 @@ def test_migration_roundtrip_and_model_consistency(database):
             "users", "dreams", "media", "jobs", "alembic_version",
             "auth_sessions", "auth_throttles",
             "image_descriptions", "image_generations",
+            "dream_emotions", "emotion_analyses",
         }
         for table in ["dreams", "media", "jobs"]:
             assert len(inspect(connection).get_foreign_keys(table)) == (2 if table == "jobs" else 1)
@@ -35,7 +36,7 @@ def test_migration_roundtrip_and_model_consistency(database):
         command.downgrade(config, "base")
         assert inspect(connection).get_table_names() == ["alembic_version"]
         command.upgrade(config, "head")
-        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "0007"
+        assert connection.scalar(text("SELECT version_num FROM alembic_version")) == "0008"
 
 
 def test_persistence_and_relationships_after_reconnect(database):

@@ -1,0 +1,29 @@
+{
+  "sha256": "a922f3ce79a3591b755680181de68165f5ebff52e1e81328bfe40c3ecd6c3680",
+  "protocol": {
+    "version": "p08-2c-v1",
+    "freeze": "Declared before final test inference, no test-driven tuning",
+    "definitions": {
+      "heureux": "Joie ou bonheur ressenti par le narrateur",
+      "stressant": "Peur, stress ou angoisse ressentis par le narrateur",
+      "neutre": "Neutralité ou absence de ressenti explicitement rapportée, pas une information absente",
+      "triste": "Tristesse ou chagrin ressentis par le narrateur",
+      "autre": "Émotion identifiable hors des quatre précédentes, jamais catégorie de repli",
+      "undetermined": "Aucun ressenti attribuable au narrateur",
+      "ambiguous": "Information émotionnelle incertaine ou impossible à départager",
+      "multiple": "Plusieurs émotions sans dominante : abstention dans ce contrat mono-étiquette"
+    },
+    "exploratory_acceptance_not_official_jira": {
+      "macro_f1_min": 0.75,
+      "recall_each_min": 0.5,
+      "emitted_accuracy_min": 0.9,
+      "explicit_coverage_min": 0.6,
+      "undetermined_suggestions_max": 1,
+      "ambiguous_abstention_min": 0.75,
+      "multiple_abstention_min": 0.75
+    },
+    "selection_dev": "Minimize negative DEV suggestions, then maximize explicit macro-F1; deterministic grid order resolves ties",
+    "abstention_scoring": "Never a correct explicit classification; report emitted accuracy and coverage separately",
+    "no_adaptation_after_final": true
+  }
+}
