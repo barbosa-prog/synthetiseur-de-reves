@@ -3,10 +3,11 @@
 import uuid
 from typing import Annotated
 
+import anyio
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import sessionmaker
-from starlette.background import BackgroundTask
+from starlette.concurrency import run_in_threadpool
 
 from backend.app.auth import CurrentUser, Database
 from backend.app.schemas import ErrorResponse
@@ -35,11 +36,31 @@ def media_service(request: Request, db: Database) -> MediaService:
 Service = Annotated[MediaService, Depends(media_service)]
 
 
+class PrivateMediaResponse(StreamingResponse):
+    """Ferme même si le navigateur part avant la première lecture du générateur."""
+
+    def __init__(self, *args, stream, **kwargs):
+        self.private_stream = stream
+        super().__init__(*args, **kwargs)
+
+    async def __call__(self, scope, receive, send):
+        try:
+            await super().__call__(scope, receive, send)
+        finally:
+            with anyio.CancelScope(shield=True):
+                await run_in_threadpool(self.private_stream.close)
+
+
 def private_response(service: MediaService, user_id: uuid.UUID, media_id: uuid.UUID,
                      inline_audio: bool = False):
     """Flux déjà ouvert : aucun chemin absolu ou storage_key dans les en-têtes."""
     try:
         download = service.download(user_id, media_id)
+        try:
+            service.check_access(user_id, media_id)
+        except BaseException:
+            download.stream.close()
+            raise
     except MediaNotFound:
         raise HTTPException(404, "Média inaccessible") from None
     except StorageError:
@@ -53,7 +74,11 @@ def private_response(service: MediaService, user_id: uuid.UUID, media_id: uuid.U
 
     def chunks():
         try:
-            while chunk := download.stream.read(65536):
+            while True:
+                service.check_access(user_id, media_id)
+                chunk = download.stream.read(65536)
+                if not chunk:
+                    break
                 yield chunk
         finally:
             download.stream.close()
@@ -61,13 +86,13 @@ def private_response(service: MediaService, user_id: uuid.UUID, media_id: uuid.U
     disposition = (
         "inline" if inline_audio and download.media_type.startswith("audio/") else "attachment"
     )
-    return StreamingResponse(
+    return PrivateMediaResponse(
         chunks(), media_type=download.media_type,
+        stream=download.stream,
         headers={"Content-Length": str(download.size), "Cache-Control": "no-store",
                  "Pragma": "no-cache", "X-Content-Type-Options": "nosniff",
                  "Content-Security-Policy": "default-src 'none'; sandbox",
                  "Content-Disposition": f'{disposition}; filename="media-{media_id}.{extension}"'},
-        background=BackgroundTask(download.stream.close),
     )
 
 

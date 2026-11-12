@@ -41,6 +41,8 @@ def main() -> int:
     parser.add_argument("--browser-only", action="store_true", help="Tests navigateur seulement")
     parser.add_argument("--emotion-web-test", action="store_true",
                         help="Disponibilité P08 simulée dans le serveur temporaire, sans worker")
+    parser.add_argument("--p10-final", action="store_true",
+                        help="Recette intégrée P10 sur la base temporaire fraîche")
     args = parser.parse_args()
     pg = Path(os.getenv("P20_POSTGRES_BIN", r"C:\Program Files\PostgreSQL\17\bin"))
     if not (pg / "initdb.exe").is_file():
@@ -81,6 +83,7 @@ def main() -> int:
             env.update(DATABASE_URL=raw_url, TEST_DATABASE_URL=raw_url,
                        WEB_ORIGIN=origin, WEB_TEST_URL=origin,
                        PRIVATE_MEDIA_ROOT=str(directory / "private_media"))
+            env["EXPORT_TEMP_ROOT"] = str(directory / "exports")
             env["EMOTION_ENABLED"] = "1" if args.emotion_web_test else "0"
             result = subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"],
                                     cwd=ROOT, env=env, capture_output=True, timeout=60)
@@ -111,6 +114,8 @@ def main() -> int:
             checks = (["-m", "browser"] if args.browser_only else [
                 "--cov=backend.app", "--cov-report=term-missing", "--cov-fail-under=80",
             ])
+            if args.p10_final:
+                checks = ["backend/tests/p10_final_recipe.py", "-x"]
             result = subprocess.run([
                 sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
                 "--basetemp", str(directory / "pytest"), "--tb=short",

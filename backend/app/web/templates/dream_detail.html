@@ -12,6 +12,15 @@
     <a class="btn btn-primary mt-5" href="/reves/{{ dream.id }}/recit">{{ 'Corriger le récit' if dream.transcript else 'Écrire le récit' }}</a>
   </section>
   <section class="surface mt-6 p-6 sm:p-8">
+    <h2 class="text-xl font-semibold">Conserver une copie</h2>
+    <p class="mt-4 text-sm text-muted">Téléchargez le récit, ses informations et les médias disponibles dans une archive ZIP privée. Maximum : 100 médias et 100 Mio. Les fichiers manquants seront signalés dans le manifeste.</p>
+    <form method="post" action="/reves/{{ dream.id }}/export" class="mt-5">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <button class="btn btn-secondary" type="submit">Exporter ce rêve</button>
+    </form>
+    <a class="btn btn-secondary mt-5" href="/reves/{{ dream.id }}/supprimer">Supprimer ce rêve</a>
+  </section>
+  <section class="surface mt-6 p-6 sm:p-8">
     <h2 class="text-xl font-semibold">Retrouver les étapes du rêve</h2>
     <div class="mt-5 flex flex-wrap gap-3">
       {% if audio %}<a class="btn btn-secondary" href="/reves/{{ dream.id }}/audio">Consulter l’audio</a>

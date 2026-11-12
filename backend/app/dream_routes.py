@@ -4,7 +4,6 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Query, Response
-from sqlalchemy import func, select
 
 from backend.app.auth import CurrentUser, Database
 from backend.app.auth_schemas import DreamResponse, DreamUpdate
@@ -12,6 +11,7 @@ from backend.app.errors import error_response
 from backend.app.history_schemas import HistoryPage, HistoryQuery
 from backend.app.models import Dream
 from backend.app.schemas import ErrorResponse
+from backend.app.services.dream_deletion import delete_dream as delete_owned_dream
 from backend.app.services.history import list_dreams
 from backend.app.services.transcripts import TextVersionConflict, apply_correction
 from backend.app.services.transcripts import owned_dream as find_owned_dream
@@ -71,9 +71,6 @@ def update_dream(dream_id: uuid.UUID, payload: DreamUpdate,
 
 @router.delete("/{dream_id}", status_code=204)
 def delete_dream(dream_id: uuid.UUID, user: CurrentUser, db: Database) -> Response:
-    """Rend le rêve inaccessible ; purge physique différée à P10/P19."""
-    dream = owned_dream(db, user, dream_id)
-    dream.status = "deleted"
-    dream.deleted_at = db.scalar(select(func.clock_timestamp()))
-    db.commit()
+    """Retrait atomique, jobs révoqués et médias programmés pour purge P19."""
+    delete_owned_dream(db, user.id, dream_id)
     return Response(status_code=204)

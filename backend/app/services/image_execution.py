@@ -83,6 +83,8 @@ def run_once(sessions, storage, provider):
     with sessions() as db:
         job = db.get(Job, identifier)
         snapshot = db.get(ImageGeneration, identifier)
+        if job is None or snapshot is None:
+            return True  # Purge P10 après réservation : aucun droit de publier.
         task = ImageTask(identifier, job.dream_id, snapshot.user_id, ImageRequest(
             description=snapshot.description, text_version=snapshot.text_version,
             description_version=snapshot.description_version, seed=snapshot.parameters["seed"]))

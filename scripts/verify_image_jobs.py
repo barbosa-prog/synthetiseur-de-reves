@@ -19,6 +19,9 @@ def main():
     parser.add_argument("--history-only", action="store_true")
     parser.add_argument("--emotion-only", action="store_true")
     parser.add_argument("--emotion-real", action="store_true")
+    parser.add_argument("--export-only", action="store_true")
+    parser.add_argument("--deletion-only", action="store_true")
+    parser.add_argument("--purge-only", action="store_true")
     args = parser.parse_args()
     history_only = args.history_only
     pg = Path(os.getenv("P20_POSTGRES_BIN", r"C:\Program Files\PostgreSQL\17\bin"))
@@ -74,6 +77,21 @@ def main():
             if args.emotion_real:
                 env["RUN_EMOTION_REAL"] = "1"
                 checks = ["backend/tests/test_emotion_real.py", "-x"]
+            if args.export_only:
+                checks = ["backend/tests/test_exports.py", "backend/tests/test_export_zip.py",
+                          "backend/tests/test_transcripts.py",
+                          "backend/tests/test_image_jobs.py", "backend/tests/test_history.py",
+                          "backend/tests/test_emotion_postgresql.py", "backend/tests/test_media.py"]
+            if args.deletion_only:
+                checks = ["backend/tests/test_dream_deletion.py",
+                          "backend/tests/test_export_zip.py",
+                          "backend/tests/test_authentication.py", "backend/tests/test_stt.py",
+                          "backend/tests/test_image_execution.py",
+                          "backend/tests/test_emotion_postgresql.py", "backend/tests/test_media.py"]
+            if args.purge_only:
+                checks = ["backend/tests/test_dream_purge.py",
+                          "backend/tests/test_dream_deletion.py",
+                          "backend/tests/test_media.py", "backend/tests/test_private_storage.py"]
             return subprocess.run([
                 sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
                 "--basetemp", str(directory / "pytest"), "--tb=short",

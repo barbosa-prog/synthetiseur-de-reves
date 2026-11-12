@@ -12,11 +12,15 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
 from backend.app.models import Dream, Media
-from backend.app.storage.local import PrivateStorage, StorageError, new_key
+from backend.app.storage.local import MissingObject, PrivateStorage, StorageError, new_key
 
 
 class MediaNotFound(Exception):
     """Même erreur pour absent, étranger, expiré, supprimé, legacy ou fichier manquant."""
+
+
+class MediaIntegrityError(Exception):
+    """Export refusé, sans détail de contenu ou chemin."""
 
 
 @dataclass
@@ -40,6 +44,18 @@ class MediaService:
 
     def __init__(self, storage: PrivateStorage, sessions: sessionmaker[Session]):
         self.storage, self.sessions = storage, sessions
+
+    def check_access(self, user_id: uuid.UUID, media_id: uuid.UUID) -> None:
+        """Relecture fraîche entre blocs : ne maintient pas le rêve verrouillé."""
+        with self.sessions() as db:
+            db.execute(text("SET LOCAL statement_timeout = '5s'"))
+            allowed = db.scalar(select(Media.id).join(Dream).where(
+                Media.id == media_id, Dream.user_id == user_id, Dream.status != "deleted",
+                Media.storage_state == "ready",
+                (Media.expires_at.is_(None) | (Media.expires_at > func.now())),
+            ))
+            if allowed is None:
+                raise MediaNotFound
 
     def store(self, user_id: uuid.UUID, dream_id: uuid.UUID, source: BinaryIO, *,
               kind: str, media_format: str, filename: str | None = None) -> uuid.UUID:
@@ -99,11 +115,15 @@ class MediaService:
                 raise
             raise StorageError("Enregistrement du média impossible ; reprise nécessaire.") from None
 
-    def download(self, user_id: uuid.UUID, media_id: uuid.UUID) -> PrivateDownload:
+    def download(self, user_id: uuid.UUID, media_id: uuid.UUID, *,
+                 strict_integrity: bool = False, checkpoint=None) -> PrivateDownload:
         """Contrôle de propriétaire à chaque lecture ; empreinte et taille vérifiées."""
         handle = None
         try:
             with self.sessions() as db:
+                if strict_integrity:
+                    db.execute(text("SET LOCAL lock_timeout = '3s'"))
+                    db.execute(text("SET LOCAL statement_timeout = '5s'"))
                 media = db.scalar(select(Media).join(Dream).where(
                     Media.id == media_id, Dream.user_id == user_id, Dream.status != "deleted",
                     Media.storage_state == "ready",
@@ -120,22 +140,40 @@ class MediaService:
                 digest = hashlib.sha256()
                 size = 0
                 while chunk := handle.read(65536):
+                    if checkpoint is not None:
+                        checkpoint()
                     size += len(chunk)
                     if size > media.size_bytes:
-                        raise MediaNotFound
+                        raise MediaIntegrityError
                     digest.update(chunk)
                 if size != media.size_bytes or digest.hexdigest() != media.sha256:
-                    raise MediaNotFound
+                    raise MediaIntegrityError
                 handle.seek(0)
                 return PrivateDownload(media.id, handle, media.size_bytes, media.media_type)
-        except (MediaNotFound, StorageError, OSError):
+        except MediaIntegrityError:
             if handle is not None:
                 handle.close()
+            if strict_integrity:
+                raise
+            raise MediaNotFound from None
+        except (MediaNotFound, MissingObject):
+            if handle is not None:
+                handle.close()
+            raise MediaNotFound from None
+        except (StorageError, OSError):
+            if handle is not None:
+                handle.close()
+            if strict_integrity:
+                raise StorageError("Lecture privée refusée.") from None
             raise MediaNotFound from None
         except SQLAlchemyError:
             if handle is not None:
                 handle.close()
             raise StorageError("Consultation du média indisponible.") from None
+        except BaseException:
+            if handle is not None:
+                handle.close()
+            raise
 
     def request_purge(self, user_id: uuid.UUID, media_id: uuid.UUID) -> None:
         """Service interne explicite, pas une suppression de rêve P10 ; tombstone conservé."""

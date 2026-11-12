@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Supprimer ce rêve · Synthétiseur de rêves{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl px-5 py-10 sm:px-8" data-protected-page data-expires-at="{{ expires_at }}">
+  <h1 class="text-3xl font-semibold">Supprimer ce rêve ?</h1>
+  <section class="surface mt-6 p-6">
+    <p class="leading-7 text-muted">Ce rêve disparaîtra de votre historique. Son récit, ses images et ses audios deviendront inaccessibles. Les traitements seront invalidés et les fichiers privés seront programmés pour la purge.</p>
+    <p class="mt-4 text-sm text-muted">Le retrait d'accès est immédiat après confirmation. L'effacement physique est différé ; une copie déjà téléchargée ne peut pas être retirée. Vous pouvez exporter votre rêve avant de continuer.</p>
+    {% if error %}<p class="mt-5 text-rose-100" role="alert">{{ error }}</p>{% endif %}
+    <form method="post" action="/reves/{{ dream.id }}/supprimer" class="mt-6">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <label class="flex items-start gap-3 text-sm leading-7">
+        <input type="checkbox" name="confirmation" value="supprimer" required>
+        Je confirme vouloir supprimer ce rêve et retirer l'accès à ses médias.
+      </label>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button class="btn btn-secondary" type="submit">Confirmer la suppression</button>
+        <a class="btn btn-primary" href="/reves/{{ dream.id }}">Annuler</a>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

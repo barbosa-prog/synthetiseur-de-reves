@@ -31,6 +31,10 @@ class StorageError(Exception):
     """Erreur publique sans chemin, nom de fichier ni contenu privé."""
 
 
+class MissingObject(StorageError):
+    """Objet absent, distingué d'un objet dangereux pour l'export P10."""
+
+
 class InvalidMedia(StorageError):
     """Format, taille ou contenu refusé."""
 
@@ -61,6 +65,7 @@ class PrivateStorage(Protocol):
               filename: str | None = None) -> StoredObject: ...
     def open(self, key: str) -> BinaryIO: ...
     def delete(self, key: str, *, temporary: bool = False) -> None: ...
+    def is_absent(self, key: str, *, temporary: bool = False) -> bool: ...
     def inventory(self) -> list[InventoryEntry]: ...
 
 
@@ -254,6 +259,10 @@ class LocalPrivateStorage:
                 handle.close()
                 raise StorageError("Objet de stockage refusé.")
             return handle
+        except FileNotFoundError:
+            if handle is not None:
+                handle.close()
+            raise MissingObject("Média privé absent.") from None
         except OSError:
             if handle is not None:
                 handle.close()
@@ -266,6 +275,19 @@ class LocalPrivateStorage:
             path.unlink(missing_ok=True)
         except OSError:
             raise StorageError("Suppression du média différée.") from None
+
+    def is_absent(self, key: str, *, temporary: bool = False) -> bool:
+        """Absence confirmée, jamais déduite d'un refus d'accès ou d'un lien."""
+        path = self._path(key, temporary)
+        try:
+            info = path.lstat()
+            if info.st_nlink != 1:
+                raise StorageError("Objet de stockage refusé.")
+            return False
+        except FileNotFoundError:
+            return True
+        except OSError:
+            raise StorageError("État du média indisponible.") from None
 
     def inventory(self) -> list[InventoryEntry]:
         """N'énumère que des fichiers réguliers conformes au format interne."""

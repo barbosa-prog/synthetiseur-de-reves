@@ -330,6 +330,8 @@ def run_once(sessions, provider, *, timeout=30, required_parameters=None):
     identifier, token = reservation
     with sessions() as db:
         job = db.scalar(select(Job).where(Job.id == identifier).with_for_update())
+        if job is None:
+            return True  # Purge P10 entre réservation et lecture de l'instantané.
         valid, _, snapshot, _ = current(db, job)
         if job.claim_token != token:
             return False

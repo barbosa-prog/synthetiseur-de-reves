@@ -132,7 +132,8 @@ def run_once(sessions, media_service, provider):
     with sessions() as db:
         job = db.scalar(select(Job).where(Job.id == identifier).with_for_update())
         now = db.scalar(select(func.clock_timestamp()))
-        if job.status != "running" or job.claim_token != token or job.lease_until <= now:
+        if (job is None or job.status != "running" or job.claim_token != token
+                or job.lease_until is None or job.lease_until <= now):
             return True  # Ancien worker : aucun droit de publier, même s'il revient tard.
         dream = db.scalar(select(Dream).where(Dream.id == job.dream_id).with_for_update())
         media = db.get(Media, job.media_id)
