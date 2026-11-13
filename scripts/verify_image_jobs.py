@@ -14,6 +14,7 @@ from sqlalchemy import URL
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from scripts.postgres_test_runtime import postgres_command, prepare_directory  # noqa: E402
 from scripts.test_safety import clean_environment, isolated_environment, probe  # noqa: E402
 
 
@@ -57,16 +58,13 @@ def main():
         raise SystemExit("PostgreSQL natif absent ; utiliser TEST_DATABASE_URL dédié.")
     with tempfile.TemporaryDirectory(prefix="p07_jobs_") as folder:
         directory = Path(folder)
+        prepare_directory(directory)
         data, password_file = directory / "data", directory / "password"
         password, role = secrets.token_hex(24), "p07_"+secrets.token_hex(6)
         password_file.write_text(password, encoding="utf-8")
 
         def run(args, env=None):
-            result = subprocess.run(args, env=env if env is not None else clean_environment(),
-                                    stdout=subprocess.DEVNULL,
-                                    stderr=subprocess.DEVNULL, timeout=90)
-            if result.returncode:
-                raise RuntimeError("PostgreSQL temporaire : opération échouée, détails masqués.")
+            postgres_command(args, env)
 
         run([str(pg / "initdb.exe"), "-D", str(data), "-U", role, "--pwfile",
              str(password_file), "-A", "scram-sha-256", "--encoding=UTF8", "--locale=C"])

@@ -45,7 +45,7 @@ jobs:
         run: |
           if (Test-Path -LiteralPath .env) { throw "Fichier .env interdit en CI" }
           $pg = Join-Path $env:ProgramFiles 'PostgreSQL\17\bin'
-          foreach ($tool in @('initdb.exe', 'pg_ctl.exe', 'createdb.exe')) {
+          foreach ($tool in @('initdb.exe', 'postgres.exe', 'pg_ctl.exe', 'createdb.exe')) {
             if (!(Test-Path -LiteralPath (Join-Path $pg $tool))) { throw "PostgreSQL 17 absent" }
           }
           $version = & (Join-Path $pg 'initdb.exe') --version

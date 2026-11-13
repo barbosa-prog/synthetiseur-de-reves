@@ -28,6 +28,7 @@ from backend.app.security import new_token, token_digest  # noqa: E402
 from backend.app.services.media import MediaService  # noqa: E402
 from backend.app.storage.local import LocalPrivateStorage  # noqa: E402
 from scripts.p11_inventory import capture  # noqa: E402
+from scripts.postgres_test_runtime import postgres_command, prepare_directory  # noqa: E402
 from scripts.test_safety import clean_environment, isolated_environment, probe  # noqa: E402
 
 
@@ -54,6 +55,7 @@ def main() -> int:
         raise SystemExit("PostgreSQL natif absent : configurer P20_POSTGRES_BIN.")
     with tempfile.TemporaryDirectory(prefix="dreams_p20_") as temporary:
         directory = Path(temporary)
+        prepare_directory(directory)
         data = directory / "data"
         password = secrets.token_hex(24)
         role = "p20_" + secrets.token_hex(6)
@@ -61,11 +63,7 @@ def main() -> int:
         password_file.write_text(password, encoding="utf-8")
 
         def run_pg(args, env=None):
-            result = subprocess.run(args, env=env if env is not None else clean_environment(),
-                                    stdout=subprocess.DEVNULL,
-                                    stderr=subprocess.DEVNULL, timeout=90)
-            if result.returncode:
-                raise RuntimeError("Opération PostgreSQL temporaire échouée ; détails masqués.")
+            postgres_command(args, env)
 
         run_pg([str(pg / "initdb.exe"), "-D", str(data), "-U", role,
                 "--pwfile", str(password_file), "-A", "scram-sha-256",
