@@ -316,7 +316,7 @@ def test_downgrade_refuses_to_discard_managed_history(env):
         env[1].attributes["connection"] = c
         command.downgrade(env[1], "0008")
     with env[0].connect() as c:
-        assert c.scalar(text("SELECT version_num FROM alembic_version")) == "0009"
+        assert c.scalar(text("SELECT version_num FROM alembic_version")) == "0010"
 
 
 def test_completed_image_is_not_reused_when_private_file_is_missing(env):

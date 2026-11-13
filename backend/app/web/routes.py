@@ -80,9 +80,13 @@ async def valid_form(request: Request) -> dict:
     length = request.headers.get("content-length", "0")
     if not length.isdigit() or int(length) > 8192:
         raise HTTPException(413, "Formulaire trop volumineux")
-    body = await request.body()
-    if len(body) > 8192:
-        raise HTTPException(413, "Formulaire trop volumineux")
+    # HTTPGuard borne déjà le flux ; ce contrôle local reste autonome et progressif.
+    body = bytearray()
+    async for chunk in request.stream():
+        if len(body) + len(chunk) > 8192:
+            raise HTTPException(413, "Formulaire trop volumineux")
+        body.extend(chunk)
+    request._body = bytes(body)
     form = await request.form(max_files=0, max_fields=4)
     check_csrf(request, str(form.get("csrf", "")))
     return dict(form)

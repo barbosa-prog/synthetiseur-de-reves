@@ -17,6 +17,8 @@ def capture(connection, *, legacy_jobs=False):
     result = {"revision": connection.scalar(text("SELECT version_num FROM alembic_version")),
               "tables": {}}
     for table in sorted(Base.metadata.tables):
+        if result["revision"] < "0010" and table in {"ai_quota_policy", "ai_executions"}:
+            continue  # Le modèle courant inclut P12 ; les schémas P11 ne l'inventent pas.
         # Les noms viennent exclusivement des métadonnées du projet, jamais du navigateur.
         excluded = ("ARRAY['retry_count','queued_at','cycle_key','input_snapshot']::text[]"
                     if legacy_jobs and table == "jobs" else "ARRAY[]::text[]")

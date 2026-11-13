@@ -218,4 +218,4 @@ def test_database_constraints(env):
         db.add(Job(dream_id=dream, kind="image"))
         db.commit()
     with sessions() as db:
-        assert db.scalar(text("select version_num from alembic_version")) == "0009"
+        assert db.scalar(text("select version_num from alembic_version")) == "0010"

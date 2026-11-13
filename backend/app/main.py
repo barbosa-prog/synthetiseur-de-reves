@@ -21,9 +21,11 @@ from backend.app.emotion_web import router as emotion_web_router
 from backend.app.errors import register_error_handlers
 from backend.app.export_routes import router as export_router
 from backend.app.history_routes import router as history_router
+from backend.app.http_guard import HTTPGuard
 from backend.app.image_routes import router as image_router
 from backend.app.job_routes import router as job_router
 from backend.app.media_routes import router as media_router
+from backend.app.safe_logging import install_safe_logging
 from backend.app.schemas import ErrorResponse
 from backend.app.stt_routes import router as stt_router
 from backend.app.transcript_routes import router as transcript_router
@@ -46,9 +48,14 @@ def create_app() -> FastAPI:
     Returns:
         Application API et interface web locale.
     """
+    install_safe_logging()
     load_dotenv(Path(__file__).resolve().parents[2] / ".env", override=False)
     origin = os.getenv("WEB_ORIGIN", "https://localhost:8443").rstrip("/")
     parts = urlsplit(origin)
+    docs_setting = os.getenv("API_DOCS_ENABLED", "1")
+    if docs_setting not in {"0", "1"}:
+        raise ValueError("API_DOCS_ENABLED doit valoir 0 ou 1.")
+    docs_enabled = docs_setting == "1"
     if parts.scheme != "https" or not parts.netloc or parts.path or parts.query or parts.fragment:
         raise ValueError("WEB_ORIGIN doit être une origine HTTPS sans chemin.")
     if parts.username or parts.password:
@@ -60,10 +67,10 @@ def create_app() -> FastAPI:
             "Backend local pédagogique : API, sessions, interface web et médias privés. "
             "Capture audio privée et transcription locale via worker séparé."
         ),
-        docs_url="/api/v1/docs",
-        redoc_url="/api/v1/redoc",
+        docs_url="/api/v1/docs" if docs_enabled else None,
+        redoc_url="/api/v1/redoc" if docs_enabled else None,
         openapi_url="/api/v1/openapi.json",
-        swagger_ui_oauth2_redirect_url="/api/v1/docs/oauth2-redirect",
+        swagger_ui_oauth2_redirect_url="/api/v1/docs/oauth2-redirect" if docs_enabled else None,
         lifespan=lifespan,
         responses={
             404: {"model": ErrorResponse, "description": "Ressource introuvable."},
@@ -108,7 +115,7 @@ def create_app() -> FastAPI:
         response = await call_next(request)
         if is_web or request.url.path == "/api/v1/dreams" or request.url.path.startswith((
             "/api/v1/auth/", "/api/v1/dreams/", "/api/v1/media/", "/api/v1/transcriptions/",
-            "/api/v1/emotion-jobs/",
+            "/api/v1/emotion-jobs/", "/api/v1/images/",
         )):
             response.headers["Cache-Control"] = "no-store"
             response.headers["Pragma"] = "no-cache"
@@ -127,6 +134,7 @@ def create_app() -> FastAPI:
             response.headers["Permissions-Policy"] = "microphone=(self), camera=()"
         return response
 
+    application.add_middleware(HTTPGuard)
     return application
 
 

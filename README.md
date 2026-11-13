@@ -1373,3 +1373,27 @@ elle utilise un faux fournisseur et reste distincte de cette recette humaine.
 La suite n'a pas été relancée pour cette mise à jour documentaire seule.
 Le contrôle final n'a modifié ni code de production, ni audio, ni récit, ni modèle,
 ni configuration. Aucun téléchargement, commit, push ou changement Jira effectué.
+
+## P12 — Sécurité HTTP, journaux et quota IA
+
+La documentation de référence est [docs/p12-final.md](docs/p12-final.md), avec les
+contrats détaillés [phase 1](docs/p12-phase1.md) et [phase 2](docs/p12-phase2.md).
+
+- Corps HTTP comptés pendant leur réception, sans confiance dans Content-Length :
+  8 Kio pour l'authentification, 256 Kio pour les API/récits, 15 Mio pour l'audio.
+- Journaux Python par liste blanche ; aucun corps HTTP, paramètre SQL ou résultat
+  privé des moteurs n'est journalisé.
+- Quota central PostgreSQL : 20 admissions IA par compte sur 24 heures glissantes,
+  tous moteurs confondus, en complément des budgets de relance P11.
+- Inférence locale : fichiers locaux uniquement, environnement hors ligne et
+  retrait des secrets serveur non nécessaires dans les sous-processus.
+
+**Swagger/ReDoc** : `API_DOCS_ENABLED=0` désactive les pages HTML et leurs CDN,
+sans supprimer `/api/v1/openapi.json`. C'est le réglage conseillé hors développement
+et celui de `.env.example`. Sans variable, la valeur 1 préserve le comportement
+P01 ; les ressources tierces restent alors actives. Ne pas utiliser ce mode avec
+des données ou jetons réels. Aucun asset tiers n'est téléchargé par cette livraison.
+
+La migration additive **0010** est nécessaire au quota. La recette P12 utilise
+uniquement PostgreSQL temporaire ; la sauvegarde, la migration personnelle, le
+commit et la clôture Jira restent des opérations humaines distinctes.

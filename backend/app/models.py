@@ -12,6 +12,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
     func,
     text,
 )
@@ -36,6 +37,41 @@ class User(Base):
     password_hash: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     dreams: Mapped[list["Dream"]] = relationship(back_populates="user", passive_deletes="all")
+
+
+class AIQuotaPolicy(Base):
+    """Configuration centrale : aucun compteur propre à un processus."""
+
+    __tablename__ = "ai_quota_policy"
+    __table_args__ = (
+        CheckConstraint("id = 1", name="ck_ai_quota_singleton"),
+        CheckConstraint("execution_limit BETWEEN 1 AND 10000", name="ck_ai_quota_limit"),
+    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    execution_limit: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
+class AIExecution(Base):
+    """Une admission atomique ; aucune copie du récit ou du média."""
+
+    __tablename__ = "ai_executions"
+    __table_args__ = (
+        CheckConstraint("attempt BETWEEN 1 AND 3", name="ck_ai_execution_attempt"),
+        CheckConstraint("kind IN ('stt','image','emotion')", name="ck_ai_execution_kind"),
+        UniqueConstraint("job_id", "attempt", name="uq_ai_execution_attempt"),
+        UniqueConstraint("reservation_token", name="uq_ai_execution_token"),
+        Index("ix_ai_execution_owner_time", "user_id", "admitted_at"),
+    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True,
+                                        server_default=text("gen_random_uuid()"))
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    job_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("jobs.id", ondelete="SET NULL"))
+    kind: Mapped[str] = mapped_column(String(12), nullable=False)
+    attempt: Mapped[int] = mapped_column(Integer, nullable=False)
+    reservation_token: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    admitted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False,
+                                                server_default=func.clock_timestamp())
 
 
 Index("uq_users_email_normalized", func.lower(User.email), unique=True)

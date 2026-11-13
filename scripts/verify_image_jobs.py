@@ -26,6 +26,8 @@ def main():
     parser.add_argument("--workers-only", action="store_true")
     parser.add_argument("--tracking-only", action="store_true")
     parser.add_argument("--p11-final", action="store_true")
+    parser.add_argument("--quota-only", action="store_true")
+    parser.add_argument("--p12-final", action="store_true")
     args = parser.parse_args()
     history_only = args.history_only
     pg = Path(os.getenv("P20_POSTGRES_BIN", r"C:\Program Files\PostgreSQL\17\bin"))
@@ -121,6 +123,23 @@ def main():
                           "backend/tests/test_worker_jobs_p11.py",
                           "backend/tests/test_emotion_postgresql.py",
                           "backend/tests/test_postgresql.py", "-x"]
+            if args.quota_only:
+                checks = ["backend/tests/test_ai_quota.py",
+                          "backend/tests/test_image_jobs.py",
+                          "backend/tests/test_job_lifecycle.py",
+                          "backend/tests/test_worker_jobs_p11.py",
+                          "backend/tests/test_job_routes_p11.py",
+                          "backend/tests/test_postgresql.py", "-x"]
+            if args.p12_final:
+                checks = ["backend/tests/test_p12_final_security.py",
+                          "backend/tests/test_p12_final_migration.py",
+                          "backend/tests/test_ai_quota.py",
+                          "backend/tests/test_http_guard.py", "backend/tests/test_safe_logging.py",
+                          "backend/tests/test_stt_provider.py",
+                          "backend/tests/test_image_provider.py",
+                          "backend/tests/test_image_runner.py",
+                          "backend/tests/test_emotion_worker.py",
+                          "backend/tests/test_job_routes_p11.py", "backend/tests/test_api.py", "-x"]
             return subprocess.run([
                 sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
                 "--basetemp", str(directory / "pytest"), "--tb=short",

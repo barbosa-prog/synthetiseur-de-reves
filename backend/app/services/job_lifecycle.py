@@ -21,6 +21,7 @@ from backend.app.models import (
     Job,
     Media,
 )
+from backend.app.services import ai_quota
 
 
 def bounded(db):
@@ -189,6 +190,7 @@ def create(sessions, owner, dream_id, kind, *, engine, parameters, text_version,
                     return latest.id
             if new_image and kind != "image":
                 raise rules.JobRuleError("invalid_input")
+            ai_quota.check(db, owner)
             job = Job(dream_id=dream.id, kind=kind, expected_text_version=text_version,
                       media_id=media_id, queued_at=now, retry_count=retry_cost,
                       cycle_key=identity.cycle_key, input_snapshot=identity.model_dump(mode="json"))
@@ -257,6 +259,7 @@ def retry_job(sessions, owner, job_id, *, engine, explicit=False):
             meta = db.get(DreamEmotion, dream.id) if job.kind == "emotion" else None
             updated = rules.retry(snapshot, db.scalar(select(func.clock_timestamp())),
                 inputs=identity, explicit=explicit, choice_revision=meta.revision if meta else None)
+            ai_quota.check(db, owner)
             job.retry_count += updated.retry_count - snapshot.retry_count
             job.status, job.queued_at, job.error_code = "queued", updated.queued_at, None
             job.finished_at = job.claim_token = job.lease_until = None
@@ -282,6 +285,8 @@ def reserve_job(sessions, owner, job_id, *, engine, token, policy=rules.Policy()
             meta = db.get(DreamEmotion, dream.id) if job.kind == "emotion" else None
             updated = rules.reserve(before, db.scalar(select(func.clock_timestamp())), token,
                 inputs=identity, choice_revision=meta.revision if meta else None, policy=policy)
+            ai_quota.admit(db, owner, job, token,
+                           job.attempts + updated.attempts - before.attempts)
             job.attempts += updated.attempts - before.attempts
             job.status, job.claim_token, job.lease_until = "running", token, updated.lease_until
             db.commit()
@@ -315,7 +320,8 @@ def claim_next(sessions, kind, timeout):
     with sessions() as db:
         candidates = list(db.execute(select(Job.id, Dream.user_id, Job.input_snapshot)
             .join(Dream).where(Job.kind == kind, Job.status == "queued",
-                              Dream.status != "deleted")
+                                Dream.status != "deleted",
+                                Dream.user_id.not_in(ai_quota.exhausted_accounts()))
             .order_by(Job.queued_at, Job.id).limit(100)))
     for identifier, owner, raw in candidates:
         if raw is None:
@@ -383,6 +389,7 @@ def publication_guard(db, job):
         rules.current(state, current, True, meta.revision if meta else None)
     except rules.JobRuleError:
         raise HTTPException(409, "Contexte modifié") from None
+    ai_quota.verify_admission(db, inputs.owner_id, job)
     return dream
 
 

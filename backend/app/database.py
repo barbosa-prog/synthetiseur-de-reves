@@ -8,6 +8,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import URL, Engine, make_url
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
+from backend.app.safe_logging import install_safe_logging
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -51,6 +53,7 @@ def make_engine(url: URL | None = None) -> Engine:
     Returns:
         Moteur ; la première connexion est différée.
     """
+    install_safe_logging()
     return create_engine(
         url if url is not None else database_url(),
         echo=False, hide_parameters=True, pool_pre_ping=True,

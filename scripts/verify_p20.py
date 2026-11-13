@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from backend.app.database import make_engine, session_factory  # noqa: E402
-from backend.app.models import AuthSession, Dream, Job, Media, User  # noqa: E402
+from backend.app.models import AIExecution, AuthSession, Dream, Job, Media, User  # noqa: E402
 from backend.app.security import new_token, token_digest  # noqa: E402
 from backend.app.services.media import MediaService  # noqa: E402
 from backend.app.storage.local import LocalPrivateStorage  # noqa: E402
@@ -150,7 +150,7 @@ def main() -> int:
                         ))
                         # Données de persistance uniquement : aucun worker n'est lancé.
                         # Budgets non nuls et réservation garantissent un contrôle non vide.
-                        db.add_all([
+                        restart_jobs = [
                             Job(dream_id=dream.id, kind="stt", status="failed", attempts=3,
                                 retry_count=2, cycle_key="a" * 64,
                                 input_snapshot={"fictitious_restart_check": True}),
@@ -159,7 +159,14 @@ def main() -> int:
                                 input_snapshot={"fictitious_restart_check": True},
                                 claim_token=uuid4(),
                                 lease_until=datetime.now(timezone.utc) + timedelta(hours=1)),
-                        ])
+                        ]
+                        db.add_all(restart_jobs)
+                        db.flush()
+                        # Admissions fictives non vides pour vérifier aussi P12 après redémarrage.
+                        for job in restart_jobs:
+                            db.add(AIExecution(user_id=user.id, job_id=job.id, kind=job.kind,
+                                attempt=job.attempts,
+                                reservation_token=job.claim_token or uuid4()))
                         db.commit()
                     audio = io.BytesIO()
                     with wave.open(audio, "wb") as sample:

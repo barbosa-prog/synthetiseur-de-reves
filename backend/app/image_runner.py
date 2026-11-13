@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from backend.app.image_provider import ImageError
+from backend.app.offline import inference_environment
 
 
 def qualification_root():
@@ -62,6 +63,7 @@ class WatchedSD15Runner:
             process = subprocess.Popen(
                 [str(python), str(bridge), str(directory)], stdin=subprocess.PIPE,
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                env=inference_environment(),
                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
             )
             # Un thread du bridge écoute EOF : crash/arrêt parent => arrêt du job GPU.

@@ -9,8 +9,9 @@ from backend.app.main import create_app
 
 
 @pytest.fixture
-def client():
+def client(monkeypatch):
     """Crée un client isolé par test."""
+    monkeypatch.setenv("API_DOCS_ENABLED", "1")
     with TestClient(create_app()) as test_client:
         yield test_client
 

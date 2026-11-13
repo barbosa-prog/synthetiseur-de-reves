@@ -7,6 +7,7 @@ from pathlib import Path
 
 from backend.app.emotion_config import local_root, parameters
 from backend.app.emotion_provider import EmotionError
+from backend.app.offline import inference_environment
 
 
 @contextmanager
@@ -53,6 +54,7 @@ class WatchedEmotionRunner:
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL,
+                env=inference_environment(),
                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
             )
             payload = dict(request=request.model_dump(mode="json"), configuration=configuration)

@@ -9,6 +9,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
+from backend.app.offline import OFFLINE_FLAGS, inference_environment
+
 
 class STTError(Exception):
     """Code stable uniquement ; jamais de contenu fournisseur ou de chemin privé."""
@@ -87,6 +89,7 @@ class LocalWhisper:
             result = subprocess.run(
                 [sys.executable, "-m", "backend.app.stt_provider", str(self.config.model_path)],
                 input=audio, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                env=inference_environment(),
                 timeout=self.timeout, check=False,
             )
         except subprocess.TimeoutExpired:
@@ -108,6 +111,7 @@ class LocalWhisper:
 
 def main():
     """Entrée privée du décodeur : français, CPU INT8, fichiers locaux exclusivement."""
+    os.environ.update(OFFLINE_FLAGS)
     from backend.app.text_rules import normalize_text
     try:
         require_memory(3072)
