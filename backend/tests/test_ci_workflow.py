@@ -38,7 +38,8 @@ def test_ci_uses_protected_commands_and_never_references_production_secrets():
     job = workflow()["jobs"]["tests"]
     commands = "\n".join(step.get("run", "") for step in job["steps"])
     for command in ["--business-coverage", "--browser-only --emotion-web-test",
-                    "ruff check", "compileall", "--only-binary=:all:"]:
+                    "ruff check", "compileall", "--only-binary=:all:",
+                    "--require-hashes", "requirements-windows-py312.lock"]:
         assert command in commands
     for forbidden in ["secrets.", "--emotion-real", "--execute-real-once", "dreams_local",
                       "requirements-stt", "requirements-cuda", "docker compose"]:

@@ -33,6 +33,8 @@ def main():
     parser.add_argument("--purge-only", action="store_true")
     parser.add_argument("--p11-only", action="store_true")
     parser.add_argument("--workers-only", action="store_true")
+    parser.add_argument("--local-demo-only", action="store_true",
+                        help="P15 : installation, recette HTTP/PostgreSQL et protections web")
     parser.add_argument("--tracking-only", action="store_true")
     parser.add_argument("--p11-final", action="store_true")
     parser.add_argument("--quota-only", action="store_true")
@@ -132,6 +134,10 @@ def main():
                           "backend/tests/test_emotion_postgresql.py",
                           "backend/tests/test_emotion_worker.py",
                           "backend/tests/test_job_lifecycle.py", "-x"]
+            if args.local_demo_only:
+                checks = ["backend/tests/test_local_demo.py", "backend/tests/test_api.py",
+                          "backend/tests/test_database.py", "backend/tests/test_web.py",
+                          "backend/tests/test_test_safety.py", "-x"]
             if args.tracking_only:
                 checks = ["backend/tests/test_job_routes_p11.py",
                           "backend/tests/test_stt.py", "backend/tests/test_image_routes.py",

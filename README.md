@@ -1,5 +1,216 @@
 # Synthétiseur de rêves
 
+## P15 — Installation et démonstration locale de référence
+
+**Architecture validée pour ce ticket : PostgreSQL 17 → FastAPI → interface
+Jinja2/Tailwind dans le navigateur.** Streamlit était une maquette : aucune
+application ni dépendance Streamlit n'existe dans le dépôt. Il n'y a donc pas
+de troisième serveur à démarrer. Ce choix a été confirmé pour P15.
+
+Cette procédure remplace les instructions de démarrage historiques conservées
+plus bas. Elle vise une démonstration pédagogique locale, sans modèle IA ni
+service payant. [Audit et preuves de recette P15](docs/p15-local.md).
+
+### 1. Prérequis Windows
+
+- Windows x86-64, PowerShell, **CPython 3.12 64 bits** ; recette sur 3.12.14.
+- Binaires **PostgreSQL 17.x** : `initdb.exe`, `postgres.exe`, `pg_ctl.exe`,
+  `createdb.exe`. L'installation des binaires ne nécessite pas de démarrer un
+  service Windows. Le lanceur crée son propre cluster, sur un port libre.
+- Dépôt complet extrait ou cloné, y compris `backend/app/web/static/` ; se placer
+  à sa racine. Les chemins avec espaces/accents sont acceptés.
+- Internet pour télécharger les wheels Python lors de la première installation.
+  Aucun compilateur C, Docker, Node/npm, GPU ou modèle IA n'est nécessaire pour
+  servir l'interface : son CSS compilé est déjà versionné.
+- Chrome installé uniquement pour la campagne navigateur P14, pas pour démarrer
+  le serveur. Le navigateur de démonstration doit accepter HTTPS local.
+
+Vérifier l'interpréteur et les binaires, sans interroger un serveur existant :
+
+```powershell
+py -0p
+py -3.12 --version
+& 'C:\Program Files\PostgreSQL\17\bin\initdb.exe' --version
+```
+
+Si le lanceur `py` n'est pas disponible, remplacer `py -3.12` par
+`& 'C:\chemin\vers\python.exe'` pour un interpréteur 3.12 64 bits.
+
+### 2. Installation reproductible
+
+Créer un venv neuf ; ne pas réutiliser celui d'une installation IA :
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --require-hashes --only-binary=:all: -r requirements-windows-py312.lock
+.\.venv\Scripts\python.exe -m pip check
+```
+
+Si `.venv` existe déjà, choisir un autre nom et adapter les commandes ; aucune
+activation ni modification d'ExecutionPolicy n'est nécessaire. Le verrou inclut
+les dépendances directes et transitives du backend et des outils de recette,
+avec les SHA-256 des wheels Windows/universelles. Il n'inclut **aucun moteur IA**.
+`requirements.txt` et `requirements-dev.txt` restent les listes des dépendances
+directes ; elles seules ne figent pas une installation transitive dans le temps.
+Le verrou est spécifique à Windows x86-64 / Python 3.12. Ne pas l'utiliser sous Linux.
+
+Pour préparer une installation hors ligne (même OS/architecture/Python), depuis
+un poste connecté, puis transporter le dépôt et le dossier `wheelhouse` :
+
+```powershell
+.\.venv\Scripts\python.exe -m pip download --require-hashes --only-binary=:all: -r requirements-windows-py312.lock --dest wheelhouse
+# Sur le poste hors ligne, après création du venv :
+.\.venv\Scripts\python.exe -m pip install --no-index --find-links wheelhouse --require-hashes --only-binary=:all: -r requirements-windows-py312.lock
+```
+
+Conserver `wheelhouse` hors du dépôt Git. Pour actualiser le verrou : résoudre
+`requirements-dev.txt` dans un venv vide avec `pip install --report rapport.json`,
+reprendre chaque `metadata.name`, `metadata.version` et
+`download_info.archive_info.hashes.sha256`, puis refaire une installation
+`--require-hashes` dans un autre venv vide et les recettes ci-dessous. Ne pas
+générer le verrou depuis `pip freeze` d'un environnement contenant les moteurs IA.
+
+### 3. Initialisation, migrations et démarrage sans données personnelles
+
+La voie recommandée pour une machine de test est entièrement **jetable** :
+aucun `.env` à copier, aucun compte administrateur PostgreSQL à saisir, aucun
+service existant à arrêter. Si les binaires sont ailleurs, préciser leur dossier :
+
+```powershell
+# Optionnel, si PostgreSQL n'est pas au chemin standard :
+$env:P20_POSTGRES_BIN = 'C:\chemin\PostgreSQL\17\bin'
+# Vérifier le démarrage, puis l'arrêt et la suppression automatiques :
+.\.venv\Scripts\python.exe scripts\local_demo.py --stop-after 2
+# Démonstration interactive, indépendante de la vérification précédente :
+.\.venv\Scripts\python.exe scripts\local_demo.py
+# Recette HTTP complète avec validation TLS stricte (voir limite Avast ci-dessous) :
+.\.venv\Scripts\python.exe scripts\local_demo.py --check
+```
+
+Ordre réellement exécuté :
+
+1. `initdb` UTF-8, authentification SCRAM, nouveau rôle/mot de passe aléatoires.
+2. `pg_ctl ... -w start` sur **127.0.0.1** et port libre, puis `createdb` pour
+   `p20_validation` dans ce nouveau cluster uniquement ; preuve de son identité P14.
+3. `python -m alembic upgrade head`, `current`, `check` ; schéma à la migration
+   **0010**. Le serveur ne crée pas automatiquement les tables.
+4. Certificat HTTPS éphémère, puis `python -m uvicorn backend.app.main:app`
+   avec `--host 127.0.0.1`, port libre, `--no-access-log`, `--no-proxy-headers`,
+   `--ssl-keyfile` et `--ssl-certfile`.
+5. Vérification de l'écoute locale ; affichage de l'URL exacte
+   `https://127.0.0.1:PORT/connexion`. Le mode `--check` contrôle aussi HTTP/TLS.
+
+Ouvrir uniquement cette URL, créer un compte **fictif**, puis se connecter.
+Le certificat n'est pas approuvé par le système : l'avertissement du navigateur
+est attendu pour cette instance locale. Aucune autorité n'est installée. Le
+contrôle automatique vérifie TLS avec son autorité éphémère, sans désactiver la
+validation des certificats. Les cookies restent `Secure` et `HttpOnly`.
+
+Le lanceur neutralise `.env`, URL PostgreSQL héritées et options IA, désactive
+Swagger/ReDoc et l'émotion automatique, et place médias/exports dans son propre
+répertoire temporaire hors dépôt/OneDrive. Aucun worker IA n'est lancé ; les
+fonctionnalités nécessitant un worker/modèle ne sont pas validées par P15.
+Le rôle initial est administrateur **de ce cluster jetable uniquement**, comme
+dans les recettes P14 ; ce n'est pas une configuration d'exploitation persistante.
+
+### 4. Vérifications et arrêt
+
+`--check` vérifie le serveur HTTPS, OpenAPI, CSS livré, inscription/connexion API,
+lecture de l'historique via PostgreSQL, persistance du compte fictif, formulaire
+Jinja2, connexion web, cookies sécurisés, révocation de session et arrêt.
+`/api/v1/health` contrôle seulement le processus ; la connexion API/base est
+vérifiée séparément par ce parcours authentifié. Aucune route de santé DB publique
+n'est ajoutée.
+
+**Limite observée sur le poste de recette :** Avast remplace même le certificat
+de la boucle locale par un certificat signé « Avast Web/Mail Shield Untrusted
+Root ». `--check` échoue alors explicitement avec
+`delai_demarrage_depasse_certificat_tls`, puis nettoie ses ressources. Ne pas
+désactiver la validation TLS ni installer cette racine non fiable pour rendre
+la recette verte. Le démarrage/arrêt et les tests Chrome P14 sont validés
+séparément ; ces derniers acceptent uniquement dans leur contexte de test les
+certificats HTTPS temporaires et ne prouvent pas leur confiance système. Refaire
+`--check` sur une seconde machine sans cette interception reste nécessaire.
+
+Pour une démonstration interactive : **Ctrl+C dans le terminal du lanceur**.
+Il arrête seulement ses propres processus, vérifie l'arrêt de PostgreSQL et du
+port HTTPS, puis supprime son répertoire temporaire. **Toutes les données de
+cette démonstration sont perdues à l'arrêt.** Ne pas fermer brutalement le terminal
+ou tuer le lanceur : la garantie de nettoyage concerne la sortie normale et Ctrl+C,
+pas une coupure électrique. Aucune commande d'arrêt globale n'est nécessaire.
+
+### 5. Installation persistante et Docker facultatif
+
+Pour conserver des données, utiliser une **nouvelle base dédiée** et un rôle
+applicatif propriétaire de cette base, sans privilèges superutilisateur, sur une
+instance administrée séparément. Ne pas migrer une base personnelle pour une
+recette. La variante persistante n'est pas créée par `local_demo.py`.
+
+Seulement si `.env` n'existe pas :
+
+```powershell
+if (Test-Path -LiteralPath .env) { throw '.env existe : le conserver et examiner sa configuration en privé.' }
+Copy-Item -LiteralPath .env.example -Destination .env -ErrorAction Stop
+```
+
+Configurer en privé `DATABASE_URL` (nouveau rôle/base, hôte, port et mot de passe
+encodé dans l'URL), `WEB_ORIGIN=https://localhost:8443`, `API_DOCS_ENABLED=0`,
+`EMOTION_ENABLED=0`, et éventuellement `PRIVATE_MEDIA_ROOT` / `EXPORT_TEMP_ROOT`
+absolus hors dépôt, `static`, OneDrive et dossiers publics. Les variables du
+processus priment sur `.env`. Les certificats de développement sont créés sans
+écrasement par `scripts/dev_https.py` (ne le relancer que si les fichiers sont
+absents). Ensuite, dans ce terminal dédié à la nouvelle base :
+
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m alembic current
+.\.venv\Scripts\python.exe -m alembic check
+.\.venv\Scripts\python.exe scripts\dev_https.py
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8443 --no-access-log --no-proxy-headers --ssl-keyfile tmp/https/key.pem --ssl-certfile tmp/https/cert.pem
+```
+
+Arrêter FastAPI par Ctrl+C ; l'arrêt d'une instance PostgreSQL persistante relève
+de son administrateur. Ces primitives Alembic/Uvicorn sont exercées par la recette
+jetable ; les identifiants, droits, certificats et services d'une autre installation
+persistante doivent être vérifiés sur cette machine.
+
+Docker reste une **alternative facultative** pour PostgreSQL : voir la section
+P02 plus bas, avec une nouvelle configuration dédiée. Ne pas démarrer Compose
+contre un volume existant pour tester l'installation. `postgres:17` reste une
+étiquette majeure, pas un digest immuable ; Docker Desktop/Compose et ce chemin
+ne sont pas validés par la recette native P15. Ne jamais utiliser `down -v` pour
+arrêter une installation contenant des données à conserver.
+
+### 6. Linux et tests complémentaires
+
+Sous Linux, le backend prévoit un stockage privé dans
+`~/.local/share/synthetiseur-de-reves/private_media`. Les primitives Python sont
+`python3.12 -m venv .venv` puis `.venv/bin/python` ; les binaires PostgreSQL n'ont
+pas le suffixe `.exe`, et `initdb` ne doit pas être exécuté comme root. Le lanceur
+P15 et les recettes natives actuelles ciblent Windows et refusent Linux ; le verrou
+Windows ne convient pas à Linux. Une installation Linux depuis les dépendances
+directes, son verrou spécifique, ses droits de stockage et son HTTPS restent à
+valider : aucune recette Linux n'est revendiquée.
+
+Tests isolés, sans base personnelle ni modèle, depuis la racine :
+
+```powershell
+.\.venv\Scripts\python.exe scripts\verify_image_jobs.py --local-demo-only
+.\.venv\Scripts\python.exe scripts\verify_image_jobs.py --unit-only
+.\.venv\Scripts\python.exe scripts\verify_image_jobs.py --all-tests
+# Nécessite Chrome Windows installé ; aucun téléchargement de navigateur :
+.\.venv\Scripts\python.exe scripts\verify_p20.py --browser-only --emotion-web-test
+.\.venv\Scripts\python.exe -m ruff check backend scripts
+.\.venv\Scripts\python.exe -m compileall -q backend scripts
+```
+
+Pour reconstruire le CSS seulement après une modification frontend, Node/npm
+et `npm.cmd ci --ignore-scripts --no-audit --no-fund`, puis `npm.cmd run build`
+dans `frontend` sont nécessaires. Ce build n'est pas une étape de déploiement
+du CSS déjà livré ; P15 ne modifie ni sa source personnelle ni son fichier compilé.
+
+## Historique des fonctionnalités et recettes antérieures
+
 Production pédagogique locale en Python 3.12. Ce dépôt contient actuellement
 **P01 : le socle FastAPI**, **P02 : PostgreSQL**, **P03 : authentification et
 isolation des rêves**, **P20 : interface web Jinja2/Tailwind** et **P19 : stockage
@@ -102,7 +313,7 @@ Validation P01 sur Windows avec Python 3.12.14 : 12 tests réussis, couverture d
 48 instructions de `backend.app` à 100 %, Ruff sans erreur. Un avertissement de
 dépréciation Starlette indique que son client de test migre de httpx vers httpx2 ;
 les tests restent opérationnels. Les dépendances directes sont figées aux versions
-testées ; le verrouillage complet des dépendances transitives relève de P15.
+testées ; le verrouillage transitif est maintenant fourni dans la procédure P15 ci-dessus.
 
 ## Structure et suite
 
@@ -142,7 +353,8 @@ Compose v2 et Python 3.12. PostgreSQL 17 est utilisé, sans service cloud.
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-Copy-Item .env.example .env
+if (Test-Path -LiteralPath .env) { throw '.env existe : ne pas le remplacer.' }
+Copy-Item -LiteralPath .env.example -Destination .env -ErrorAction Stop
 ```
 
 Éditer `.env` localement : remplacer le mot de passe fictif par une valeur

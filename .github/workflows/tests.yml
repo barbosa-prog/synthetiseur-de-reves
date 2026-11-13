@@ -55,7 +55,7 @@ jobs:
           }
           "P20_POSTGRES_BIN=$pg" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Dependances de developpement uniquement - aucun moteur IA
-        run: 'python -m pip install --only-binary=:all: -r requirements-dev.txt'
+        run: 'python -m pip install --require-hashes --only-binary=:all: -r requirements-windows-py312.lock'
       - name: Coherence des dependances
         run: python -m pip check
       - name: Ruff
