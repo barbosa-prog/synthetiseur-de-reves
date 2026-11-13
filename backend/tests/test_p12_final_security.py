@@ -4,6 +4,7 @@ import ast
 import io
 import json
 import os
+import platform
 import re
 import runpy
 import socket
@@ -123,12 +124,62 @@ def test_emotion_missing_model_exits_before_importing_ai(monkeypatch, tmp_path, 
                 "OMP_NUM_THREADS", "MKL_NUM_THREADS"]:
         monkeypatch.setenv(key, "0")
     monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    # Le test vise l'absence de poids APRÈS validation de l'environnement qualifié.
+    # Le correctif Python du runner peut différer de celui du venv IA qualifié.
+    monkeypatch.setattr(platform, "python_version", lambda: config["python"])
     monkeypatch.setattr(importlib.metadata, "version", lambda name: config["dependencies"][name])
     payload = dict(configuration=config, request={"text": "Recit fictif"})
     monkeypatch.setattr(sys, "stdin",
                         SimpleNamespace(buffer=io.BytesIO(json.dumps(payload).encode())))
     module = runpy.run_path(str(ROOT / "scripts/emotion_cpu_child.py"), run_name="p12_child")
     assert module["main"]() == {"error": "model_unavailable"}
+
+
+def test_stt_missing_numpy_fails_before_loader_without_private_output(monkeypatch, tmp_path,
+                                                                   no_network, capsys):
+    """Reproduit le runner sans NumPy, sans désinstaller quoi que ce soit."""
+    import builtins
+
+    captured = []
+    original_import = builtins.__import__
+
+    def without_numpy(name, *args, **kwargs):
+        if name == "numpy":
+            raise ModuleNotFoundError("FICTITIOUS_MISSING_NUMPY")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.delitem(sys.modules, "backend.app.stt_audio", raising=False)
+    monkeypatch.setattr(builtins, "__import__", without_numpy)
+    monkeypatch.setattr(stt_provider, "require_memory", lambda _: None)
+    monkeypatch.setitem(sys.modules, "faster_whisper", SimpleNamespace(
+        WhisperModel=lambda *a, **k: captured.append(True)))
+    monkeypatch.setattr(sys, "argv", ["stt", str(tmp_path)])
+    stt_provider.main()
+    output = capsys.readouterr().out
+    assert json.loads(output) == {"error": "provider_failed"}
+    assert captured == [] and "FICTITIOUS" not in output
+
+
+@pytest.mark.parametrize("mismatch", ["python", "dependency"])
+def test_emotion_rejects_unqualified_environment_before_model_access(monkeypatch, no_network,
+                                                                    mismatch):
+    """Conserve le contrôle exact des versions ; aucune dépendance IA importée."""
+    import importlib.metadata
+    from pathlib import Path
+
+    config = {**parameters(), "inference_enabled": True}
+    monkeypatch.setattr(platform, "python_version", lambda:
+                        "3.12.0" if mismatch == "python" else config["python"])
+    monkeypatch.setattr(importlib.metadata, "version", lambda name:
+                        "unqualified" if mismatch == "dependency"
+                        else config["dependencies"][name])
+    payload = {"configuration": config, "request": {"text": "Récit fictif"}}
+    monkeypatch.setattr(sys, "stdin", SimpleNamespace(
+        buffer=io.BytesIO(json.dumps(payload).encode())))
+    module = runpy.run_path(str(ROOT / "scripts/emotion_cpu_child.py"), run_name="p12_child")
+    with monkeypatch.context() as guard:
+        guard.setattr(Path, "is_dir", lambda _: pytest.fail("Lecture du modèle interdite"))
+        assert module["main"]() == {"error": "configuration"}
 
 
 @pytest.mark.parametrize("file", ["scripts/emotion_cpu_child.py",

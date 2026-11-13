@@ -8,3 +8,4 @@ playwright==1.65.0
 trustme==1.2.1
 psutil==7.1.3
 PyYAML==6.0.3
+numpy==2.5.4

@@ -4,12 +4,11 @@ import io
 import wave
 
 import av
+import numpy as np
 import pytest
 
-np = pytest.importorskip("numpy", reason="Dépendances STT optionnelles absentes")
-
-from backend.app.stt_audio import decode_private_wav  # noqa: E402
-from backend.tests.audio_fixtures import audio_sample  # noqa: E402
+from backend.app.stt_audio import decode_private_wav
+from backend.tests.audio_fixtures import audio_sample
 
 
 def test_p04_wav_to_float32():
