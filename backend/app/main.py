@@ -105,7 +105,7 @@ def create_app() -> FastAPI:
     async def private_responses(request, call_next):
         is_web = request.url.path.startswith(("/web/media/", "/reves/")) or request.url.path in {
             "/", "/connexion", "/inscription", "/accueil", "/deconnexion", "/web/session",
-            "/nouveau-reve", "/web/audio", "/mes-reves",
+            "/nouveau-reve", "/web/audio", "/mes-reves", "/confidentialite",
         }
         if is_web and (
             request.url.scheme != "https" or request.headers.get("host") != parts.netloc

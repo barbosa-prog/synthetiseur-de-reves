@@ -115,6 +115,12 @@ def register_page(request: Request):
     return render(request, "auth.html", mode="register")
 
 
+@router.get("/confidentialite")
+def privacy_page(request: Request):
+    """Information publique statique ; aucun accès aux comptes ou aux rêves."""
+    return render(request, "privacy.html")
+
+
 def credentials(form: dict) -> Credentials:
     """Les erreurs de validation ne sont ni affichées brutes ni journalisées."""
     return Credentials(email=form.get("email", ""), password=form.get("password", ""))

@@ -28,6 +28,7 @@
       <button type="submit" class="btn btn-primary w-full">{{ 'Créer mon compte' if mode == 'register' else 'Me connecter' }} {{ icon('arrow', 'h-4 w-4') }}</button>
     </form>
     <p class="mt-6 text-center text-sm text-muted">{{ 'Déjà un compte ?' if mode == 'register' else 'Première visite ?' }} <a class="font-medium text-lavender underline-offset-4 hover:underline" href="{{ '/connexion' if mode == 'register' else '/inscription' }}">{{ 'Se connecter' if mode == 'register' else 'Créer un compte' }}</a></p>
+    {% if mode == 'register' %}<p class="mt-6 text-sm leading-6 text-muted">Avant de créer votre compte, consultez la <a href="/confidentialite" class="text-lavender underline">notice de confidentialité</a>. Elle distingue les règles actuelles des décisions restant à confirmer.</p>{% endif %}
     <p class="mt-8 border-t border-slate-700 pt-5 text-xs leading-5 text-muted">Aucun e-mail n’est envoyé. Utilisez une adresse et un mot de passe fictifs pour la démonstration.</p>
   </section>
 </div>

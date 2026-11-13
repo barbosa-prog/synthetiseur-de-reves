@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Confidentialité · Synthétiseur de rêves{% endblock %}
+{% block content %}
+<article class="mx-auto max-w-3xl px-5 py-12 sm:px-8" aria-labelledby="privacy-title">
+  <p class="eyebrow mb-3">Information des utilisateurs · Version du 13 novembre 2026</p>
+  <h1 id="privacy-title" class="text-3xl font-semibold">Confidentialité</h1>
+  <p class="mt-6 leading-7 text-muted">Ce projet pédagogique permet de conserver un récit de rêve et ses médias, avec des aides IA facultatives. Privilégiez les récits et comptes fictifs. Évitez les informations sensibles et les informations permettant d’identifier d’autres personnes.</p>
+  <aside class="surface mt-6 p-6" aria-label="Informations à compléter">
+    <h2 class="text-lg font-semibold">Informations à compléter avant une utilisation avec des données réelles</h2>
+    <p class="mt-3 leading-7">Identité du responsable et coordonnées de contact : à compléter. Bases juridiques des traitements et éventuel consentement requis : décisions à confirmer. Durées de conservation non encore arrêtées : à valider. Cette notice ne constitue pas une déclaration de conformité RGPD.</p>
+  </aside>
+  <section class="mt-8" aria-labelledby="data-title">
+    <h2 id="data-title" class="text-xl font-semibold">Quelles données et pourquoi ?</h2>
+    <ul class="mt-3 space-y-6 leading-7 text-muted">
+      <li>Compte : adresse e-mail, identifiant, date de création et empreinte du mot de passe, pour accéder à votre espace. Le mot de passe n’est pas conservé en clair.</li>
+      <li>Connexion : empreinte du jeton de session, dates et révocation ; compteurs de sécurité dérivés du compte et de l’adresse IP, pour limiter les tentatives répétées. Le navigateur reçoit des cookies de session et de protection des formulaires, sans usage publicitaire identifié.</li>
+      <li>Récits et transcriptions : texte actuel, version et dates, pour lire et corriger votre récit.</li>
+      <li>Audio et images : fichiers privés et informations techniques telles que taille, format, durée ou empreinte, pour les traiter et les consulter.</li>
+      <li>IA : description visuelle, images générées, suggestions émotionnelles et provenance de votre choix. Certains traitements conservent des copies du récit et de la description utilisés ; ce n’est pas un historique complet de vos modifications.</li>
+      <li>Traitements et quotas : état, tentatives, réservations et dates d’exécution, pour suivre les demandes et limiter l’utilisation des ressources. Le quota commun initial est de 20 exécutions par compte sur 24 heures ; une exécution admise peut rester comptabilisée même si elle échoue.</li>
+    </ul>
+  </section>
+  <section class="mt-8" aria-labelledby="ai-title">
+    <h2 id="ai-title" class="text-xl font-semibold">Comment fonctionne l’IA ?</h2>
+    <p class="mt-3 leading-7 text-muted">Les moteurs actuellement raccordés fonctionnent localement : Whisper pour la transcription, Stable Diffusion pour les images et mDeBERTa pour les émotions. Leurs chargements utilisent les modèles locaux, sans envoi prévu de votre récit à une API d’inférence distante. L’analyse émotionnelle est expérimentale, facultative et peut s’abstenir. Elle ne change jamais votre émotion retenue sans acceptation ou correction explicite. Aucune traduction automatique du récit n’est fournie.</p>
+    <p class="mt-3 leading-7 text-muted">Cette suggestion automatique est indicative et peut être incorrecte. Elle ne constitue ni un diagnostic ni un avis médical. Vous pouvez la modifier.</p>
+  </section>
+  <section class="mt-8" aria-labelledby="storage-title">
+    <h2 id="storage-title" class="text-xl font-semibold">Où sont les données et qui peut y accéder ?</h2>
+    <p class="mt-3 leading-7 text-muted">Les données sont enregistrées dans PostgreSQL et dans un stockage local privé pour les fichiers, hors des ressources publiques du site. L’application contrôle le compte propriétaire pour les rêves, médias et traitements. L’administrateur de l’ordinateur ou de la base peut néanmoins accéder aux données ; le stockage privé ne signifie pas un chiffrement de bout en bout. Les journaux applicatifs sont filtrés pour exclure récits, transcriptions, secrets, cookies et jetons. Les journaux du système, de PostgreSQL ou d’autres outils relèvent de leur propre configuration.</p>
+  </section>
+  <section class="mt-8" aria-labelledby="recipients-title">
+    <h2 id="recipients-title" class="text-xl font-semibold">Prestataires et transferts éventuels</h2>
+    <p class="mt-3 leading-7 text-muted">Les téléchargements explicites des modèles depuis Hugging Face peuvent transmettre des informations techniques de connexion, sans transmettre les récits. Les pages métier utilisent des ressources locales. Les interfaces techniques Swagger/ReDoc, lorsqu’elles sont activées, peuvent charger des ressources tierces. Les conditions contractuelles et garanties de ces services restent à vérifier et documenter avant tout usage pertinent de données réelles. Aucun fournisseur distant de classification, transcription ou génération n’est actuellement raccordé. Les synchronisations et sauvegardes de l’ordinateur dépendent de sa configuration.</p>
+  </section>
+  <section class="mt-8" aria-labelledby="retention-title">
+    <h2 id="retention-title" class="text-xl font-semibold">Combien de temps ? Règles actuelles</h2>
+    <p class="mt-3 leading-7 text-muted">Une session est valable huit heures. La limitation des tentatives utilise une fenêtre de quinze minutes. Le quota IA est calculé sur vingt-quatre heures. Ces délais ne suppriment pas automatiquement les lignes correspondantes. Aucune durée maximale automatique n’est actuellement définie pour les comptes, récits, audios, images ou analyses. Un audio n’est pas automatiquement effacé après sa transcription.</p>
+    <p class="mt-3 leading-7 text-muted">Les exports temporaires sont nettoyés après utilisation ou erreur ; certains résidus de plus d’une heure sont nettoyés lors d’un export ultérieur. Les conversions et traitements prévoient un nettoyage temporaire, mais un arrêt brutal peut laisser des fichiers. Les sauvegardes et journaux n’ont pas de rotation générale imposée par l’application.</p>
+    <h3 class="mt-6 text-lg font-semibold">Propositions non activées — décisions à confirmer</h3>
+    <p class="mt-3 leading-7 text-muted">Audio : sept jours après validation du récit et trente jours maximum après import ; nettoyage des sessions expirées sous vingt-quatre heures ; admissions IA environ quarante-huit heures ; journaux sept jours ; sauvegardes trente jours. La fin de conservation des données pédagogiques reste à définir. Ces délais proposés ne sont ni des garanties actuelles ni des suppressions déjà programmées.</p>
+  </section>
+  <section class="mt-8" aria-labelledby="rights-title">
+    <h2 id="rights-title" class="text-xl font-semibold">Consulter, corriger, exporter et supprimer</h2>
+    <p class="mt-3 leading-7 text-muted">Depuis « Mes rêves », ouvrez un rêve pour corriger son récit ou son émotion, exporter ses données disponibles dans un ZIP lisible, ou demander sa suppression avec confirmation. La suppression le rend immédiatement inaccessible dans l’application et invalide ses traitements actifs. L’effacement définitif des fichiers audio, images et données dérivées nécessite ensuite la maintenance de purge. Elle est reprenable, mais peut être bloquée par un fichier inaccessible ou une référence incohérente : aucun délai automatique n’est actuellement garanti.</p>
+    <p class="mt-3 leading-7 text-muted">Il n’existe pas encore de suppression complète du compte en libre-service. Pour les autres demandes d’accès, rectification, effacement, limitation, opposition ou portabilité lorsqu’elles sont applicables, le contact et la procédure doivent être complétés par le responsable avant ouverture à des utilisateurs réels. Lorsque le consentement est la base retenue, ses modalités de retrait doivent également être précisées. Vous pouvez vous renseigner auprès de la CNIL et exercer un droit de réclamation auprès de l’autorité compétente.</p>
+  </section>
+  <section class="mt-8" aria-labelledby="copies-title">
+    <h2 id="copies-title" class="text-xl font-semibold">Sauvegardes et copies téléchargées</h2>
+    <p class="mt-3 leading-7 text-muted">Supprimer un rêve n’efface pas automatiquement ses copies dans les sauvegardes, les anciens journaux système ou les archives déjà téléchargées. Leur accès et leur expiration doivent être organisés séparément. Avant toute remise en service d’une sauvegarde restaurée, les suppressions doivent être prises en compte. La suppression applicative ne garantit pas l’effacement irréversible des anciens blocs du disque. Conservez vos exports en sécurité et effacez les copies devenues inutiles.</p>
+  </section>
+</article>
+{% endblock %}
