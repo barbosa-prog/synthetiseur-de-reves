@@ -15,6 +15,7 @@ from backend.app.services import job_lifecycle as lifecycle
 from backend.app.services.dream_deletion import delete_dream
 from backend.app.services.transcripts import apply_correction
 from backend.tests import test_job_lifecycle as cases
+from backend.tests.browser_workers import wait_for_work
 from backend.tests.test_emotion_contract import FakeEmotionProvider
 from backend.tests.test_image_execution import FakeEngine
 from backend.tests.test_stt import FakeProvider
@@ -269,13 +270,43 @@ def test_bad_stt_manifest_remains_unverified(tmp_path):
     assert stt_parameters(config)["model_revision"] == "local-unverified"
 
 
-def test_dream_lock_contention_defers_without_failing_valid_job(env):
-    identifier = queue(env, "stt")
+@pytest.mark.parametrize("kind", ["stt", "image", "emotion"])
+def test_dream_lock_contention_defers_without_failing_valid_job(env, kind):
+    identifier = queue(env, kind)
     with env[2]() as blocker:
-        blocker.scalar(select(Dream).where(Dream.id == env[5]).with_for_update())
-        assert stt_jobs.claim(env[2], 600) is None
+        if kind == "emotion":
+            # Le GET /emotion/statut prend exactement ce verrou via projection().
+            emotions.projection(blocker, env[3], env[5])
+        else:
+            blocker.scalar(select(Dream).where(Dream.id == env[5]).with_for_update())
+        assert lifecycle.claim_next(env[2], kind, 600) is None
         blocker.rollback()
     with env[2]() as db:
         row = db.get(Job, identifier)
         assert row.status == "queued" and row.attempts == 0
-    assert stt_jobs.claim(env[2], 600)[0] == identifier
+    assert lifecycle.claim_next(env[2], kind, 600)[0] == identifier
+
+
+def test_fake_emotion_worker_retries_reservation_deferred_by_status_poll(env):
+    identifier = queue(env, "emotion")
+    reservations = []
+    with env[2]() as polling:
+        emotions.projection(polling, env[3], env[5])
+
+        def reserve():
+            reservation = emotions.claim(env[2])
+            reservations.append(reservation)
+            if reservation is None:
+                with env[2]() as db:
+                    job = db.get(Job, identifier)
+                    assert job.status == "queued" and job.attempts == 0
+                # Fin du GET de suivi : la prochaine itération peut réserver.
+                polling.rollback()
+            return reservation
+
+        reservation = wait_for_work(reserve)
+    assert reservations == [None, reservation]
+    assert reservation[0] == identifier
+    with env[2]() as db:
+        job = db.get(Job, identifier)
+        assert job.status == "running" and job.attempts == 1

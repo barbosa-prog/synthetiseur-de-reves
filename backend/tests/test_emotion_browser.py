@@ -10,9 +10,10 @@ from sqlalchemy import select
 
 from backend.app.database import ROOT, make_engine, session_factory
 from backend.app.emotion_web import WARNING
-from backend.app.models import Dream, User
+from backend.app.models import Dream, Job, User
 from backend.app.services import emotions
 from backend.app.services.transcripts import apply_correction
+from backend.tests.browser_workers import wait_for_work
 from backend.tests.test_emotion_web import complete_fake
 
 
@@ -73,7 +74,21 @@ def test_emotion_chrome_fictional_only():
             if os.getenv("EMOTION_ENABLED") == "1":
                 page.get_by_role("button", name="Suggérer une émotion").click()
                 expect(page.locator("#emotion-status")).to_contain_text("En attente")
-                reservation = emotions.claim(sessions)
+                with sessions() as db:
+                    job_id = db.scalar(select(Job.id).where(
+                        Job.dream_id == identifier, Job.kind == "emotion"))
+                reservation = wait_for_work(lambda: emotions.claim(sessions))
+                assert reservation is not None, "Le worker fictif n'a réservé aucun job"
+                assert reservation[0] == job_id, "Le worker fictif a réservé un autre job"
+                with sessions() as db:
+                    assert db.get(Job, job_id).status == "running"
+                response = context.request.get(origin + path + "/statut")
+                assert response.status == 200
+                progress = response.json()
+                assert progress["job_id"] == str(job_id)
+                assert progress["status"] == "running"
+                assert progress["tracking"]["technical_state"] == "running"
+                assert progress["message"] == "Analyse en cours…"
                 expect(page.locator("#emotion-status")).to_have_text("Analyse en cours…")
                 assert complete_fake(sessions, reservation=reservation)
                 expect(page.locator("#suggested-emotion")).to_have_text("Heureux")
@@ -91,7 +106,8 @@ def test_emotion_chrome_fictional_only():
                 page.goto(origin + path)
                 page.get_by_role("button", name="Suggérer une émotion").click()
                 expect(page.locator("#emotion-status")).to_contain_text("En attente")
-                assert complete_fake(sessions, None, "ambiguous")
+                assert complete_fake(sessions, None, "ambiguous", reservation=wait_for_work(
+                    lambda: emotions.claim(sessions)))
                 expect(page.locator("#emotion-status")).to_contain_text("Abstention")
                 expect(page.locator("#emotion-accept")).to_be_disabled()
                 with sessions() as db:
@@ -101,7 +117,8 @@ def test_emotion_chrome_fictional_only():
                 page.goto(origin + path)
                 page.get_by_role("button", name="Suggérer une émotion").click()
                 expect(page.locator("#emotion-status")).to_contain_text("En attente")
-                assert complete_fake(sessions)
+                assert complete_fake(sessions, reservation=wait_for_work(
+                    lambda: emotions.claim(sessions)))
                 expect(page.locator("#suggested-emotion")).to_have_text("Heureux")
                 with sessions() as db:
                     row = db.get(Dream, identifier, with_for_update=True)

@@ -18,6 +18,7 @@ from backend.app.services import emotions, stt_jobs
 from backend.app.services import image_execution as images
 from backend.app.services.media import MediaService
 from backend.app.storage.local import LocalPrivateStorage
+from backend.tests.browser_workers import wait_for_work
 from backend.tests.test_emotion_web import complete_fake
 from backend.tests.test_image_execution import FakeEngine
 from backend.tests.test_private_storage import wav_bytes
@@ -133,9 +134,18 @@ def test_job_retry_network_and_terminal_polling_in_chrome(kind):
                 return emotions.run_once(sessions, FailedEmotion(), timeout=120)
 
             with ThreadPoolExecutor(1) as pool:
-                future = pool.submit(fail_once)
+                future = pool.submit(wait_for_work, fail_once)
                 try:
                     assert entered.wait(5)
+                    with sessions() as db:
+                        assert db.get(Job, job_id).status == "running", (
+                            "Le worker fictif ne traite pas le job de ce parcours")
+                    response = context.request.get(status_url)
+                    assert response.status == 200
+                    progress = response.json()
+                    assert progress["tracking"]["job_id"] == str(job_id)
+                    assert progress["tracking"]["technical_state"] == "running"
+                    assert progress["tracking"]["state_label"] == "En cours"
                     expect(page.locator("[data-job-canonical]")).to_have_text("En cours")
                 finally:
                     release.set()
@@ -161,7 +171,8 @@ def test_job_retry_network_and_terminal_polling_in_chrome(kind):
             elif kind == "image":
                 assert images.run_once(sessions, service.storage, FakeEngine())
             else:
-                assert complete_fake(sessions)
+                assert complete_fake(sessions, reservation=wait_for_work(
+                    lambda: emotions.claim(sessions)))
             expect(page.locator("[data-job-canonical]")).to_have_text("Terminé", timeout=8000)
             expect(page.locator("[data-job-budget]")).to_contain_text("2 / 3")
             expect(page.locator("[data-job-budget]")).to_contain_text("1 / 2")
