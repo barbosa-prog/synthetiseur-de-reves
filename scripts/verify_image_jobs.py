@@ -22,6 +22,10 @@ def main():
     parser.add_argument("--export-only", action="store_true")
     parser.add_argument("--deletion-only", action="store_true")
     parser.add_argument("--purge-only", action="store_true")
+    parser.add_argument("--p11-only", action="store_true")
+    parser.add_argument("--workers-only", action="store_true")
+    parser.add_argument("--tracking-only", action="store_true")
+    parser.add_argument("--p11-final", action="store_true")
     args = parser.parse_args()
     history_only = args.history_only
     pg = Path(os.getenv("P20_POSTGRES_BIN", r"C:\Program Files\PostgreSQL\17\bin"))
@@ -92,6 +96,31 @@ def main():
                 checks = ["backend/tests/test_dream_purge.py",
                           "backend/tests/test_dream_deletion.py",
                           "backend/tests/test_media.py", "backend/tests/test_private_storage.py"]
+            if args.p11_only:
+                checks = ["backend/tests/test_job_rules.py", "backend/tests/test_job_lifecycle.py",
+                          "backend/tests/test_job_maintenance_cli.py",
+                          "backend/tests/test_emotion_postgresql.py",
+                          "backend/tests/test_postgresql.py", "-x"]
+            if args.workers_only:
+                checks = ["backend/tests/test_worker_jobs_p11.py",
+                          "backend/tests/test_stt.py", "backend/tests/test_image_jobs.py",
+                          "backend/tests/test_image_execution.py",
+                          "backend/tests/test_emotion_postgresql.py",
+                          "backend/tests/test_emotion_worker.py",
+                          "backend/tests/test_job_lifecycle.py", "-x"]
+            if args.tracking_only:
+                checks = ["backend/tests/test_job_routes_p11.py",
+                          "backend/tests/test_stt.py", "backend/tests/test_image_routes.py",
+                          "backend/tests/test_emotion_web.py",
+                          "backend/tests/test_worker_jobs_p11.py", "-x"]
+            if args.p11_final:
+                checks = ["backend/tests/test_p11_final_migration.py",
+                          "backend/tests/test_job_rules.py", "backend/tests/test_job_lifecycle.py",
+                          "backend/tests/test_job_maintenance_cli.py",
+                          "backend/tests/test_job_routes_p11.py",
+                          "backend/tests/test_worker_jobs_p11.py",
+                          "backend/tests/test_emotion_postgresql.py",
+                          "backend/tests/test_postgresql.py", "-x"]
             return subprocess.run([
                 sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
                 "--basetemp", str(directory / "pytest"), "--tb=short",

@@ -69,6 +69,8 @@ def current_image(db, user_id, dream_id):
             Job.dream_id == dream_id, Job.kind == "image", Job.status == "done",
             ImageGeneration.user_id == user_id, ImageGeneration.text_version == dream.text_version,
             ImageGeneration.description_version == description.version,
+            ImageGeneration.transcript == dream.transcript,
+            ImageGeneration.description == description.description,
             Media.dream_id == dream_id, Media.kind == "image", Media.storage_state == "ready",
             (Media.expires_at.is_(None) | (Media.expires_at > func.now())),
         ).order_by(Job.finished_at.desc(), Job.id.desc()).limit(1))
@@ -98,8 +100,18 @@ def run_once(sessions, storage, provider):
                 return False
 
     try:
+        from backend.app.image_provider import LocalStableDiffusion15
+        from backend.app.job_config import image_parameters
+        if isinstance(provider, LocalStableDiffusion15) and (
+            snapshot.parameters != image_parameters(task.request.seed)
+        ):
+            raise ImageError("configuration")
         result = prepare_image(task, provider, current)
         publish(sessions, storage, task, token, result)
+    except KeyboardInterrupt:
+        from backend.app.services.job_lifecycle import stop_reservation
+        stop_reservation(sessions, identifier, token)
+        raise
     except Exception as exc:
         code = str(exc) if isinstance(exc, ImageError) else "provider_failed"
         try:

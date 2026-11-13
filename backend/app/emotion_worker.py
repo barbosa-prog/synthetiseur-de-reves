@@ -60,7 +60,14 @@ def main():
             configuration = parameters()
             provider = LocalMDeberta(WatchedEmotionRunner(), configuration)
             while True:
-                worked = work_once(sessions, provider, configuration)
+                try:
+                    worked = work_once(sessions, provider, configuration)
+                except Exception:
+                    print("Worker émotion indisponible ; reprise différée.", flush=True)
+                    if args.once:
+                        return 1
+                    time.sleep(5)
+                    continue
                 if args.once:
                     return 0
                 if not worked:

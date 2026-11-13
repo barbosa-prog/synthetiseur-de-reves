@@ -9,6 +9,7 @@ from sqlalchemy import select
 
 from backend.app.auth import CurrentUser, Database
 from backend.app.errors import error_response
+from backend.app.media_routes import Service
 from backend.app.models import ImageDescription, ImageGeneration, Job, User
 from backend.app.services import image_jobs
 from backend.app.services.image_execution import current_image
@@ -45,6 +46,8 @@ class ImageStart(BaseModel):
 
 
 def state(db, user_id, dream_id, job=None):
+    from backend.app.services.job_lifecycle import bounded
+    bounded(db)
     dream = owned_dream(db, user_id, dream_id, lock=True)
     description = db.get(ImageDescription, dream_id, populate_existing=True)
     if job is None:
@@ -67,6 +70,10 @@ def state(db, user_id, dream_id, job=None):
     media_id = current_image(db, user_id, dream_id)
     if media_id:
         result["image_url"] = f"/web/media/{media_id}/content"
+    from backend.app.services.job_tracking import project
+    result["tracking"] = project(db, user_id, job) if job else None
+    if result["tracking"] and result["tracking"]["outdated"]:
+        result.update(status="outdated", message=MESSAGES["outdated"], image_url=None)
     return result
 
 
@@ -95,10 +102,11 @@ def save_api(dream_id: uuid.UUID, payload: DescriptionUpdate, user: CurrentUser,
 
 
 @router.post("/api/v1/dreams/{dream_id}/images", status_code=202)
-def start_api(dream_id: uuid.UUID, payload: ImageStart, user: CurrentUser, db: Database):
+def start_api(dream_id: uuid.UUID, payload: ImageStart, user: CurrentUser, db: Database,
+              service: Service):
     try:
         job = image_jobs.enqueue(db, user.id, dream_id, payload.text_version,
-                                 payload.description_version)
+                                 payload.description_version, media_service=service)
     except HTTPException as exc:
         if exc.status_code != 409:
             raise
@@ -162,14 +170,15 @@ async def save_web(dream_id: uuid.UUID, request: Request, session: BrowserSessio
 
 
 @router.post("/reves/{dream_id}/image/generer", include_in_schema=False)
-async def start_web(dream_id: uuid.UUID, request: Request, session: BrowserSession, db: Database):
+async def start_web(dream_id: uuid.UUID, request: Request, session: BrowserSession, db: Database,
+                    service: Service):
     fields = await editor_form(request, {"expected_version", "csrf"})
     owned_dream(db, session.user_id, dream_id)
     try:
         text_version, description_version = versions(fields["expected_version"])
         payload = ImageStart(text_version=text_version, description_version=description_version)
         image_jobs.enqueue(db, session.user_id, dream_id, payload.text_version,
-                           payload.description_version)
+                           payload.description_version, media_service=service)
     except (ValueError, ValidationError):
         return page(request, db, session.user_id, dream_id, status=422,
                     error="Enregistrez une description liée au récit courant.")

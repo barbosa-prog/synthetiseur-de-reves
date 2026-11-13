@@ -69,6 +69,21 @@ def test_transcription_web_journey():
             expect(page.get_by_label("Récit du rêve")).to_have_value(FakeProvider().output)
             page.get_by_role("link", name="Transcription locale de l’audio").click()
             page.get_by_role("button", name="Lancer la transcription locale").click()
+            duplicate = FakeProvider(error="timeout")
+            assert not run_once(sessions, service, duplicate)
+            assert duplicate.calls == 0
+            expect(page.locator("#stt-status")).to_contain_text("Transcription enregistrée")
+            # Un autre rêve fictif fournit des entrées nouvelles pour l'erreur.
+            page.goto(origin + "/nouveau-reve")
+            page.get_by_role("button", name="Importer un fichier").click()
+            page.locator("#audio-file").set_input_files({
+                "name": "fiction-timeout.wav", "mimeType": "audio/wav",
+                "buffer": audio_sample("wav"),
+            })
+            page.get_by_role("button", name="Confirmer et enregistrer l’audio").click()
+            page.wait_for_url("**/audio")
+            page.get_by_role("link", name="Transcrire l’audio en français").click()
+            page.get_by_role("button", name="Lancer la transcription locale").click()
             assert run_once(sessions, service, FakeProvider(error="timeout"))
             expect(page.locator("#stt-status")).to_contain_text("délai", timeout=10000)
             assert not errors

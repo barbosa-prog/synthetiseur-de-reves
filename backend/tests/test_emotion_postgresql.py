@@ -186,7 +186,9 @@ def test_provider_exception_and_wrong_snapshot_output(env):
     service.run_once(env[2], Broken())
     with env[2]() as db:
         assert db.get(Job, identifier).error_code == "provider_failed"
-    identifier = queue(env, revision=1)
+    from backend.app.job_config import identity
+    from backend.app.services.job_lifecycle import retry_job
+    retry_job(env[2], env[3][0], identifier, engine=identity(FAKE_CONFIG), explicit=True)
     reservation = service.claim(env[2])
     forged = output(env, identifier).model_copy(update={"model_revision": "wrong"})
     assert not service.finish(env[2], *reservation, forged)
@@ -203,6 +205,10 @@ def test_lease_recovery_expiry_and_old_token(env):
             job.lease_until = datetime.now(timezone.utc) - timedelta(seconds=1)
             db.commit()
         assert not service.finish(env[2], *first, result)
+        assert service.claim(env[2]) is None
+        from backend.app.job_config import identity
+        from backend.app.services.job_lifecycle import retry_job
+        retry_job(env[2], env[3][0], identifier, engine=identity(FAKE_CONFIG), explicit=True)
         new = service.claim(env[2])
         assert new[0] == identifier and new[1] != first[1]
         assert not service.finish(env[2], *first, result)
@@ -328,7 +334,11 @@ def test_cancel_releases_slot_and_old_result_cannot_publish(env):
     assert not service.finish(env[2], *reservation, result)
     with env[2]() as db:
         assert service.job_projection(db, env[3][0], identifier)["error_code"] == "cancelled"
-    assert queue(env, revision=1) != identifier
+    with pytest.raises(HTTPException):
+        queue(env, revision=1)
+    with env[2]() as db:
+        service.correct(db, env[3][0], env[3][2], "triste", 1)
+    assert queue(env, revision=2) != identifier
 
 
 def test_acceptance_api_and_no_implicit_reclassification(env):
@@ -393,6 +403,8 @@ def test_migration_0007_0008_legacy_and_safe_downgrade(database):
         assert row == ("legacy", None)
         command.downgrade(config, "0007")
         command.upgrade(config, "0008")
+        # Les assertions précédentes portent sur 0008 ; l'ORM courant exige la tête.
+        command.upgrade(config, "head")
     sessions = session_factory(engine)
     with sessions() as db:
         db.add(Job(dream_id=dream, kind="emotion"))

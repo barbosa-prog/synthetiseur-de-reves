@@ -22,6 +22,10 @@
   </section>
   <section class="surface mt-6 p-6 sm:p-8">
     <h2 class="text-xl font-semibold">Retrouver les étapes du rêve</h2>
+    <div id="job-summary" class="mt-4 text-sm leading-7 text-muted">
+      <p>États au chargement. Ouvrez une étape pour suivre son avancement.</p>
+      {% for item in job_summary %}<p><a href="{{ item.href }}" class="text-lavender">{{ item.label }}</a> : {{ item.tracking.state_label }}{% if item.tracking.outdated %} · Résultat dépassé{% elif item.tracking.outcome == 'abstention' %} · Abstention{% endif %}</p>{% endfor %}
+    </div>
     <div class="mt-5 flex flex-wrap gap-3">
       {% if audio %}<a class="btn btn-secondary" href="/reves/{{ dream.id }}/audio">Consulter l’audio</a>
       <a class="btn btn-secondary" href="/reves/{{ dream.id }}/transcription">Transcription locale</a>{% else %}<p class="text-sm text-muted">Aucun audio disponible pour ce rêve.</p>{% endif %}

@@ -193,6 +193,14 @@ class Job(Base):
         CheckConstraint("kind IN ('stt','image','tts','emotion')", name="ck_job_kind"),
         CheckConstraint("status IN ('queued','running','done','failed')", name="ck_job_status"),
         CheckConstraint("attempts BETWEEN 0 AND 3", name="ck_job_attempts"),
+        CheckConstraint("retry_count BETWEEN 0 AND 2", name="ck_job_retry_count"),
+        CheckConstraint(
+            "(cycle_key IS NULL AND input_snapshot IS NULL) OR "
+            "(cycle_key IS NOT NULL AND input_snapshot IS NOT NULL "
+            "AND cycle_key ~ '^[a-f0-9]{64}$' AND jsonb_typeof(input_snapshot) = 'object')",
+            name="ck_job_cycle",
+        ),
+        Index("ix_jobs_cycle", "dream_id", "kind", "cycle_key"),
         Index("uq_active_stt_dream", "dream_id", unique=True,
               postgresql_where=text("kind = 'stt' AND status IN ('queued','running')")),
         Index("uq_active_image_dream", "dream_id", unique=True,
@@ -211,6 +219,10 @@ class Job(Base):
     kind: Mapped[str] = mapped_column(String(12))
     status: Mapped[str] = mapped_column(String(12), server_default="queued")
     attempts: Mapped[int] = mapped_column(Integer, server_default="0")
+    retry_count: Mapped[int] = mapped_column(Integer, server_default="0")
+    queued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    cycle_key: Mapped[str | None] = mapped_column(String(64))
+    input_snapshot: Mapped[dict | None] = mapped_column(JSONB(none_as_null=True))
     error_code: Mapped[str | None] = mapped_column(String(40))
     media_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("media.id", ondelete="RESTRICT"))
     expected_text_version: Mapped[int | None] = mapped_column(Integer)

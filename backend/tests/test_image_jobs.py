@@ -141,7 +141,8 @@ def test_stale_publication_refused_and_cleanup(env, change):
         db.commit()
     assert images.claim(sessions) is None
     with sessions() as db:
-        assert db.get(Job, identifier).error_code == "text_conflict"
+        assert db.get(Job, identifier).error_code == (
+            "dream_deleted" if change == "deleted" else "interrupted")
 
 
 def test_expiration_reclaim_old_token_and_max_attempts(env):
@@ -149,22 +150,26 @@ def test_expiration_reclaim_old_token_and_max_attempts(env):
     description(env)
     identifier = enqueue(env)
     _, old_token = images.claim(sessions)
+    from backend.app.job_config import identity, image_parameters
+    from backend.app.services.job_lifecycle import retry_job
     for attempt in (2, 3):
         with sessions() as db:
             db.get(Job, identifier).lease_until = datetime.now(timezone.utc)-timedelta(seconds=1)
             db.commit()
+        assert images.claim(sessions) is None
+        assert not images.fail(sessions, owner, identifier, old_token, "private detail")
+        retry_job(sessions, owner, identifier, engine=identity(image_parameters()), explicit=True)
         _, token = images.claim(sessions)
         assert token != old_token
         with sessions() as db:
             assert db.get(Job, identifier).attempts == attempt
-        assert not images.fail(sessions, owner, identifier, old_token, "private detail")
         old_token = token
     with sessions() as db:
         db.get(Job, identifier).lease_until = datetime.now(timezone.utc)-timedelta(seconds=1)
         db.commit()
     assert images.claim(sessions) is None
-    with sessions() as db:
-        assert db.get(Job, identifier).error_code == "interrupted"
+    with pytest.raises(HTTPException):
+        retry_job(sessions, owner, identifier, engine=identity(image_parameters()), explicit=True)
 
 
 def test_publication_guard_keeps_dream_locked(env):
@@ -194,7 +199,9 @@ def test_cancel_failure_redaction_and_stt_untouched(env):
     with sessions() as db:
         assert db.get(Job, identifier).error_code == "provider_failed"
         assert db.get(Job, stt_id).status == "queued"
-    identifier = enqueue(env)
+    from backend.app.job_config import identity, image_parameters
+    from backend.app.services.job_lifecycle import retry_job
+    retry_job(sessions, owner, identifier, engine=identity(image_parameters()), explicit=True)
     with sessions() as db:
         images.cancel(db, owner, identifier)
         assert db.get(Job, identifier).error_code == "cancelled"
@@ -211,4 +218,4 @@ def test_database_constraints(env):
         db.add(Job(dream_id=dream, kind="image"))
         db.commit()
     with sessions() as db:
-        assert db.scalar(text("select version_num from alembic_version")) == "0008"
+        assert db.scalar(text("select version_num from alembic_version")) == "0009"

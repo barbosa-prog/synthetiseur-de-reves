@@ -11,7 +11,7 @@ from sqlalchemy import func, select
 
 from backend.app.auth import Database
 from backend.app.history_schemas import HistoryQuery
-from backend.app.models import Media, User
+from backend.app.models import Job, Media, User
 from backend.app.services.history import list_dreams
 from backend.app.services.image_execution import current_image
 from backend.app.services.transcripts import owned_dream
@@ -71,7 +71,17 @@ def dream_detail(dream_id: uuid.UUID, request: Request, session: BrowserSession,
         (Media.expires_at.is_(None) | (Media.expires_at > func.now())),
     ).limit(1))
     image = current_image(db, session.user_id, dream_id)
+    from backend.app.services.job_tracking import project
+    summary = []
+    for kind, label, stage in [("stt", "Transcription", "transcription"),
+                                ("image", "Image", "image"), ("emotion", "Émotion", "emotion")]:
+        job = db.scalar(select(Job).where(Job.dream_id == dream_id, Job.kind == kind)
+                        .order_by(Job.created_at.desc(), Job.id.desc()).limit(1))
+        if job:
+            summary.append(dict(label=label, href=f"/reves/{dream_id}/{stage}",
+                                tracking=project(db, session.user_id, job)))
     return render(request, "dream_detail.html", dream=dream, audio=audio,
+                  job_summary=summary,
                   image_url=f"/web/media/{image}/content" if image else None,
                   user=db.get(User, session.user_id), expires_at=session.expires_at.isoformat(),
                   emotions=EMOTIONS, states=STATES, utc_date=utc_date)

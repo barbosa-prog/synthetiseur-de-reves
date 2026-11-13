@@ -212,11 +212,13 @@ def test_restart_expired_lease_and_fencing(environment):
         db.commit()
     env[1].dispose()
     fake = FakeProvider()
-    assert execute(environment, fake)
+    assert not execute(environment, fake)
+    assert fake.calls == 0
     with sessions() as db:
         job = db.get(Job, identifier)
-        assert job.status == "done" and job.attempts == 2 and job.claim_token is None
-        assert db.get(Dream, dream).text_version == 1
+        assert job.status == "failed" and job.attempts == 1 and job.claim_token is None
+        assert job.error_code == "interrupted"
+        assert db.get(Dream, dream).text_version == 0
 
 
 def test_stale_worker_cannot_publish(environment):
@@ -231,7 +233,7 @@ def test_stale_worker_cannot_publish(environment):
 
     execute(environment, FakeProvider(callback=steal_after_expiry))
     with Session(env[1]) as db:
-        assert db.get(Job, identifier).attempts == 2
+        assert db.get(Job, identifier).attempts == 1
         assert db.get(Dream, dream).transcript is None
 
 

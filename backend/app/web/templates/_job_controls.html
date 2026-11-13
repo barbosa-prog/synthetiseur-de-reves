@@ -1,0 +1,21 @@
+<div data-job-controls class="mt-5 rounded-xl border border-slate-700 p-4"
+     data-action-revision="{{ tracking.job_id ~ ':' ~ tracking.retry_count ~ ':' ~ tracking.cycle_attempts ~ ':' ~ tracking.technical_state if tracking else '' }}">
+  <p data-job-canonical class="text-sm font-medium">{% if tracking %}{{ tracking.state_label }}{% else %}Aucun traitement demandé.{% endif %}</p>
+  <p data-job-budget class="mt-2 text-xs leading-6 text-muted">{% if tracking and tracking.budget_known %}Exécutions du cycle : {{ tracking.cycle_attempts }} / {{ tracking.max_attempts }}. Relances manuelles : {{ tracking.retry_count }} / {{ tracking.max_manual_retries }}. {{ tracking.retries_remaining }} relance(s) restante(s).{% elif tracking %}Budget inconnu pour cet ancien traitement. Relance indisponible.{% endif %}</p>
+  <p data-job-safe-message class="mt-2 text-sm text-muted">{{ tracking.state_message if tracking else '' }}</p>
+  <p data-job-network class="mt-3 text-sm text-rose-100" role="status" hidden></p>
+  <form data-job-retry method="post" action="{{ tracking.retry_url if tracking else '' }}" class="mt-4" {% if not tracking or not tracking.retryable %}hidden{% endif %}>
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="expected" value="{{ tracking.confirmation if tracking else '' }}">
+    <label class="block text-sm leading-6 text-muted"><input type="checkbox" name="confirmed" value="yes" required> Je confirme une nouvelle exécution locale, qui peut mobiliser les ressources du PC.</label>
+    <button data-job-action type="submit" class="btn btn-secondary mt-3 disabled:opacity-50" {% if not tracking or not tracking.retryable %}disabled{% endif %}>Relancer le traitement</button>
+  </form>
+  {% if job_kind == 'image' %}
+  <form data-job-regenerate method="post" action="{{ tracking.regenerate_url if tracking else '' }}" class="mt-4" {% if not tracking or not tracking.regeneratable %}hidden{% endif %}>
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="expected" value="{{ tracking.confirmation if tracking else '' }}">
+    <label class="block text-sm leading-6 text-muted"><input type="checkbox" name="confirmed" value="yes" required> Je confirme la génération volontaire d’une nouvelle image, avec le budget restant du même cycle.</label>
+    <button data-job-action type="submit" class="btn btn-secondary mt-3 disabled:opacity-50" {% if not tracking or not tracking.regeneratable %}disabled{% endif %}>Générer une nouvelle image</button>
+  </form>
+  {% endif %}
+</div>

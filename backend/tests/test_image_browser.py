@@ -69,6 +69,13 @@ def test_image_user_journey_without_gpu():
             page.screenshot(path=str(screenshots/"image-fictive-mobile.png"), full_page=True)
             assert page.locator("html").evaluate("el => el.scrollWidth <= innerWidth")
             page.get_by_role("button", name="Générer une image").click()
+            expect(page.locator("#image-status")).to_have_text("Image terminée.")
+            duplicate = FakeEngine(error="timeout")
+            assert not run_once(sessions, storage, duplicate)
+            assert duplicate.calls == 0
+            page.get_by_label("Description visuelle").fill("A second fictional forest")
+            page.get_by_role("button", name="Enregistrer la description").click()
+            page.get_by_role("button", name="Générer une image").click()
             expect(page.locator("#image-status")).to_contain_text("En attente")
             assert run_once(sessions, storage, FakeEngine(error="timeout"))
             expect(page.locator("#image-status")).to_contain_text("délai", timeout=10000)

@@ -156,6 +156,12 @@ def test_abstention_error_and_manual_choice_during_job(web_env, monkeypatch):
         == 409
     )
     post(web_env, "suggerer", {"text_version": "1"})
+    assert emotions.claim(env[2]) is None  # L'abstention identique est réutilisée.
+    with env[2]() as db:
+        dream = db.get(Dream, env[3][2], with_for_update=True)
+        apply_correction(db, dream, "Nouveau récit fictif pour tester un conflit.", 1)
+        db.commit()
+    post(web_env, "suggerer", {"text_version": "2"})
     identifier, token = emotions.claim(env[2])
     assert client.get(base(web_env) + "/statut").json()["status"] == "running"
     stale_form = fields(client.get(base(web_env)))
@@ -163,7 +169,7 @@ def test_abstention_error_and_manual_choice_during_job(web_env, monkeypatch):
     assert post(web_env, "retirer", raw=stale_form).status_code == 409
     assert not emotions.finish(env[2], identifier, token, error="timeout")
     assert client.get(base(web_env) + "/statut").json()["value"] == "autre"
-    post(web_env, "suggerer", {"text_version": "1"})
+    post(web_env, "suggerer", {"text_version": "2"})
     identifier, token = emotions.claim(env[2])
     emotions.finish(env[2], identifier, token, error="model_unavailable")
     assert client.get(base(web_env) + "/statut").json()["status"] == "failed"

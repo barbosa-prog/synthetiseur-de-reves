@@ -13,7 +13,7 @@
     <p class="mt-4 whitespace-pre-wrap break-words leading-7 text-muted">{{ dream.transcript or 'Aucun récit enregistré.' }}</p>
     <a class="btn btn-secondary mt-5" href="/reves/{{ dream.id }}/recit">Corriger le récit</a>
   </section>
-  <div id="emotion-controller" data-url="/reves/{{ dream.id }}/emotion/statut" data-version="{{ dream.text_version }}" data-revision="{{ progress.revision }}" data-job="{{ progress.job_id or '' }}" data-busy="{{ '1' if progress.busy else '0' }}">
+  <div id="emotion-controller" data-state="{{ progress.tracking.technical_state if progress.tracking else '' }}" data-url="/reves/{{ dream.id }}/emotion/statut" data-version="{{ dream.text_version }}" data-revision="{{ progress.revision }}" data-job="{{ progress.job_id or '' }}" data-busy="{{ '1' if progress.busy else '0' }}">
     <p id="emotion-reload" role="alert" class="mt-5 text-rose-100" hidden>Le récit ou le choix a changé. Rechargez la page avant de continuer.</p>
     <section class="surface mt-6 p-6">
       <h2 class="text-xl font-semibold">Émotion retenue</h2>
@@ -44,6 +44,7 @@
         <button id="emotion-request" class="btn btn-secondary disabled:opacity-50" type="submit" {% if not progress.enabled or not progress.ready or progress.busy %}disabled{% endif %}>Suggérer une émotion</button>
       </form>
       {% if not dream.transcript %}<p class="mt-3 text-sm text-muted">Enregistrez un récit avant de demander une suggestion.</p>{% endif %}
+    {% set tracking = progress.tracking %}{% set job_kind = 'emotion' %}{% include '_job_controls.html' %}
       <div id="emotion-suggestion" class="mt-5" {% if not progress.suggestion %}hidden{% endif %}>
         <p id="suggested-emotion" class="font-medium text-lavender">{% if progress.suggestion %}{{ labels.get(progress.suggestion.emotion, 'Abstention — aucune émotion proposée') }}{% endif %}</p>
         <form method="post" action="/reves/{{ dream.id }}/emotion/accepter" class="mt-4">
@@ -54,5 +55,6 @@
     </section>
   </div>
 </div>
+<script src="{{ url_for('static', path='js/job-polling.js') }}" defer></script>
 <script src="{{ url_for('static', path='js/emotion.js') }}" defer></script>
 {% endblock %}

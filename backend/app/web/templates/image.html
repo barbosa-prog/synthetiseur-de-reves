@@ -3,7 +3,7 @@
 {% block content %}
 <div class="mx-auto max-w-3xl px-5 py-12 sm:px-8">
   <a href="/reves/{{ dream.id }}/recit" class="text-sm text-muted hover:text-ink">← Votre récit corrigé</a>
-  <section class="surface mt-8 p-7 sm:p-10">
+  <section id="image-controller" data-state="{{ progress.tracking.technical_state if progress.tracking else '' }}" class="surface mt-8 p-7 sm:p-10">
     <p class="eyebrow mb-3">03 · Image du rêve</p>
     <h1 class="text-3xl font-semibold">Donner une forme au rêve.</h1>
     <p class="mt-5 leading-7 text-muted">Votre récit français reste conservé. Décrivez brièvement la scène à représenter. Aucune traduction automatique n’est effectuée. Une description en anglais peut donner un résultat plus fidèle avec ce modèle ; ce n’est pas garanti.</p>
@@ -27,7 +27,7 @@
     <form method="post" action="/reves/{{ dream.id }}/image/generer" class="mt-6">
       <input type="hidden" name="csrf" value="{{ csrf }}">
       <input type="hidden" name="expected_version" value="{{ dream.text_version }}:{{ description.version if description else 0 }}">
-      <button id="image-generate" class="btn btn-primary disabled:opacity-50" type="submit" {% if not progress.ready or progress.busy %}disabled{% endif %}>Générer une image</button>
+      <button id="image-generate" class="btn btn-primary disabled:opacity-50" type="submit" {% if not progress.ready or progress.busy or progress.status == 'failed' %}disabled{% endif %}>Générer une image</button>
     </form>
     {% endif %}
     <div id="image-progress" data-url="/reves/{{ dream.id }}/image/statut" data-description-version="{{ progress.description_version }}" data-text-version="{{ dream.text_version }}" class="mt-6 rounded-xl border border-slate-700 p-5" aria-live="polite">
@@ -35,11 +35,13 @@
       <p id="image-refresh" class="mt-3 text-sm text-muted" {% if progress.ready %}hidden{% endif %}>Enregistrez ou reconfirmez la description pour la version actuelle du récit. Si une autre page a changé, rechargez avant de continuer.</p>
       <p class="mt-3 text-xs leading-6 text-muted">La demande reste en attente si le worker image local est arrêté. Le délai dépend des ressources du PC. Le filtre de sécurité peut refuser une sortie.</p>
     </div>
+    {% set tracking = progress.tracking %}{% set job_kind = 'image' %}{% include '_job_controls.html' %}
     <figure id="image-result" class="mt-7" {% if not progress.image_url %}hidden{% endif %}>
       <img id="dream-image" {% if progress.image_url %}src="{{ progress.image_url }}"{% endif %} width="512" height="512" alt="Illustration générée à partir de votre description visuelle" class="w-full rounded-xl">
       <figcaption class="mt-3 text-sm text-muted">Image privée générée par IA. Les détails peuvent différer de votre description.</figcaption>
     </figure>
   </section>
 </div>
+<script src="{{ url_for('static', path='js/job-polling.js') }}" defer></script>
 <script src="{{ url_for('static', path='js/image.js') }}" defer></script>
 {% endblock %}

@@ -1,31 +1,22 @@
 "use strict";
 (() => {
+  const root = document.getElementById("stt-controller");
   const progress = document.getElementById("stt-progress");
-  if (!progress || !["pending", "processing"].includes(progress.dataset.status)) return;
+  if (!root || !progress) return;
   const label = document.getElementById("stt-status");
   const button = document.getElementById("stt-start");
-  const poll = async () => {
-    if (document.hidden) { window.setTimeout(poll, 3000); return; }
-    try {
-      const response = await fetch(progress.dataset.url, {cache: "no-store", redirect: "error"});
-      if (!response.ok) throw new Error("status");
-      const job = await response.json();
-      if (job.status === "completed") {
-        label.textContent = "Transcription enregistrée. Vous pouvez vérifier et corriger le récit.";
-        // Recharger avant toute nouvelle demande : sa version doit être à jour.
-        label.append(document.createTextNode(" Rechargez cette page pour relancer une transcription."));
-        return;
-      }
-      if (job.status === "failed") {
-        label.textContent = job.message || "La transcription a échoué.";
-        if (button) button.disabled = false;
-        return;
-      }
-      label.textContent = job.status === "processing" ? "Transcription en cours…" : "En attente du worker local…";
-      window.setTimeout(poll, 2000);
-    } catch {
-      label.textContent = "Suivi indisponible. Rechargez la page et vérifiez votre connexion. Votre demande reste enregistrée.";
+  const offline = () => { if (button) button.disabled = true; };
+  DreamJobPolling.start({root, url: progress.dataset.url, initialState: root.dataset.state,
+    onUnavailable: offline, onGone: offline,
+    onState: job => {
+      DreamJobPolling.controls(root, job.tracking);
+      const active = ["queued", "running"].includes(job.tracking.technical_state);
+      const changed = String(job.tracking.text_version) !== root.dataset.version;
+      if (button) button.disabled = active || changed || job.status === "completed" ||
+        (job.status === "failed" && !job.tracking.outdated);
+      label.textContent = job.status === "completed"
+        ? "Transcription enregistrée. Vous pouvez vérifier et corriger le récit. Rechargez avant une nouvelle demande."
+        : job.tracking.state_message;
     }
-  };
-  window.setTimeout(poll, 1000);
+  });
 })();

@@ -12,6 +12,7 @@ import time
 import wave
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from uuid import uuid4
 
 import httpx
 import trustme
@@ -22,10 +23,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from backend.app.database import make_engine, session_factory  # noqa: E402
-from backend.app.models import AuthSession, Dream, Media, User  # noqa: E402
+from backend.app.models import AuthSession, Dream, Job, Media, User  # noqa: E402
 from backend.app.security import new_token, token_digest  # noqa: E402
 from backend.app.services.media import MediaService  # noqa: E402
 from backend.app.storage.local import LocalPrivateStorage  # noqa: E402
+from scripts.p11_inventory import capture  # noqa: E402
 
 
 def free_port() -> int:
@@ -43,6 +45,8 @@ def main() -> int:
                         help="Disponibilité P08 simulée dans le serveur temporaire, sans worker")
     parser.add_argument("--p10-final", action="store_true",
                         help="Recette intégrée P10 sur la base temporaire fraîche")
+    parser.add_argument("--p11-browser", action="store_true",
+                        help="Parcours Chrome P11 uniquement, sans fournisseur réel")
     args = parser.parse_args()
     pg = Path(os.getenv("P20_POSTGRES_BIN", r"C:\Program Files\PostgreSQL\17\bin"))
     if not (pg / "initdb.exe").is_file():
@@ -116,6 +120,8 @@ def main() -> int:
             ])
             if args.p10_final:
                 checks = ["backend/tests/p10_final_recipe.py", "-x"]
+            if args.p11_browser:
+                checks = ["backend/tests/test_job_tracking_browser.py", "-x"]
             result = subprocess.run([
                 sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
                 "--basetemp", str(directory / "pytest"), "--tb=short",
@@ -142,6 +148,18 @@ def main() -> int:
                             user_id=user.id, token_hash=token_digest(token),
                             expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
                         ))
+                        # Données de persistance uniquement : aucun worker n'est lancé.
+                        # Budgets non nuls et réservation garantissent un contrôle non vide.
+                        db.add_all([
+                            Job(dream_id=dream.id, kind="stt", status="failed", attempts=3,
+                                retry_count=2, cycle_key="a" * 64,
+                                input_snapshot={"fictitious_restart_check": True}),
+                            Job(dream_id=dream.id, kind="image", status="running", attempts=2,
+                                retry_count=1, cycle_key="b" * 64,
+                                input_snapshot={"fictitious_restart_check": True},
+                                claim_token=uuid4(),
+                                lease_until=datetime.now(timezone.utc) + timedelta(hours=1)),
+                        ])
                         db.commit()
                     audio = io.BytesIO()
                     with wave.open(audio, "wb") as sample:
@@ -182,6 +200,8 @@ def main() -> int:
                                 or history_before.json()["total"] != 1
                                 or history_before.json()["items"][0]["id"] != str(dream_id)):
                             raise RuntimeError("Historique P09 initial non validé.")
+                    with engine.begin() as connection:
+                        p11_before_restart = capture(connection)
                     server.terminate()
                     server.wait(timeout=15)
                     server = None
@@ -200,6 +220,11 @@ def main() -> int:
                             except httpx.HTTPError:
                                 pass
                             time.sleep(0.1)
+                        with engine.begin() as connection:
+                            if capture(connection) != p11_before_restart:
+                                raise RuntimeError("Données ou budgets perdus après redémarrage.")
+                        print("P11 : données, budgets et réservations identiques après "
+                              "redémarrage PostgreSQL/Uvicorn.", flush=True)
                         response = client.get(endpoint, headers=headers)
                         if response.status_code != 200 or response.content != payload:
                             raise RuntimeError("Persistance après redémarrage non validée.")

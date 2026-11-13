@@ -27,12 +27,13 @@ class StartTranscription(BaseModel):
 
 @router.post("/api/v1/dreams/{dream_id}/transcriptions", status_code=202)
 def start_api(dream_id: uuid.UUID, payload: StartTranscription, user: CurrentUser, db: Database):
-    return projection(enqueue(db, user.id, dream_id, payload.media_id, payload.expected_version))
+    return projection(enqueue(db, user.id, dream_id, payload.media_id, payload.expected_version),
+                      db, user.id)
 
 
 @router.get("/api/v1/transcriptions/{job_id}")
 def status_api(job_id: uuid.UUID, user: CurrentUser, db: Database):
-    return projection(owned_job(db, user.id, job_id))
+    return projection(owned_job(db, user.id, job_id), db, user.id)
 
 
 def page(request, db, dream, session, *, error=None, status=200):
@@ -45,7 +46,7 @@ def page(request, db, dream, session, *, error=None, status=200):
         Job.created_at.desc(), Job.id.desc(),
     ).limit(1))
     return render(request, "transcription.html", status, dream=dream, media=media,
-                  job=projection(job) if job else None, error=error,
+                  job=projection(job, db, dream.user_id) if job else None, error=error,
                   user=db.get(User, dream.user_id), expires_at=session.expires_at.isoformat())
 
 
@@ -82,4 +83,4 @@ def status_web(dream_id: uuid.UUID, job_id: uuid.UUID, session: BrowserSession, 
     job = owned_job(db, session.user_id, job_id)
     if job.dream_id != dream_id:
         raise HTTPException(404, "Traitement inaccessible")
-    return projection(job)
+    return projection(job, db, session.user_id)

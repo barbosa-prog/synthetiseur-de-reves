@@ -83,19 +83,31 @@ def test_emotion_chrome_fictional_only():
                 expect(page.locator("#emotion-origin")).to_have_text("Suggestion acceptée")
                 page.get_by_role("button", name="Retirer mon choix").click()
                 expect(page.locator("#retained-emotion")).to_have_text("Non renseignée")
+                # Une même entrée réussie est réutilisée ; changer réellement le récit.
+                with sessions() as db:
+                    row = db.get(Dream, identifier, with_for_update=True)
+                    apply_correction(db, row, "Une fiction différente pour une abstention.", 1)
+                    db.commit()
+                page.goto(origin + path)
                 page.get_by_role("button", name="Suggérer une émotion").click()
                 expect(page.locator("#emotion-status")).to_contain_text("En attente")
                 assert complete_fake(sessions, None, "ambiguous")
                 expect(page.locator("#emotion-status")).to_contain_text("Abstention")
                 expect(page.locator("#emotion-accept")).to_be_disabled()
+                with sessions() as db:
+                    row = db.get(Dream, identifier, with_for_update=True)
+                    apply_correction(db, row, "Une autre fiction pour une suggestion.", 2)
+                    db.commit()
+                page.goto(origin + path)
                 page.get_by_role("button", name="Suggérer une émotion").click()
                 expect(page.locator("#emotion-status")).to_contain_text("En attente")
                 assert complete_fake(sessions)
                 expect(page.locator("#suggested-emotion")).to_have_text("Heureux")
                 with sessions() as db:
                     row = db.get(Dream, identifier, with_for_update=True)
-                    apply_correction(db, row, "Une nouvelle fiction corrigée.", 1)
+                    apply_correction(db, row, "Une nouvelle fiction corrigée.", 3)
                     db.commit()
+                page.evaluate("window.dispatchEvent(new Event('focus'))")
                 expect(page.locator("#emotion-suggestion")).to_be_hidden(timeout=10000)
                 expect(page.locator("#emotion-reload")).to_be_visible()
             else:

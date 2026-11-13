@@ -22,6 +22,7 @@ from backend.app.errors import register_error_handlers
 from backend.app.export_routes import router as export_router
 from backend.app.history_routes import router as history_router
 from backend.app.image_routes import router as image_router
+from backend.app.job_routes import router as job_router
 from backend.app.media_routes import router as media_router
 from backend.app.schemas import ErrorResponse
 from backend.app.stt_routes import router as stt_router
@@ -83,6 +84,7 @@ def create_app() -> FastAPI:
     application.include_router(transcript_router)
     application.include_router(stt_router)
     application.include_router(image_router)
+    application.include_router(job_router)
     application.include_router(history_router)
     application.include_router(emotion_router)
     application.include_router(emotion_web_router)

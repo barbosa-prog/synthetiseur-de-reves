@@ -47,7 +47,11 @@ def render(request: Request, template: str, status: int = 200, **context):
 
 async def web_login_required(request: Request, exc: WebLoginRequired):
     """Session absente, expirée ou révoquée : retour à la connexion, cookies effacés."""
-    response = RedirectResponse("/connexion?etat=expiree", status_code=303)
+    if request.headers.get("accept") == "application/json":
+        from fastapi.responses import JSONResponse
+        response = JSONResponse({"detail": "Authentification requise"}, status_code=401)
+    else:
+        response = RedirectResponse("/connexion?etat=expiree", status_code=303)
     clear_cookies(response)
     return response
 

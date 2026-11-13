@@ -64,6 +64,7 @@ def state(db, owner, identifier):
         "ready": bool(dream.transcript),
         "value_label": EMOTIONS.get(view["value"], "Non renseignée"),
         "origin_label": ORIGINS[view["source"]],
+        "tracking": progress["tracking"] if job else None,
     }
 
 

@@ -1,8 +1,6 @@
 """P08 PostgreSQL : aucune attribution automatique, aucun import de moteur IA."""
 
 import json
-import uuid
-from datetime import timedelta
 
 from fastapi import HTTPException
 from sqlalchemy import func, select
@@ -115,37 +113,12 @@ def invalidate_for_text(db, dream, new_version):
 
 
 def enqueue(db, user_id, dream_id, text_version, revision, *, parameters=None):
-    dream = owned_dream(db, user_id, dream_id, lock=True)
-    if not dream.transcript or dream.text_version != text_version:
-        raise HTTPException(409, "Un récit courant est nécessaire")
-    if db.scalar(
-        select(Job.id).where(
-            Job.dream_id == dream_id, Job.kind == "emotion", Job.status.in_(["queued", "running"])
-        )
-    ):
-        raise HTTPException(409, "Une suggestion est déjà en attente ou en cours")
-    meta = metadata(db, dream)
-    identifier = uuid.uuid4()
-    state, request = translate(
-        rules.begin_analysis, state_for(db, dream, meta), dream.transcript, identifier, revision
-    )
-    db.add(
-        Job(id=identifier, dream_id=dream_id, kind="emotion", expected_text_version=text_version)
-    )
-    db.flush()
-    db.add(
-        EmotionAnalysis(
-            job_id=identifier,
-            user_id=user_id,
-            transcript=request.text,
-            text_version=request.text_version,
-            choice_revision=request.choice_revision,
-            parameters=dict(runtime_parameters() if parameters is None else parameters),
-        )
-    )
-    save_state(db, dream, meta, state)
-    db.commit()
-    return job_projection(db, user_id, identifier)
+    from backend.app.services.job_lifecycle import enqueue_existing
+    job = enqueue_existing(db, user_id, dream_id, "emotion",
+                           dict(runtime_parameters() if parameters is None else parameters),
+                           text_version=text_version, choice_revision=revision)
+    return job_projection(db, user_id, job.id)
+
 
 
 def owned_job(db, user_id, job_id, *, lock=False):
@@ -175,12 +148,14 @@ def job_projection(db, user_id, job_id):
     outdated_reservation = job.status in {"queued", "running"} and (
         meta is None or meta.active_request != job.id or meta.revision != snapshot.choice_revision
     )
+    from backend.app.services.job_tracking import project, safe_error
     return dict(
+        tracking=project(db, user_id, job),
         id=job.id,
         dream_id=job.dream_id,
         status=job.status,
         attempts=job.attempts,
-        error_code=job.error_code,
+        error_code=safe_error(job.error_code),
         text_version=snapshot.text_version,
         stale=(
             dream.text_version != snapshot.text_version
@@ -226,31 +201,9 @@ def terminate(db, job, code):
 
 
 def claim(sessions, timeout=30):
-    if type(timeout) is not int or not 1 <= timeout <= 600:
-        raise ValueError("Délai invalide")
-    with sessions() as db:
-        now = db.scalar(select(func.clock_timestamp()))
-        jobs = db.scalars(
-            select(Job)
-            .where(Job.kind == "emotion", Job.status.in_(["queued", "running"]))
-            .order_by(Job.created_at, Job.id)
-            .with_for_update(skip_locked=True)
-        ).all()
-        for job in jobs:
-            if job.status == "running" and job.lease_until and job.lease_until > now:
-                continue
-            valid, _, _, _ = current(db, job)
-            if not valid or job.attempts >= 3:
-                terminate(db, job, "stale_result" if not valid else "interrupted")
-                continue
-            job.status, job.attempts = "running", job.attempts + 1
-            job.claim_token = uuid.uuid4()
-            job.lease_until = now + timedelta(seconds=timeout + 60)
-            token = job.claim_token
-            db.commit()
-            return job.id, token
-        db.commit()
-        return None
+    from backend.app.services.job_lifecycle import claim_next
+    return claim_next(sessions, "emotion", timeout)
+
 
 
 def cancel(db, user_id, job_id):
@@ -265,6 +218,8 @@ def cancel(db, user_id, job_id):
 def finish(sessions, job_id, token, result=None, error=None):
     """Une seule transaction de validation/publication ; aucun choix implicite."""
     with sessions() as db:
+        from backend.app.services.job_lifecycle import bounded
+        bounded(db)
         job = db.scalar(
             select(Job)
             .where(Job.id == job_id, Job.kind == "emotion")
@@ -281,6 +236,12 @@ def finish(sessions, job_id, token, result=None, error=None):
         ):
             return False
         valid, dream, snapshot, meta = current(db, job)
+        if valid:
+            from backend.app.services.job_lifecycle import publication_guard
+            try:
+                publication_guard(db, job)
+            except HTTPException:
+                valid = False
         if not valid:
             terminate(db, job, "stale_result")
         elif error:
@@ -352,7 +313,8 @@ def run_once(sessions, provider, *, timeout=30, required_parameters=None):
     try:
         result = analyze(provider, request)
     except KeyboardInterrupt:
-        finish(sessions, identifier, token, error="worker_stopped")
+        from backend.app.services.job_lifecycle import stop_reservation
+        stop_reservation(sessions, identifier, token)
         raise
     except EmotionError as exc:
         finish(sessions, identifier, token, error=str(exc))

@@ -1,14 +1,12 @@
 """File PostgreSQL persistante, réservations expirables et publication atomique P06."""
 
-import uuid
-from datetime import timedelta
 
 from fastapi import HTTPException
 from sqlalchemy import func, select
 
 from backend.app.models import Dream, Job, Media
 from backend.app.services.media import MediaNotFound
-from backend.app.services.transcripts import TextVersionConflict, apply_correction, owned_dream
+from backend.app.services.transcripts import TextVersionConflict, apply_correction
 from backend.app.storage.local import StorageError
 from backend.app.stt_provider import STTError
 
@@ -25,39 +23,36 @@ MESSAGES = {
     "interrupted": "Le traitement a été interrompu à plusieurs reprises.",
     "provider_failed": "La transcription locale a échoué. La saisie manuelle reste disponible.",
     "provider_unavailable": "Le moteur local est indisponible.",
+    "configuration": "La configuration du moteur doit être vérifiée.",
+    "queue_timeout": "Le délai d'attente est dépassé. Aucun traitement n'a été relancé.",
+    "worker_stopped": "Le traitement a été arrêté.",
 }
 
 
-def projection(job):
+def projection(job, db=None, owner=None):
     """Aucun contenu, chemin, jeton de réservation ni détail d'exception."""
-    return {"id": job.id, "dream_id": job.dream_id, "media_id": job.media_id,
+    result = {"id": job.id, "dream_id": job.dream_id, "media_id": job.media_id,
             "status": PUBLIC_STATES[job.status], "attempts": job.attempts,
             "error_code": job.error_code,
-            "message": MESSAGES.get(job.error_code) if job.error_code else None}
+            "message": MESSAGES.get(job.error_code, MESSAGES["provider_failed"])
+            if job.error_code else None}
+    if db is not None:
+        from backend.app.services.job_tracking import project, safe_error
+        result["tracking"] = project(db, owner, job)
+        result["error_code"] = safe_error(job.error_code)
+    return result
 
 
 def enqueue(db, user_id, dream_id, media_id, expected_version):
-    """Verrou du rêve + index unique : même audio/rêve jamais deux fois simultanément."""
-    dream = owned_dream(db, user_id, dream_id, lock=True)
-    media = db.scalar(select(Media).where(
-        Media.id == media_id, Media.dream_id == dream.id, Media.kind == "audio",
-        Media.storage_state == "ready", Media.audio_source.is_not(None),
-        (Media.expires_at.is_(None) | (Media.expires_at > func.now())),
-    ))
-    if media is None:
-        raise HTTPException(404, "Audio inaccessible")
-    if dream.text_version != expected_version:
-        raise HTTPException(409, "Le récit a changé ; rechargez la page")
-    active = db.scalar(select(Job).where(
-        Job.dream_id == dream_id, Job.kind == "stt", Job.status.in_(["queued", "running"]),
-    ))
-    if active:
-        raise HTTPException(409, "Une transcription est déjà en cours")
-    job = Job(dream_id=dream_id, media_id=media_id, kind="stt",
-              expected_text_version=expected_version)
-    db.add(job)
-    db.commit()
-    return job
+    from backend.app.job_config import stt_parameters
+    from backend.app.services.job_lifecycle import enqueue_existing
+    try:
+        parameters = stt_parameters()
+    except (STTError, ValueError):
+        raise HTTPException(503, "Configuration du moteur indisponible") from None
+    return enqueue_existing(db, user_id, dream_id, "stt", parameters,
+                            text_version=expected_version, media_id=media_id)
+
 
 
 def owned_job(db, user_id, job_id):
@@ -70,37 +65,9 @@ def owned_job(db, user_id, job_id):
 
 
 def claim(sessions, timeout):
-    """SKIP LOCKED pour plusieurs workers ; jeton distinct à chaque reprise."""
-    with sessions() as db:
-        now = db.scalar(select(func.clock_timestamp()))
-        expired = db.scalars(select(Job).where(
-            Job.kind == "stt", Job.status == "running",
-            (Job.lease_until.is_(None) | (Job.lease_until <= now)),
-        ).with_for_update(skip_locked=True)).all()
-        for job in expired:
-            job.status = "failed" if job.attempts >= 3 else "queued"
-            job.claim_token = None
-            job.lease_until = None
-            if job.status == "failed":
-                job.error_code, job.finished_at = "interrupted", now
-        db.flush()
-        job = db.scalar(select(Job).where(
-            Job.kind == "stt", Job.status == "queued",
-        ).order_by(Job.created_at, Job.id).with_for_update(skip_locked=True).limit(1))
-        if job is None:
-            db.commit()
-            return None
-        if job.attempts >= 3 or job.media_id is None or job.expected_text_version is None:
-            job.status, job.error_code, job.finished_at = "failed", "interrupted", now
-            db.commit()
-            return None
-        job.status, job.attempts = "running", job.attempts + 1
-        job.claim_token = uuid.uuid4()
-        job.lease_until = now + timedelta(seconds=timeout + 60)
-        token = job.claim_token
-        identifier = job.id
-        db.commit()
-        return identifier, token
+    from backend.app.services.job_lifecycle import claim_next
+    return claim_next(sessions, "stt", timeout)
+
 
 
 def run_once(sessions, media_service, provider):
@@ -113,16 +80,32 @@ def run_once(sessions, media_service, provider):
     try:
         with sessions() as db:
             job = db.get(Job, identifier)
+            if job is None:
+                return True
             dream = db.get(Dream, job.dream_id)
-            if dream.status == "deleted" or dream.text_version != job.expected_text_version:
+            if dream is None or dream.status == "deleted" or (
+                dream.text_version != job.expected_text_version
+            ):
                 raise STTError("text_conflict")
             user_id, media_id = dream.user_id, job.media_id
+            from backend.app.job_config import identity, stt_parameters
+            from backend.app.services.job_lifecycle import read_inputs
+            from backend.app.stt_provider import LocalWhisper
+            if isinstance(provider, LocalWhisper):
+                approved = identity(stt_parameters(provider.config))
+                if (approved.model_revision == "local-unverified"
+                        or read_inputs(job.input_snapshot).engine != approved):
+                    raise STTError("configuration")
         audio = media_service.download(user_id, media_id)
         with audio.stream:
             content = audio.stream.read(15 * 1024**2 + 1)
         if len(content) > 15 * 1024**2:
             raise STTError("media_unavailable")
         output = provider.transcribe(content)
+    except KeyboardInterrupt:
+        from backend.app.services.job_lifecycle import stop_reservation
+        stop_reservation(sessions, identifier, token)
+        raise
     except STTError as exc:
         error = str(exc) if str(exc) in MESSAGES else "provider_failed"
     except (MediaNotFound, StorageError):
@@ -130,6 +113,8 @@ def run_once(sessions, media_service, provider):
     except Exception:
         error = "provider_failed"
     with sessions() as db:
+        from backend.app.services.job_lifecycle import bounded
+        bounded(db)
         job = db.scalar(select(Job).where(Job.id == identifier).with_for_update())
         now = db.scalar(select(func.clock_timestamp()))
         if (job is None or job.status != "running" or job.claim_token != token
@@ -145,8 +130,16 @@ def run_once(sessions, media_service, provider):
                 error = "media_unavailable"
             else:
                 try:
+                    from backend.app.services.job_lifecycle import publication_guard
+                    publication_guard(db, job)
                     apply_correction(db, dream, output, job.expected_text_version)
+                    from backend.app.job_rules import content_digest
+                    job.input_snapshot = {**job.input_snapshot, "_output": {
+                        "text_version": dream.text_version,
+                        "text_digest": content_digest(dream.transcript)}}
                 except TextVersionConflict:
+                    error = "text_conflict"
+                except HTTPException:
                     error = "text_conflict"
                 except (ValueError, TypeError):
                     error = "invalid_text"
