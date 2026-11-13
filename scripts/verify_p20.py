@@ -28,6 +28,7 @@ from backend.app.security import new_token, token_digest  # noqa: E402
 from backend.app.services.media import MediaService  # noqa: E402
 from backend.app.storage.local import LocalPrivateStorage  # noqa: E402
 from scripts.p11_inventory import capture  # noqa: E402
+from scripts.test_safety import clean_environment, isolated_environment, probe  # noqa: E402
 
 
 def free_port() -> int:
@@ -60,7 +61,8 @@ def main() -> int:
         password_file.write_text(password, encoding="utf-8")
 
         def run_pg(args, env=None):
-            result = subprocess.run(args, env=env, stdout=subprocess.DEVNULL,
+            result = subprocess.run(args, env=env if env is not None else clean_environment(),
+                                    stdout=subprocess.DEVNULL,
                                     stderr=subprocess.DEVNULL, timeout=90)
             if result.returncode:
                 raise RuntimeError("Opération PostgreSQL temporaire échouée ; détails masqués.")
@@ -76,7 +78,7 @@ def main() -> int:
                     "-o", f"-h 127.0.0.1 -p {db_port}", "-w", "start"])
             started = True
             print("PostgreSQL temporaire démarré.", flush=True)
-            env = os.environ.copy()
+            env = clean_environment()
             env["PGPASSWORD"] = password
             run_pg([str(pg / "createdb.exe"), "-h", "127.0.0.1", "-p", str(db_port),
                     "-U", role, "p20_validation"], env)
@@ -84,11 +86,15 @@ def main() -> int:
                              host="127.0.0.1", port=db_port, database="p20_validation")
             raw_url = url.render_as_string(hide_password=False)
             origin = f"https://127.0.0.1:{web_port}"
+            env = isolated_environment(directory, url)
+            probe(env)
             env.update(DATABASE_URL=raw_url, TEST_DATABASE_URL=raw_url,
                        WEB_ORIGIN=origin, WEB_TEST_URL=origin,
                        PRIVATE_MEDIA_ROOT=str(directory / "private_media"))
             env["EXPORT_TEMP_ROOT"] = str(directory / "exports")
             env["EMOTION_ENABLED"] = "1" if args.emotion_web_test else "0"
+            if args.emotion_web_test:
+                env["P14_FAKE_EMOTION_UI"] = "1"
             result = subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"],
                                     cwd=ROOT, env=env, capture_output=True, timeout=60)
             if result.returncode:

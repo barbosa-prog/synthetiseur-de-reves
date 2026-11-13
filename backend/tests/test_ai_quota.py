@@ -156,6 +156,9 @@ from sqlalchemy.engine import make_url
 from backend.app.database import make_engine, session_factory
 from backend.app.services.job_lifecycle import reserve_job
 from backend.tests.test_job_lifecycle import identity
+from scripts.test_safety import validate_target, probe
+validate_target(os.environ, make_url(os.environ['P12_TEMP_URL']))
+probe(os.environ)
 engine = make_engine(make_url(os.environ['P12_TEMP_URL']))
 try:
     try:
@@ -524,10 +527,9 @@ def test_cli_never_uses_implicit_or_wrong_database(monkeypatch, capsys, args):
 
 
 def test_configuration_is_central_and_cli_requires_explicit_apply(env, monkeypatch, capsys):
-    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://localhost/fictitious")
     monkeypatch.setattr(cli, "make_engine", lambda _: env[0])
     monkeypatch.setattr(sys, "argv", ["quota", "--apply", "--limit", "7",
-                                      "--confirm-database", "fictitious"])
+                                      "--confirm-database", env[0].url.database])
     assert cli.main() == 0
     assert json.loads(capsys.readouterr().out)["execution_limit"] == 7
     with env[2]() as db:

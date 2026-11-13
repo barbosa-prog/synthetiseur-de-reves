@@ -12,10 +12,18 @@ from pathlib import Path
 from sqlalchemy import URL
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from scripts.test_safety import clean_environment, isolated_environment, probe  # noqa: E402
 
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--unit-only", action="store_true")
+    parser.add_argument("--all-tests", action="store_true",
+                        help="Suite hors navigateur et qualification IA, PostgreSQL jetable")
+    parser.add_argument("--business-coverage", action="store_true",
+                        help="Suite isolée et seuil métier obligatoire de 80 %, branches incluses")
     parser.add_argument("--history-only", action="store_true")
     parser.add_argument("--emotion-only", action="store_true")
     parser.add_argument("--emotion-real", action="store_true")
@@ -29,6 +37,20 @@ def main():
     parser.add_argument("--quota-only", action="store_true")
     parser.add_argument("--p12-final", action="store_true")
     args = parser.parse_args()
+    if args.business_coverage:
+        if any(value for key, value in vars(args).items() if key != "business_coverage"):
+            parser.error("--business-coverage doit être utilisé seul")
+        import importlib.util
+
+        for dependency in ("pytest", "pytest_cov", "coverage", "psycopg", "alembic"):
+            if importlib.util.find_spec(dependency) is None:
+                raise SystemExit("Dépendance de test absente : " + dependency)
+    if args.unit_only:
+        with tempfile.TemporaryDirectory(prefix="p14_tests_unit_") as folder:
+            return subprocess.run([
+                sys.executable, "-m", "pytest", "-m", "unit", "-p", "no:cacheprovider",
+                "--basetemp", str(Path(folder) / "pytest"), "--tb=short", "-q",
+            ], cwd=ROOT, env=clean_environment(), timeout=600).returncode
     history_only = args.history_only
     pg = Path(os.getenv("P20_POSTGRES_BIN", r"C:\Program Files\PostgreSQL\17\bin"))
     if not (pg / "initdb.exe").is_file():
@@ -40,7 +62,8 @@ def main():
         password_file.write_text(password, encoding="utf-8")
 
         def run(args, env=None):
-            result = subprocess.run(args, env=env, stdout=subprocess.DEVNULL,
+            result = subprocess.run(args, env=env if env is not None else clean_environment(),
+                                    stdout=subprocess.DEVNULL,
                                     stderr=subprocess.DEVNULL, timeout=90)
             if result.returncode:
                 raise RuntimeError("PostgreSQL temporaire : opération échouée, détails masqués.")
@@ -56,12 +79,13 @@ def main():
             run([str(pg / "pg_ctl.exe"), "-D", str(data), "-l", str(directory / "pg.log"),
                  "-o", f"-h 127.0.0.1 -p {port}", "-w", "start"])
             started = True
-            env = dict(os.environ, PGPASSWORD=password)
+            env = dict(clean_environment(), PGPASSWORD=password)
             run([str(pg / "createdb.exe"), "-h", "127.0.0.1", "-p", str(port),
                  "-U", role, "p07_validation"], env)
             url = URL.create("postgresql+psycopg", username=role, password=password,
                              host="127.0.0.1", port=port, database="p07_validation")
-            env["TEST_DATABASE_URL"] = url.render_as_string(hide_password=False)
+            env = isolated_environment(directory, url)
+            probe(env)
             print("PostgreSQL temporaire démarré ; aucune base personnelle utilisée.", flush=True)
             checks = [
                 "backend/tests/test_history.py", "backend/tests/test_history_rules.py",
@@ -82,7 +106,7 @@ def main():
                           "backend/tests/test_postgresql.py"]
             if args.emotion_real:
                 env["RUN_EMOTION_REAL"] = "1"
-                checks = ["backend/tests/test_emotion_real.py", "-x"]
+                checks = ["backend/tests/test_emotion_real.py", "--allow-real-ai", "-x"]
             if args.export_only:
                 checks = ["backend/tests/test_exports.py", "backend/tests/test_export_zip.py",
                           "backend/tests/test_transcripts.py",
@@ -140,11 +164,33 @@ def main():
                           "backend/tests/test_image_runner.py",
                           "backend/tests/test_emotion_worker.py",
                           "backend/tests/test_job_routes_p11.py", "backend/tests/test_api.py", "-x"]
-            return subprocess.run([
+            if args.all_tests or args.business_coverage:
+                checks = ["backend/tests", "-m", "not browser and not qualification"]
+            if args.business_coverage:
+                reports = ROOT / "tmp/p14-coverage"
+                reports.mkdir(parents=True, exist_ok=True)
+                # Invalider les anciens rapports, sans supprimer de fichier du projet.
+                for name in ("backend.json", "business.json", "backend.xml", "tests.xml"):
+                    (reports / name).write_text("", encoding="utf-8")
+                env["COVERAGE_FILE"] = str(reports / ".coverage")
+                env.pop("COVERAGE_PROCESS_START", None)
+                env.pop("COVERAGE_RCFILE", None)
+                checks += ["--cov=backend.app", "--cov-branch",
+                           f"--cov-config={ROOT / 'pyproject.toml'}", "--cov-report=term",
+                           f"--junitxml={reports / 'tests.xml'}",
+                           f"--cov-report=json:{reports / 'backend.json'}",
+                           f"--cov-report=xml:{reports / 'backend.xml'}"]
+            result = subprocess.run([
                 sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
                 "--basetemp", str(directory / "pytest"), "--tb=short",
                 *checks, "-q",
-            ], env=env, cwd=ROOT, timeout=600).returncode
+            ], env=env, cwd=ROOT, timeout=1200 if args.business_coverage else 600).returncode
+            if result or not args.business_coverage:
+                return result
+            return subprocess.run([
+                sys.executable, str(ROOT / "scripts/business_coverage.py"),
+                str(reports / "backend.json"), "--output", str(reports / "business.json"),
+            ], env=env, cwd=ROOT, timeout=60).returncode
         finally:
             if started:
                 run([str(pg / "pg_ctl.exe"), "-D", str(data), "-m", "fast", "-w", "stop"])

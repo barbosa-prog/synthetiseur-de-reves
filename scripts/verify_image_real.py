@@ -17,6 +17,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from scripts.test_safety import clean_environment  # noqa: E402
+
 FICTIONAL_EMAILS = ("real-owner@example.com", "real-other@example.com")
 
 
@@ -39,16 +41,14 @@ def check_isolation(env, url, directory, base, data, private):
     require(url.database.startswith("p07_real_") and url.username.startswith("real_"),
             "unsafe_database")
     require(make_url(env["DATABASE_URL"]) == url, "environment_database_mismatch")
+    require(make_url(env["TEST_DATABASE_URL"]) == url, "environment_database_mismatch")
     require(Path(env["PRIVATE_MEDIA_ROOT"]).resolve() == private.resolve(),
             "environment_storage_mismatch")
 
 
 def isolated_environment(url, private, runtime, receipt):
     """Ne modifie pas os.environ ; aucune cible PostgreSQL héritée n'est réutilisée."""
-    env = {key: value for key, value in os.environ.items()
-           if not key.upper().startswith("PG")
-           and key not in {"DATABASE_URL", "TEST_DATABASE_URL", "PRIVATE_MEDIA_ROOT",
-                           "IMAGE_MODEL_PATH", "IMAGE_RECEIPT_PATH"}}
+    env = clean_environment()
     env.update(DATABASE_URL=url.render_as_string(hide_password=False),
                TEST_DATABASE_URL=url.render_as_string(hide_password=False),
                PRIVATE_MEDIA_ROOT=str(private), IMAGE_MODEL_PATH=str(runtime/"model"),

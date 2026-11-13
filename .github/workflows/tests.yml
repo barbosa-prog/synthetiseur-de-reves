@@ -1,0 +1,82 @@
+name: P14 - Tests et couverture metier
+
+"on":
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p14-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Windows - PostgreSQL 17 - Python 3.12
+    runs-on: windows-2025
+    timeout-minutes: 35
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      CI: "true"
+      PYTHON_DOTENV_DISABLED: "1"
+      PYTHONUTF8: "1"
+      EMOTION_ENABLED: "0"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      HF_HUB_DISABLE_IMPLICIT_TOKEN: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+    steps:
+      - name: Checkout sans identifiants persistants
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Python 3.12
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.12"
+      - name: Prerequis natifs - aucun service existant utilise
+        run: |
+          if (Test-Path -LiteralPath .env) { throw "Fichier .env interdit en CI" }
+          $pg = Join-Path $env:ProgramFiles 'PostgreSQL\17\bin'
+          foreach ($tool in @('initdb.exe', 'pg_ctl.exe', 'createdb.exe')) {
+            if (!(Test-Path -LiteralPath (Join-Path $pg $tool))) { throw "PostgreSQL 17 absent" }
+          }
+          $version = & (Join-Path $pg 'initdb.exe') --version
+          if ($LASTEXITCODE -ne 0 -or $version -notmatch '\b17\.') { throw "Version PostgreSQL incorrecte" }
+          if (!(Test-Path -LiteralPath 'C:\Program Files\Google\Chrome\Application\chrome.exe')) {
+            throw "Chrome obligatoire absent"
+          }
+          "P20_POSTGRES_BIN=$pg" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Dependances de developpement uniquement - aucun moteur IA
+        run: 'python -m pip install --only-binary=:all: -r requirements-dev.txt'
+      - name: Coherence des dependances
+        run: python -m pip check
+      - name: Ruff
+        run: python -m ruff check backend scripts
+      - name: Compilation Python
+        run: python -m compileall -q backend scripts
+      - name: Pytest - PostgreSQL jetable - couverture metier >= 80
+        run: python scripts/verify_image_jobs.py --business-coverage
+      - name: Chrome - bureau et mobile - donnees fictives et moteurs simules
+        run: python scripts/verify_p20.py --browser-only --emotion-web-test
+      - name: Resume de couverture associe au commit teste
+        run: python scripts/ci_report.py
+      - name: Rapports autorises uniquement
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: p14-tests-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            tmp/p14-coverage/backend.json
+            tmp/p14-coverage/backend.xml
+            tmp/p14-coverage/business.json
+            tmp/p14-coverage/ci-summary.json
+            tmp/p14-coverage/ci-summary.md

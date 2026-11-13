@@ -2,6 +2,8 @@
 testpaths = ["backend/tests"]
 addopts = "-ra"
 markers = [
+    "unit: sans connexion PostgreSQL ni moteur IA réel",
+    "qualification: moteur IA réel, option --allow-real-ai obligatoire",
     "integration: exige TEST_DATABASE_URL vers PostgreSQL local jetable",
     "browser: exige WEB_TEST_URL vers un serveur HTTPS de test et Chrome ou Edge installé",
 ]
@@ -9,6 +11,13 @@ markers = [
 [tool.ruff]
 target-version = "py312"
 line-length = 100
+
+[tool.coverage.run]
+branch = true
+source = ["backend.app"]
+
+[tool.coverage.report]
+precision = 2
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]

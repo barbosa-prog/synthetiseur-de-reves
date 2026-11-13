@@ -1397,3 +1397,50 @@ des données ou jetons réels. Aucun asset tiers n'est téléchargé par cette l
 La migration additive **0010** est nécessaire au quota. La recette P12 utilise
 uniquement PostgreSQL temporaire ; la sauvegarde, la migration personnelle, le
 commit et la clôture Jira restent des opérations humaines distinctes.
+
+## P14 — Tests isolés (phase 2)
+
+La procédure actuelle est décrite dans [docs/p14-phase2.md](docs/p14-phase2.md).
+Les commandes suivantes créent leurs propres ressources temporaires et ne lisent
+pas le `.env` personnel pour choisir une base :
+
+```powershell
+.\.venv\Scripts\python.exe scripts\verify_image_jobs.py --unit-only
+.\.venv\Scripts\python.exe scripts\verify_image_jobs.py --all-tests
+.\.venv\Scripts\python.exe scripts\verify_p20.py --browser-only --emotion-web-test
+```
+
+Les tests PostgreSQL lancés directement sans autorisation temporaire échouent
+de façon sûre ; localhost seul ne suffit plus. Ne pas renseigner `dreams_local`
+comme cible. Les qualifications IA réelles restent séparées et désactivées par
+défaut. Les seuils de couverture et la CI ne sont pas modifiés dans cette phase.
+
+## P14 — Couverture métier obligatoire (phase 3)
+
+```powershell
+.\.venv\Scripts\python.exe scripts\verify_image_jobs.py --business-coverage
+```
+
+Cette recette crée un PostgreSQL jetable avec les protections P14, exécute les
+tests hors navigateur et qualification IA, mesure instructions **et branches**
+du backend et impose **80 % minimum** sur leur taux combiné dans les corps des
+fonctions métier. Un échec de test, un rapport incomplet ou un seuil non atteint
+rend la commande non réussie. Aucun moteur réel ni base personnelle utilisé.
+
+Le périmètre inclut services, règles, sécurité, stockage et orchestration IA,
+y compris les workers peu couverts. Rapports détaillés dans `tmp/p14-coverage/`
+(ignoré par Git). Voir [périmètre, formule et limites](docs/p14-phase3.md).
+La couverture n'est pas un pourcentage de fonctions intégralement testées.
+GitHub Actions reste réservé à la phase suivante.
+
+## P14 — GitHub Actions (phase 4)
+
+Le workflow [tests.yml](.github/workflows/tests.yml) vérifie Ruff, compilation,
+pytest/PostgreSQL jetable, couverture métier >= 80 % et Chrome avec moteurs
+simulés sur un unique runner Windows Server 2025. Il s'exécute sur PR vers
+`main`, push sur `main` et déclenchement manuel, avec `contents: read`.
+
+Seuls les rapports autorisés sont publiés, associés au commit, pendant 7 jours.
+Aucune base personnelle, secret de production, modèle IA ou service Docker
+utilisé. Voir [fonctionnement et première validation GitHub](docs/p14-phase4.md).
+Le premier résultat distant reste à vérifier après votre commit/push.

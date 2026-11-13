@@ -3,6 +3,7 @@
 import json
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -11,12 +12,7 @@ from backend.app.emotion_config import parameters
 
 
 def test_preflight_failure_exits_cleanly_with_parent_pipe_open():
-    python = (
-        Path(os.environ["LOCALAPPDATA"])
-        / "SynthetiseurDeReves/qualification/p08/.venv/Scripts/python.exe"
-    )
-    if not python.is_file():
-        pytest.skip("Venv CPU absent")
+    python = sys.executable  # psutil de requirements-dev ; aucun environnement IA requis.
     bridge = Path(__file__).resolve().parents[2] / "scripts/emotion_cpu_bridge.py"
     config = {**parameters(), "initial_free_mib": 999999}
     with subprocess.Popen(
@@ -34,12 +30,7 @@ def test_preflight_failure_exits_cleanly_with_parent_pipe_open():
 
 @pytest.mark.parametrize("interrupted", [False, True])
 def test_bridge_timeout_or_parent_eof_cleans_child(tmp_path, interrupted):
-    python = (
-        Path(os.environ["LOCALAPPDATA"])
-        / "SynthetiseurDeReves/qualification/p08/.venv/Scripts/python.exe"
-    )
-    if not python.is_file():
-        pytest.skip("Venv CPU de qualification absent")
+    python = sys.executable
     child = tmp_path / "synthetic.py"
     child.write_text("import sys,time\nsys.stdin.readline()\ntime.sleep(20)\n", encoding="utf-8")
     wrapper = tmp_path / "bridge_test.py"
