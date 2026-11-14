@@ -66,6 +66,8 @@ jobs:
         run: python scripts/verify_image_jobs.py --business-coverage
       - name: Chrome - bureau et mobile - donnees fictives et moteurs simules
         run: python scripts/verify_p20.py --browser-only --emotion-web-test
+      - name: P16 - parcours continu Chrome - sept etapes et purge
+        run: python scripts/verify_p20.py --p16-demo
       - name: Resume de couverture associe au commit teste
         run: python scripts/ci_report.py
       - name: Rapports autorises uniquement
@@ -80,3 +82,19 @@ jobs:
             tmp/p14-coverage/business.json
             tmp/p14-coverage/ci-summary.json
             tmp/p14-coverage/ci-summary.md
+      - name: P16 - preuves fictives autorisees uniquement
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: p16-demo-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            tmp/p16-demo/run-*/01-audio-fictif.png
+            tmp/p16-demo/run-*/02-transcription-simulee.png
+            tmp/p16-demo/run-*/03-recit-corrige.png
+            tmp/p16-demo/run-*/04-image-simulee.png
+            tmp/p16-demo/run-*/05-emotion-acceptee.png
+            tmp/p16-demo/run-*/06-historique.png
+            tmp/p16-demo/run-*/07-suppression-confirmation.png
+            tmp/p16-demo/run-*/08-historique-apres-purge.png
+            tmp/p16-demo/run-*/result.json

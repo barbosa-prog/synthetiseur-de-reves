@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "result": "passed",
+  "steps_completed": 7,
+  "captured_at_utc": "2026-11-14T07:28:12.706192+00:00",
+  "audio": "chrome-synthetic-device",
+  "ai": "simulated-only",
+  "tls": "p14-test-context-exception-not-a-trust-validation",
+  "same_session": true,
+  "same_dream": true,
+  "text_version": 2,
+  "successful_jobs": 3,
+  "removed_media": 2,
+  "physical_purge": true,
+  "retained_account": true,
+  "retained_session": true,
+  "retained_quota_events": 3,
+  "screenshots": [
+    {
+      "file": "01-audio-fictif.png",
+      "sha256": "9e66f240d9e2df25b4789fc914192c13e9e346b52d684b7a4f83852fe387df5a",
+      "width": 1280,
+      "height": 1071
+    },
+    {
+      "file": "02-transcription-simulee.png",
+      "sha256": "3ed3df6a199a11943eaa011557ea489bd0125b9757c4561cd9e4648a7cf085d2",
+      "width": 1280,
+      "height": 1402
+    },
+    {
+      "file": "03-recit-corrige.png",
+      "sha256": "4308bc0a2d1b4dba8ef3189a381a66308d7604deb7c70e0f859f965fea070ee3",
+      "width": 1280,
+      "height": 1480
+    },
+    {
+      "file": "04-image-simulee.png",
+      "sha256": "cd502e8b0aef63a609e5005294955467d9c6d17e52f3404295e08a085a6ed5bb",
+      "width": 1280,
+      "height": 2255
+    },
+    {
+      "file": "05-emotion-acceptee.png",
+      "sha256": "2250032ef7907da157c59a9539a4bd4bda418c91b26c1af0cd7fb750a4f43d1b",
+      "width": 1280,
+      "height": 1698
+    },
+    {
+      "file": "06-historique.png",
+      "sha256": "44ab414adf86944fb485d37b8ccfc3085c5722035d860bd7b1c167f503ac3eb3",
+      "width": 1280,
+      "height": 960
+    },
+    {
+      "file": "07-suppression-confirmation.png",
+      "sha256": "0d3b1a716d747cda36c881db698cb9077ddef31f2676d478c3897ce9d25b2eb1",
+      "width": 1280,
+      "height": 960
+    },
+    {
+      "file": "08-historique-apres-purge.png",
+      "sha256": "42d3bb3435c34c7c13cbe745628ea914a5e1439567e49142e98a1b9980a84c88",
+      "width": 1280,
+      "height": 960
+    }
+  ]
+}

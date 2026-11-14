@@ -61,6 +61,25 @@ def test_artifact_allowlist_contains_only_reports():
     assert "if" not in upload  # Publication seulement si toutes les étapes réussissent.
 
 
+def test_p16_recipe_is_required_and_only_safe_evidence_is_uploaded():
+    steps = workflow()["jobs"]["tests"]["steps"]
+    recipe = next(step for step in steps if "--p16-demo" in step.get("run", ""))
+    assert recipe["run"] == "python scripts/verify_p20.py --p16-demo"
+    assert "if" not in recipe and not recipe.get("continue-on-error")
+    upload = next(step for step in steps if step.get("with", {}).get("name", "").startswith(
+        "p16-demo-"))
+    filenames = {
+        "01-audio-fictif.png", "02-transcription-simulee.png", "03-recit-corrige.png",
+        "04-image-simulee.png", "05-emotion-acceptee.png", "06-historique.png",
+        "07-suppression-confirmation.png", "08-historique-apres-purge.png", "result.json",
+    }
+    assert set(upload["with"]["path"].split()) == {
+        "tmp/p16-demo/run-*/" + filename for filename in filenames}
+    assert upload["with"]["if-no-files-found"] == "error"
+    assert upload["with"]["retention-days"] == 7
+    assert "if" not in upload
+
+
 @pytest.fixture
 def reports(tmp_path):
     (tmp_path / "business.json").write_text(json.dumps({

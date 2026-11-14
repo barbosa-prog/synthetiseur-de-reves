@@ -49,7 +49,11 @@ def main() -> int:
                         help="Recette intégrée P10 sur la base temporaire fraîche")
     parser.add_argument("--p11-browser", action="store_true",
                         help="Parcours Chrome P11 uniquement, sans fournisseur réel")
+    parser.add_argument("--p16-demo", action="store_true",
+                        help="Parcours continu P16 et captures, fournisseurs fictifs uniquement")
     args = parser.parse_args()
+    if args.p16_demo and (args.p10_final or args.p11_browser):
+        parser.error("--p16-demo ne se combine pas avec les autres recettes ciblées")
     pg = Path(os.getenv("P20_POSTGRES_BIN", r"C:\Program Files\PostgreSQL\17\bin"))
     if not (pg / "initdb.exe").is_file():
         raise SystemExit("PostgreSQL natif absent : configurer P20_POSTGRES_BIN.")
@@ -90,8 +94,8 @@ def main() -> int:
                        WEB_ORIGIN=origin, WEB_TEST_URL=origin,
                        PRIVATE_MEDIA_ROOT=str(directory / "private_media"))
             env["EXPORT_TEMP_ROOT"] = str(directory / "exports")
-            env["EMOTION_ENABLED"] = "1" if args.emotion_web_test else "0"
-            if args.emotion_web_test:
+            env["EMOTION_ENABLED"] = "1" if args.emotion_web_test or args.p16_demo else "0"
+            if args.emotion_web_test or args.p16_demo:
                 env["P14_FAKE_EMOTION_UI"] = "1"
             result = subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"],
                                     cwd=ROOT, env=env, capture_output=True, timeout=60)
@@ -126,6 +130,8 @@ def main() -> int:
                 checks = ["backend/tests/p10_final_recipe.py", "-x"]
             if args.p11_browser:
                 checks = ["backend/tests/test_job_tracking_browser.py", "-x"]
+            if args.p16_demo:
+                checks = ["backend/tests/p16_demo_recipe.py", "-x"]
             result = subprocess.run([
                 sys.executable, "-m", "pytest", "-p", "no:cacheprovider",
                 "--basetemp", str(directory / "pytest"), "--tb=short",

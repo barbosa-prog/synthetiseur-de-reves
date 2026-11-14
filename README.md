@@ -1,5 +1,20 @@
 # Synthétiseur de rêves
 
+## P16 — Parcours continu de démonstration
+
+La [recette P16 et ses huit captures](docs/p16-demo.md) enchaînent dans une seule
+session Chrome : audio synthétique, transcription simulée, correction, image
+fictive, émotion acceptée, historique, suppression et purge physique explicite.
+
+```powershell
+.\.venv\Scripts\python.exe scripts\verify_p20.py --p16-demo
+```
+
+PostgreSQL et HTTPS sont temporaires ; aucun `.env` personnel ni moteur IA réel
+n'est utilisé. L'exception de certificat est limitée au contexte de test P14 ;
+elle ne constitue pas une validation de la confiance TLS. Voir les prérequis P15
+ci-dessous et les [résultats et limites P16](docs/p16-demo.md).
+
 ## P15 — Installation et démonstration locale de référence
 
 **Architecture validée pour ce ticket : PostgreSQL 17 → FastAPI → interface
