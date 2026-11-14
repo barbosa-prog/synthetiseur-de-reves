@@ -1,5 +1,13 @@
 # Synthétiseur de rêves
 
+## P18 — Piste sonore ou synthèse vocale : étude et report
+
+L'[étude de faisabilité US10](docs/p18-audio-faisabilite.md) compare une piste
+locale sous licence vérifiée et plusieurs solutions de synthèse vocale.
+**L'implémentation est reportée** : elle est optionnelle et ne bloque pas la
+démonstration principale. Aucun lecteur supplémentaire, modèle ou service payant
+n'est ajouté ; la relecture de l'audio existant reste disponible.
+
 ## P17 — Performances mesurées et coûts
 
 La [campagne P17](docs/p17-performance-couts.md) mesure p50/p95 sur 30 essais STT
