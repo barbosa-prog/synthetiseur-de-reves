@@ -94,6 +94,20 @@ def reports(tmp_path):
     return tmp_path
 
 
+def test_p17_campaign_and_artifacts_are_required_and_bounded():
+    steps = workflow()["jobs"]["tests"]["steps"]
+    campaign = next(step for step in steps if "--p17-performance" in step.get("run", ""))
+    assert campaign["run"] == "python scripts/verify_image_jobs.py --p17-performance"
+    assert "if" not in campaign and not campaign.get("continue-on-error")
+    upload = next(step for step in steps if step.get("with", {}).get("name", "").startswith(
+        "p17-performance-"))
+    assert set(upload["with"]["path"].split()) == {
+        "tmp/p17-performance/run-*/measurements.json", "tmp/p17-performance/run-*/latencies.jsonl"}
+    assert upload["with"]["retention-days"] == 7
+    assert upload["with"]["if-no-files-found"] == "error"
+    assert "if" not in upload
+
+
 def test_summary_is_bound_to_commit_without_test_payload(reports):
     markdown = render(reports, "a" * 40)
     assert "a" * 40 in markdown

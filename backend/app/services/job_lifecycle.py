@@ -285,11 +285,15 @@ def reserve_job(sessions, owner, job_id, *, engine, token, policy=rules.Policy()
             meta = db.get(DreamEmotion, dream.id) if job.kind == "emotion" else None
             updated = rules.reserve(before, db.scalar(select(func.clock_timestamp())), token,
                 inputs=identity, choice_revision=meta.revision if meta else None, policy=policy)
-            ai_quota.admit(db, owner, job, token,
-                           job.attempts + updated.attempts - before.attempts)
+            admitted_at = ai_quota.admit(db, owner, job, token,
+                                        job.attempts + updated.attempts - before.attempts)
+            queue_seconds = (admitted_at - job.queued_at).total_seconds()
             job.attempts += updated.attempts - before.attempts
             job.status, job.claim_token, job.lease_until = "running", token, updated.lease_until
             db.commit()
+            if job.kind in {"stt", "image"} and queue_seconds >= 0:
+                from backend.app.latency import emit
+                emit(job.kind, "queue", queue_seconds, "admitted")
             return token
         except (SQLAlchemyError, rules.JobRuleError, HTTPException, ValidationError) as exc:
             db.rollback()

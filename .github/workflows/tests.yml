@@ -68,6 +68,8 @@ jobs:
         run: python scripts/verify_p20.py --browser-only --emotion-web-test
       - name: P16 - parcours continu Chrome - sept etapes et purge
         run: python scripts/verify_p20.py --p16-demo
+      - name: P17 - mesures locales - fournisseurs simules uniquement
+        run: python scripts/verify_image_jobs.py --p17-performance
       - name: Resume de couverture associe au commit teste
         run: python scripts/ci_report.py
       - name: Rapports autorises uniquement
@@ -98,3 +100,12 @@ jobs:
             tmp/p16-demo/run-*/07-suppression-confirmation.png
             tmp/p16-demo/run-*/08-historique-apres-purge.png
             tmp/p16-demo/run-*/result.json
+      - name: P17 - mesures sans contenu autorisees uniquement
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: p17-performance-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            tmp/p17-performance/run-*/measurements.json
+            tmp/p17-performance/run-*/latencies.jsonl

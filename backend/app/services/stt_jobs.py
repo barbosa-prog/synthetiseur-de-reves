@@ -4,6 +4,7 @@
 from fastapi import HTTPException
 from sqlalchemy import func, select
 
+from backend.app.latency import provider_latency, worker_latency
 from backend.app.models import Dream, Job, Media
 from backend.app.services.media import MediaNotFound
 from backend.app.services.transcripts import TextVersionConflict, apply_correction
@@ -70,6 +71,7 @@ def claim(sessions, timeout):
 
 
 
+@worker_latency("stt")
 def run_once(sessions, media_service, provider):
     """Un appel fournisseur hors transaction ; résultat publié seulement avec le bail courant."""
     reservation = claim(sessions, provider.timeout)
@@ -101,7 +103,8 @@ def run_once(sessions, media_service, provider):
             content = audio.stream.read(15 * 1024**2 + 1)
         if len(content) > 15 * 1024**2:
             raise STTError("media_unavailable")
-        output = provider.transcribe(content)
+        with provider_latency("stt"):
+            output = provider.transcribe(content)
     except KeyboardInterrupt:
         from backend.app.services.job_lifecycle import stop_reservation
         stop_reservation(sessions, identifier, token)

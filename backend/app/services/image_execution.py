@@ -7,6 +7,7 @@ from sqlalchemy import func, select
 
 from backend.app.image_provider import ImageError, ImageRequest, validate_result
 from backend.app.image_worker import ImageTask, prepare_image
+from backend.app.latency import worker_latency
 from backend.app.models import ImageDescription, ImageGeneration, Job, Media
 from backend.app.services import image_jobs
 from backend.app.services.media import lock_key
@@ -76,6 +77,7 @@ def current_image(db, user_id, dream_id):
         ).order_by(Job.finished_at.desc(), Job.id.desc()).limit(1))
 
 
+@worker_latency("image")
 def run_once(sessions, storage, provider):
     """L'appelant détient le verrou GPU OS pendant claim/calcul/publication."""
     reservation = image_jobs.claim(sessions)

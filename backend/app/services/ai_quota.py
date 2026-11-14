@@ -59,6 +59,7 @@ def admit(db, owner, job, token, attempt):
     admitted_at = check(db, owner)
     db.add(AIExecution(user_id=owner, job_id=job.id, kind=job.kind, attempt=attempt,
                        reservation_token=token, admitted_at=admitted_at))
+    return admitted_at
 
 
 def verify_admission(db, owner, job):

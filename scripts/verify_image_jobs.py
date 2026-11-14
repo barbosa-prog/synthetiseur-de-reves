@@ -21,6 +21,8 @@ from scripts.test_safety import clean_environment, isolated_environment, probe  
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--unit-only", action="store_true")
+    parser.add_argument("--p17-performance", action="store_true",
+                        help="P17 : 30 essais STT/image simules, mesures sans contenu")
     parser.add_argument("--all-tests", action="store_true",
                         help="Suite hors navigateur et qualification IA, PostgreSQL jetable")
     parser.add_argument("--business-coverage", action="store_true",
@@ -40,6 +42,9 @@ def main():
     parser.add_argument("--quota-only", action="store_true")
     parser.add_argument("--p12-final", action="store_true")
     args = parser.parse_args()
+    if args.p17_performance and any(value for key, value in vars(args).items()
+                                    if key != "p17_performance"):
+        parser.error("--p17-performance doit etre utilise seul")
     if args.business_coverage:
         if any(value for key, value in vars(args).items() if key != "business_coverage"):
             parser.error("--business-coverage doit être utilisé seul")
@@ -168,6 +173,8 @@ def main():
                           "backend/tests/test_image_runner.py",
                           "backend/tests/test_emotion_worker.py",
                           "backend/tests/test_job_routes_p11.py", "backend/tests/test_api.py", "-x"]
+            if args.p17_performance:
+                checks = ["backend/tests/p17_performance_recipe.py", "-x"]
             if args.all_tests or args.business_coverage:
                 checks = ["backend/tests", "-m", "not browser and not qualification"]
             if args.business_coverage:

@@ -6,6 +6,7 @@ from pathlib import Path
 from uuid import UUID
 
 from backend.app.image_provider import ImageError, ImageProvider, ImageRequest, validate_result
+from backend.app.latency import provider_latency
 
 
 @dataclass(frozen=True)
@@ -29,7 +30,9 @@ def prepare_image(task: ImageTask, provider: ImageProvider,
     if not is_current(task):
         raise ImageError("text_conflict")
     try:
-        result = validate_result(provider.generate(task.request), task.request)
+        with provider_latency("image"):
+            generated = provider.generate(task.request)
+        result = validate_result(generated, task.request)
     except ImageError:
         raise
     except Exception:

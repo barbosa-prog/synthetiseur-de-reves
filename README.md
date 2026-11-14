@@ -1,5 +1,18 @@
 # Synthétiseur de rêves
 
+## P17 — Performances mesurées et coûts
+
+La [campagne P17](docs/p17-performance-couts.md) mesure p50/p95 sur 30 essais STT
+et 30 essais image **simulés**, avec PostgreSQL réel jetable, journaux de durées
+sans contenu et quota de 20 admissions par compte sur 24 heures conservé.
+
+```powershell
+.\.venv\Scripts\python.exe scripts\verify_image_jobs.py --p17-performance
+```
+
+Dépenses externes de cette recette : **0 €**. Ces mesures caractérisent les faux
+fournisseurs et l'orchestration locale, pas les performances des modèles IA.
+
 ## P16 — Parcours continu de démonstration
 
 La [recette P16 et ses huit captures](docs/p16-demo.md) enchaînent dans une seule
