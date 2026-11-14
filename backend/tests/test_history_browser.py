@@ -95,8 +95,8 @@ def test_history_journey_and_mobile_without_ai():
             page.locator(f'article[data-dream-id="{dream_id}"]').get_by_role(
                 "link", name="Ouvrir le rêve").click()
             expect(page.locator("#current-image-panel")).to_be_visible()
-            page.wait_for_function(
-                "() => document.querySelector('#current-dream-image').naturalWidth === 512")
+            expect(page.locator("#current-dream-image")).to_have_js_property("naturalWidth", 512)
+            expect(page.locator("#current-dream-image")).to_have_js_property("complete", True)
             page.screenshot(path=str(screenshots/"detail-mobile-fictitious.png"), full_page=True)
             assert page.locator("html").evaluate("el => el.scrollWidth <= innerWidth")
             with sessions() as db:
